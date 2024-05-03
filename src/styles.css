@@ -4,8 +4,7 @@
 
 @layer base {
   body {
-    @apply antialiased;
-    color: #11181c;
+    @apply antialiased text-sm text-default-800;
   }
 }
 

@@ -3,7 +3,9 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": ["main"],
+  "platforms": ["linux", "macOS", "windows"],
   "permissions": [
+    "fs:default",
     "path:default",
     "event:default",
     "window:default",
@@ -12,6 +14,8 @@
     "resources:default",
     "menu:default",
     "tray:default",
+    "dialog:allow-open",
+    "dialog:allow-message",
     "shell:allow-open"
   ]
 }

@@ -1,27 +1,31 @@
-import { useState } from 'react'
-import { invoke } from '@tauri-apps/api/core'
-import { Button } from '@nextui-org/button'
-import { Input } from '@nextui-org/input'
-import { TAURI_COMMAND } from '@/const'
-import { useTranslation } from 'react-i18next'
+import { useFiles } from '@/hooks'
+import SelectFolder from '@/components/SelectFolder.tsx'
+import DropArea from '@/components/DropArea.tsx'
+import FilesTable from '@/components/FilesTable.tsx'
 
 function App() {
-  const { t } = useTranslation()
-  const [name, setName] = useState('')
-  const [greetMsg, setGreetMsg] = useState('')
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke(TAURI_COMMAND.GREET, { name }))
-  }
+  const { dirPath, isDragging, files, selectFolder } = useFiles()
+  const hasFiles = files.length > 0
 
   return (
-    <div className="h-[100vh]">
-      <div className="flex">
-        <Input value={name} onValueChange={setName} />
-        <Button onClick={greet}>{t('Select Folder')}</Button>
+    <div className="flex h-[100vh] flex-col p-5">
+      <SelectFolder className="mb-4 h-8 shrink-0" dirPath={dirPath} onClick={selectFolder} />
+
+      {/* files and selected file */}
+      <div className="relative flex h-full">
+        {hasFiles ? (
+          // (5 * 2 + 8 + 4 + 4 + 32) * 4 = 232
+          <>
+            <div className="absolute left-4 right-4 top-0 z-10 h-4 bg-white"></div>
+            <FilesTable className="h-[calc(100vh-232px)]" files={files} />
+          </>
+        ) : (
+          <DropArea className="h-full w-full" isDragging={isDragging} />
+        )}
       </div>
-      {greetMsg}
+
+      {/* operation */}
+      {hasFiles && <div className="mt-4 h-32 shrink-0 border">operation</div>}
     </div>
   )
 }

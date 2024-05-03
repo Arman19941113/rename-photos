@@ -1,3 +1,3 @@
 export const enum TAURI_COMMAND {
-  GREET = 'greet',
+  READ_DIR = 'read_dir',
 }
