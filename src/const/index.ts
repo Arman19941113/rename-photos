@@ -1,3 +1,3 @@
 export const enum TAURI_COMMAND {
-  READ_DIR = 'read_dir',
+  GET_FILES_FROM_DIR = 'get_files_from_dir',
 }

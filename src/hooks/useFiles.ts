@@ -55,7 +55,7 @@ export function useFiles() {
     if (!dirPath) return
 
     try {
-      const res = (await invoke(TAURI_COMMAND.READ_DIR, { dirPath })) as Array<{
+      const res = (await invoke(TAURI_COMMAND.GET_FILES_FROM_DIR, { dirPath })) as Array<{
         pathname: string
         filename: string
         modified: number
