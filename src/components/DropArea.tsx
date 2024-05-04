@@ -10,7 +10,7 @@ function DropArea({ className, isDragging }: { className?: string; isDragging: b
       className={clsx(
         className,
         'flex-center rounded-3xl border-2 border-dashed',
-        isDragging ? 'border-primary-400' : 'border-default-400',
+        isDragging ? 'border-pink-400' : 'border-default-400',
       )}
     >
       <p className="text-lg text-default-500">{t('Drop Files')}</p>

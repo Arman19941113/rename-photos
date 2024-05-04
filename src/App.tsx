@@ -1,6 +1,8 @@
+import { AnimatePresence } from 'framer-motion'
 import { useFiles } from '@/hooks'
 import SelectFolder from '@/components/SelectFolder.tsx'
 import DropArea from '@/components/DropArea.tsx'
+import DropModal from '@/components/DropModal.tsx'
 import FilesTable from '@/components/FilesTable.tsx'
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
 
       {/* operation */}
       {hasFiles && <div className="mt-4 h-32 shrink-0 border">operation</div>}
+
+      <AnimatePresence>{hasFiles && isDragging && DropModal()}</AnimatePresence>
     </div>
   )
 }
