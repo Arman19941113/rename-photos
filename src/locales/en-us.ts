@@ -5,8 +5,9 @@ export default {
 
   // business
   'Select Folder': 'Select Folder',
-  'Select Folder Error': 'Select Folder Error',
+  'Read Folder Error': 'Read Folder Error',
   'Drop Files': 'Drop Files',
+  'Read Files Error': 'Read Files Error',
   Filename: 'Name',
   Modified: 'Modified',
 }

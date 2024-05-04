@@ -7,12 +7,12 @@ function FilesTable({ className, files }: { className?: string; files: FileInfo[
 
   return (
     <Table
-      selectionMode="single"
-      isHeaderSticky
-      classNames={{ wrapper: className }}
       isCompact
-      color="primary"
+      isHeaderSticky
       aria-label="table"
+      color="primary"
+      selectionMode="single"
+      classNames={{ wrapper: className }}
     >
       <TableHeader>
         <TableColumn>{t('Filename')}</TableColumn>

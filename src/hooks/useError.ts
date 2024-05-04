@@ -19,7 +19,7 @@ export function useError() {
       title: title || t('System Error'),
       kind: 'error',
       okLabel: okLabel || t('Ok'),
-    }).catch()
+    }).catch(() => {})
   }
 
   return {

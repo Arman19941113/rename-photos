@@ -1,6 +1,6 @@
 use std::fs;
-use std::time::UNIX_EPOCH;
 
+use crate::file_lib;
 use crate::file_lib::FileUtil;
 
 #[derive(serde::Serialize)]
@@ -28,17 +28,35 @@ pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<FileInfo>, String> {
     if FileUtil::check_is_hidden(pathname) { continue; }
     if FileUtil::check_is_system_file(pathname) { continue; }
 
-    let filename = path_buf.file_name().unwrap().to_str().unwrap();
-    let modified = metadata.modified().map_err(|err| err.to_string())?;
-    let duration = modified.duration_since(UNIX_EPOCH).map_err(|err| err.to_string())?;
     files.push(FileInfo {
       pathname: pathname.to_string(),
-      filename: filename.to_string(),
-      modified: duration.as_millis(),
+      filename: path_buf.file_name().unwrap().to_str().unwrap().to_string(),
+      modified: file_lib::get_modified_time(metadata),
     })
   }
 
   Ok(files)
 }
 
+#[tauri::command]
+pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<FileInfo>, String> {
+  let mut files: Vec<FileInfo> = Vec::new();
 
+  for pathname in paths {
+    let metadata = fs::metadata(pathname).map_err(|err| err.to_string())?;
+    // jump dir
+    if !metadata.is_file() { continue; }
+    // jump invalid file
+    if FileUtil::check_is_symlink(pathname) { continue; }
+    if FileUtil::check_is_hidden(pathname) { continue; }
+    if FileUtil::check_is_system_file(pathname) { continue; }
+
+    files.push(FileInfo {
+      pathname: pathname.to_string(),
+      filename: FileUtil::get_filename(pathname),
+      modified: file_lib::get_modified_time(metadata),
+    })
+  }
+
+  Ok(files)
+}

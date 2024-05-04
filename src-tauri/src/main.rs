@@ -11,6 +11,7 @@ fn main() {
     .plugin(tauri_plugin_dialog::init())
     .invoke_handler(tauri::generate_handler![
       files_api::get_files_from_dir,
+      files_api::get_files_from_paths,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

@@ -22,3 +22,8 @@ export function formatDate(val: Date | string | number, fmt = 'YYYY-mm-dd HH:MM:
   }
   return fmt
 }
+
+export function getDirPath(filePath: string) {
+  const pathParts = filePath.split('/')
+  return pathParts.slice(0, -1).join('/')
+}

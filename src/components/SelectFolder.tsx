@@ -19,7 +19,7 @@ export default function SelectFolder({
       <Button
         radius="sm"
         size="sm"
-        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white !outline-0"
+        className="select-none bg-gradient-to-tr from-pink-500 to-yellow-500 text-white !outline-0"
         onClick={onClick}
       >
         {t('Select Folder')}
