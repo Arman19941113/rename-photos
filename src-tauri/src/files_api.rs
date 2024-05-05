@@ -19,7 +19,7 @@ pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<FileInfo>, String> {
     let dir_entry = dir_entry.map_err(|err| err.to_string())?;
     let metadata = dir_entry.metadata().map_err(|err| err.to_string())?;
     // jump dir
-    if !metadata.is_file() { continue; }
+    if metadata.is_dir() { continue; }
 
     let path_buf = dir_entry.path();
     let pathname = path_buf.to_str().unwrap();
@@ -40,12 +40,22 @@ pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<FileInfo>, String> {
 
 #[tauri::command]
 pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<FileInfo>, String> {
+  // drop 1 folder
+  if paths.len() == 1 {
+    let pathname = paths[0];
+    let metadata = fs::metadata(pathname).map_err(|err| err.to_string())?;
+    if metadata.is_dir() {
+      return get_files_from_dir(pathname);
+    }
+  }
+
+  // drop multiple files and folders
   let mut files: Vec<FileInfo> = Vec::new();
 
   for pathname in paths {
     let metadata = fs::metadata(pathname).map_err(|err| err.to_string())?;
     // jump dir
-    if !metadata.is_file() { continue; }
+    if metadata.is_dir() { continue; }
     // jump invalid file
     if FileUtil::check_is_symlink(pathname) { continue; }
     if FileUtil::check_is_hidden(pathname) { continue; }
