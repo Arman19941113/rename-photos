@@ -17,13 +17,12 @@ function App() {
       <div className="relative flex h-full">
         {hasFiles ? (
           // (5 * 2 + 8 + 4 + 4 + 32) * 4 = 232
-          <>
-            <div className="absolute left-4 right-4 top-0 z-10 h-4 bg-white"></div>
-            <FilesTable className="h-[calc(100vh-232px)]" files={files} />
-          </>
+          <FilesTable className="h-[calc(100vh-232px)]" files={files} />
         ) : (
           <DropArea className="h-full w-full" isDragging={isDragging} />
         )}
+
+        {/* todo selected file info*/}
       </div>
 
       {/* operation */}

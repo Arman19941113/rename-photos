@@ -1,6 +1,7 @@
 import { clsx } from 'clsx'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@nextui-org/button'
+import { RiFolderOpenLine } from '@/components/icon'
 import folderImage from '@/assets/folder-image.jpg'
 
 export default function SelectFolder({
@@ -21,6 +22,7 @@ export default function SelectFolder({
         size="sm"
         className="select-none bg-gradient-to-tr from-pink-500 to-yellow-500 text-white !outline-0"
         onClick={onClick}
+        startContent={<RiFolderOpenLine className="text-base" />}
       >
         {t('Select Folder')}
       </Button>

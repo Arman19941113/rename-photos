@@ -6,31 +6,34 @@ function FilesTable({ className, files }: { className?: string; files: FileInfo[
   const { t } = useTranslation()
 
   return (
-    <Table
-      isCompact
-      isHeaderSticky
-      aria-label="table"
-      color="primary"
-      selectionMode="single"
-      classNames={{ wrapper: className }}
-    >
-      <TableHeader>
-        <TableColumn>{t('Filename')}</TableColumn>
-        <TableColumn>{t('Modified')}</TableColumn>
-      </TableHeader>
-      <TableBody>
-        {files.map(fileInfo => (
-          <TableRow key={fileInfo.pathname}>
-            <TableCell>
-              <span className="text-s ">{fileInfo.filename}</span>
-            </TableCell>
-            <TableCell>
-              <span className="text-s text-default-500">{fileInfo.modified}</span>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <>
+      <div className="absolute left-4 right-4 top-0 z-10 h-4 bg-white"></div>
+      <Table
+        isCompact
+        isHeaderSticky
+        aria-label="table"
+        color="primary"
+        selectionMode="single"
+        classNames={{ wrapper: className }}
+      >
+        <TableHeader>
+          <TableColumn>{t('Filename')}</TableColumn>
+          <TableColumn>{t('Modified')}</TableColumn>
+        </TableHeader>
+        <TableBody>
+          {files.map(fileInfo => (
+            <TableRow key={fileInfo.pathname}>
+              <TableCell>
+                <span className="text-s ">{fileInfo.filename}</span>
+              </TableCell>
+              <TableCell>
+                <span className="text-s text-default-500">{fileInfo.modified}</span>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
   )
 }
 
