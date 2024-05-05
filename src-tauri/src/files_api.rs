@@ -1,13 +1,17 @@
+use std::collections::HashMap;
 use std::fs;
 
 use crate::file_lib;
-use crate::file_lib::FileUtil;
+use crate::file_lib::{ExifAnalysis, FileUtil};
 
 #[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FileInfo {
   pathname: String,
   filename: String,
   modified: u128,
+  exif_error: Option<String>,
+  exif_data: Option<HashMap<String, Option<String>>>,
 }
 
 #[tauri::command]
@@ -28,10 +32,13 @@ pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<FileInfo>, String> {
     if FileUtil::check_is_hidden(pathname) { continue; }
     if FileUtil::check_is_system_file(pathname) { continue; }
 
+    let ExifAnalysis { exif_error, exif_data } = ExifAnalysis::new(pathname);
     files.push(FileInfo {
       pathname: pathname.to_string(),
       filename: path_buf.file_name().unwrap().to_str().unwrap().to_string(),
       modified: file_lib::get_modified_time(metadata),
+      exif_error,
+      exif_data,
     })
   }
 
@@ -61,10 +68,13 @@ pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<FileInfo>, String> {
     if FileUtil::check_is_hidden(pathname) { continue; }
     if FileUtil::check_is_system_file(pathname) { continue; }
 
+    let ExifAnalysis { exif_error, exif_data } = ExifAnalysis::new(pathname);
     files.push(FileInfo {
       pathname: pathname.to_string(),
       filename: FileUtil::get_filename(pathname),
       modified: file_lib::get_modified_time(metadata),
+      exif_error,
+      exif_data,
     })
   }
 
