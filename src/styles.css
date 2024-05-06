@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply antialiased text-sm text-default-800;
+    @apply antialiased text-sm text-default-800 overflow-hidden;
   }
 }
 

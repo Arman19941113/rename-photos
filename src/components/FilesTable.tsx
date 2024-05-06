@@ -36,7 +36,7 @@ function FilesTable({
           {files.map(fileInfo => (
             <TableRow key={fileInfo.pathname} onClick={() => onRowClick(fileInfo)}>
               <TableCell>
-                <span className="text-s ">{fileInfo.filename}</span>
+                <span className="text-s">{fileInfo.filename}</span>
               </TableCell>
               <TableCell>
                 <span className="text-s text-default-500">{fileInfo.modified}</span>

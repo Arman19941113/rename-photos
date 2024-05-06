@@ -42,7 +42,7 @@ export function useFiles() {
     setSelectedFile(null)
   }
 
-  const selectFolder = async () => {
+  const handleOpenFolder = async () => {
     try {
       const data = await open({
         multiple: false,
@@ -130,7 +130,7 @@ export function useFiles() {
     dirPath,
     files,
     selectedFile,
-    setSelectedFile,
-    selectFolder,
+    handleSelectFile: setSelectedFile,
+    handleOpenFolder,
   }
 }

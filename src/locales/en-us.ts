@@ -4,7 +4,7 @@ export default {
   'System Error': 'System Error',
 
   // business
-  'Select Folder': 'Select Folder',
+  'Open Folder': 'Open Folder',
   'Read Folder Error': 'Read Folder Error',
   'Drop Files': 'Drop Files',
   'Read Files Error': 'Read Files Error',

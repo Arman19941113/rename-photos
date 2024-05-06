@@ -4,7 +4,7 @@ import { Button } from '@nextui-org/button'
 import { RiFolderOpenLine } from '@/components/icon'
 import folderImage from '@/assets/folder-image.jpg'
 
-export default function SelectFolder({
+export default function OpenFolder({
   className,
   dirPath,
   onClick,
@@ -24,7 +24,7 @@ export default function SelectFolder({
         onClick={onClick}
         startContent={<RiFolderOpenLine className="text-base" />}
       >
-        {t('Select Folder')}
+        {t('Open Folder')}
       </Button>
 
       {dirPath && (

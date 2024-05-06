@@ -4,9 +4,9 @@ export default {
   'System Error': '系统错误',
 
   // business
-  'Select Folder': '选择文件夹',
+  'Open Folder': '打开文件夹',
   'Read Folder Error': '读取文件夹出错',
-  'Drop Files': '直接拖放文件～',
+  'Drop Files': '拖放文件',
   'Read Files Error': '读取文件出错',
   'Unknown image format': '未知图片格式',
   'Missing exif data': 'EXIF 数据缺失',
