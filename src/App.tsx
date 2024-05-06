@@ -25,7 +25,7 @@ function App() {
           <DropArea className="h-full w-full" isDragging={isDragging} />
         )}
 
-        {selectedFile && <FileView className="w-60 shrink-0 pl-3" fileInfo={selectedFile} />}
+        {selectedFile && <FileView className="w-[260px] shrink-0 pl-3" fileInfo={selectedFile} />}
       </div>
 
       {/* bottom: operator */}
