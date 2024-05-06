@@ -83,7 +83,7 @@ impl FileUtil {
   }
 }
 
-pub fn get_modified_time(metadata: Metadata) -> u128 {
+pub fn get_modified_time(metadata: &Metadata) -> u128 {
   let modified = metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH);
   let duration = modified.duration_since(UNIX_EPOCH).unwrap();
   duration.as_millis()
