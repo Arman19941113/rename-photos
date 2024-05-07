@@ -34,7 +34,6 @@ function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (row
       >
         <TableHeader>
           <TableColumn>{t('Filename')}</TableColumn>
-          <TableColumn>{t('Modified')}</TableColumn>
           <TableColumn width={48}>{t('Exif')}</TableColumn>
         </TableHeader>
         <TableBody>
@@ -42,9 +41,6 @@ function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (row
             <TableRow key={fileInfo.pathname}>
               <TableCell>
                 <span className="text-s">{fileInfo.filename}</span>
-              </TableCell>
-              <TableCell>
-                <span className="text-s text-default-500">{fileInfo.modified}</span>
               </TableCell>
               <TableCell>
                 <ExifTips fileInfo={fileInfo} />

@@ -11,7 +11,6 @@ export default {
   'Unknown image format': 'Unknown image format',
   'Missing exif data': 'Missing exif data',
   Filename: 'Name',
-  Modified: 'Modified',
 
   // exif field
   'Exif Information': 'Exif Information',

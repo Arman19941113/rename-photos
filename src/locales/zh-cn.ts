@@ -11,7 +11,6 @@ export default {
   'Unknown image format': '未知图片格式',
   'Missing exif data': 'EXIF 数据缺失',
   Filename: '文件名',
-  Modified: '修改时间',
 
   // exif field
   'Exif Information': 'Exif 信息',

@@ -1,10 +1,9 @@
 import { ExifStatus } from '@/const'
-import { formatDate, formatFileSize } from './'
+import { formatFileSize } from './'
 
 export interface FileInfo {
   pathname: string
   filename: string
-  modified: string
   size: string
   exifStatus: ExifStatus
   exifMsg: string
@@ -28,7 +27,6 @@ export function transformIpcFiles(ipcFiles: IpcFiles, t: any): FileInfo[] {
       return {
         pathname: item.pathname,
         filename: item.filename,
-        modified: formatDate(item.modified),
         size: formatFileSize(item.size),
         exifStatus,
         exifMsg,
