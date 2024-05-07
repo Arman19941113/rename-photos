@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { MingcuteFileMoreLine } from '@/components/icon'
-import { EXIF_FIELD, FileInfo } from '@/hooks'
+import { FileInfo } from '@/hooks'
 
-function FileView({ className, fileInfo }: { className?: string; fileInfo: FileInfo }) {
+function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   const { t } = useTranslation()
 
   /* image source */
@@ -14,28 +14,28 @@ function FileView({ className, fileInfo }: { className?: string; fileInfo: FileI
   useEffect(() => setIsImgError(false), [fileInfo])
 
   /* exif data */
-  let focalLength = fileInfo.exifData?.[EXIF_FIELD.FocalLength]
+  let focalLength = fileInfo.exifData?.FocalLength
   focalLength = focalLength ? `${focalLength} mm` : ''
-  let aperture = fileInfo.exifData?.[EXIF_FIELD.Aperture]
+  let aperture = fileInfo.exifData?.Aperture
   aperture = aperture ? `f/${aperture}` : ''
   const exifData: Array<[string, string]> = [
-    [t('Date'), fileInfo.exifData?.[EXIF_FIELD.Date] || '--'],
-    [t('Make'), fileInfo.exifData?.[EXIF_FIELD.Make] || '--'],
-    [t('Camera'), fileInfo.exifData?.[EXIF_FIELD.Camera] || '--'],
-    [t('Lens'), fileInfo.exifData?.[EXIF_FIELD.Lens] || '--'],
+    [t('Date'), fileInfo.exifData?.Date || '--'],
+    [t('Make'), fileInfo.exifData?.Make || '--'],
+    [t('Camera'), fileInfo.exifData?.Camera || '--'],
+    [t('Lens'), fileInfo.exifData?.Lens || '--'],
     [t('FocalLength'), focalLength || '--'],
     [t('Aperture'), aperture || '--'],
-    [t('Shutter'), fileInfo.exifData?.[EXIF_FIELD.Shutter] || '--'],
-    [t('ISO'), fileInfo.exifData?.[EXIF_FIELD.ISO] || '--'],
+    [t('Shutter'), fileInfo.exifData?.Shutter || '--'],
+    [t('ISO'), fileInfo.exifData?.ISO || '--'],
   ]
 
   return (
-    <div className={className}>
+    <div className="ml-4 w-[248px] shrink-0 overflow-auto">
       <div className="flex-center h-[143px]">
         {isImgError ? (
           <MingcuteFileMoreLine className="text-5xl text-default-500" />
         ) : (
-          <div className="p-1 shadow-md">
+          <div className="p-1 pt-0 shadow-md">
             <img src={imageSrc} alt="" className="h-[135px] object-contain" onError={onImgError} />
           </div>
         )}

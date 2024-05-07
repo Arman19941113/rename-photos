@@ -5,7 +5,8 @@ import { listen, TauriEvent } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useError } from '@/hooks'
 import { formatDate, formatFileSize, getDirFromFilePath } from '@/util'
-import { ExifStatus, TauriCommand } from '@/const'
+import { ExifStatus, getInitialFormat, StorageKey, TauriCommand } from '@/const'
+import { IpcFiles } from '@/types/rust'
 
 export interface FileInfo {
   pathname: string
@@ -17,17 +18,6 @@ export interface FileInfo {
   exifData: IpcFiles[number]['exifData']
 }
 
-export const enum EXIF_FIELD {
-  Date = 'Date',
-  Make = 'Make',
-  Camera = 'Camera',
-  Lens = 'Lens',
-  FocalLength = 'FocalLength',
-  Aperture = 'Aperture',
-  Shutter = 'Shutter',
-  ISO = 'ISO',
-}
-
 export function useFiles() {
   const { t } = useTranslation()
   const { handleError } = useError()
@@ -35,6 +25,7 @@ export function useFiles() {
   const [dirPath, setDirPath] = useState('')
   const [files, setFiles] = useState<FileInfo[]>([])
   const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null)
+  const [format, setFormat] = useState(getInitialFormat())
 
   const updateData = (data: { dirPath: string; ipcFiles: IpcFiles }) => {
     setDirPath(data.dirPath)
@@ -52,6 +43,11 @@ export function useFiles() {
       if (!data) return
       updateForDirPath(data).catch(() => {})
     } catch (e) {}
+  }
+
+  const handleClickRename = async () => {
+    console.log(format)
+    localStorage.setItem(StorageKey.FORMAT, format)
   }
 
   useEffect(() => {
@@ -130,7 +126,10 @@ export function useFiles() {
     dirPath,
     files,
     selectedFile,
-    handleSelectFile: setSelectedFile,
+    format,
     handleOpenFolder,
+    handleSelectFile: setSelectedFile,
+    handleFormatChange: setFormat,
+    handleClickRename,
   }
 }

@@ -5,15 +5,7 @@ import { FileInfo } from '@/hooks'
 import { ExifStatus } from '@/const'
 import { RiAlertLine, RiCheckLine, RiCloseLine } from '@/components/icon'
 
-function FilesTable({
-  className,
-  files,
-  onRowClick,
-}: {
-  className?: string
-  files: FileInfo[]
-  onRowClick: (rowData: FileInfo | null) => void
-}) {
+function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (rowData: FileInfo | null) => void }) {
   const { t } = useTranslation()
 
   const handleSelectionChange = (selection: Selection) => {
@@ -28,16 +20,16 @@ function FilesTable({
   }
 
   return (
-    <div className="relative w-full">
-      <div className="absolute left-4 right-4 top-0 z-10 h-4 bg-white"></div>
+    <div className="max-h-[calc(100%-58px)] overflow-auto">
       <Table
         isCompact
         isHeaderSticky
+        removeWrapper
         aria-label="table"
         color="primary"
         selectionMode="single"
         selectionBehavior="replace"
-        classNames={{ wrapper: className, tr: '!outline-none', td: '!outline-none' }}
+        classNames={{ tr: '!outline-none', td: '!outline-none' }}
         onSelectionChange={handleSelectionChange}
       >
         <TableHeader>

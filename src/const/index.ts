@@ -8,3 +8,12 @@ export const enum ExifStatus {
   WARNING,
   ERROR,
 }
+
+export const enum StorageKey {
+  FORMAT = 'FORMAT',
+}
+
+export function getInitialFormat() {
+  const defaultVal = '{Make}_{YYYY}-{MM}-{DD}_{hh}.{mm}.{ss}'
+  return localStorage.getItem(StorageKey.FORMAT) || defaultVal
+}

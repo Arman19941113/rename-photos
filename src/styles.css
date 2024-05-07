@@ -13,3 +13,28 @@
     @apply flex items-center justify-center;
   }
 }
+
+.btn--grad-blue {
+  color: white;
+  background-image: linear-gradient(to right, #77a1d3 0%, #79cbca 51%, #77a1d3 100%);
+  background-size: 200% auto;
+  outline: none;
+  user-select: none;
+}
+
+.btn--grad-blue:hover {
+  background-position: right center;
+}
+
+.btn--grad-pink {
+  color: white;
+  background-image: linear-gradient(to right, #ff6e7f 0%, #a4d8f3 51%, #ff6e7f 100%);
+  background-size: 200% auto;
+  background-position: right center;
+  outline: none;
+  user-select: none;
+}
+
+.btn--grad-pink:hover {
+  background-position: left center;
+}
