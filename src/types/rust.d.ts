@@ -1,6 +1,6 @@
-export type ExifField = 'Date' | 'Make' | 'Camera' | 'Lens' | 'FocalLength' | 'Aperture' | 'Shutter' | 'ISO'
+declare type ExifField = 'Date' | 'Make' | 'Camera' | 'Lens' | 'FocalLength' | 'Aperture' | 'Shutter' | 'ISO'
 
-export type IpcFiles = Array<{
+declare type IpcFiles = Array<{
   pathname: string
   filename: string
   modified: number

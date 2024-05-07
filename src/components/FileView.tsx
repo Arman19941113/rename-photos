@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { MingcuteFileMoreLine } from '@/components/icon'
-import { FileInfo } from '@/hooks'
+import { FileInfo } from '@/util'
 
 function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   const { t } = useTranslation()

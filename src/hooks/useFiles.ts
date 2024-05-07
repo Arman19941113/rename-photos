@@ -4,19 +4,8 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen, TauriEvent } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useError } from '@/hooks'
-import { formatDate, formatFileSize, getDirFromFilePath } from '@/util'
-import { ExifStatus, getInitialFormat, StorageKey, TauriCommand } from '@/const'
-import { IpcFiles } from '@/types/rust'
-
-export interface FileInfo {
-  pathname: string
-  filename: string
-  modified: string
-  size: string
-  exifStatus: ExifStatus
-  exifMsg: string
-  exifData: IpcFiles[number]['exifData']
-}
+import { FileInfo, getDirFromFilePath, transformIpcFiles } from '@/util'
+import { getInitialFormat, StorageKey, TauriCommand } from '@/const'
 
 export function useFiles() {
   const { t } = useTranslation()
@@ -29,7 +18,7 @@ export function useFiles() {
 
   const updateData = (data: { dirPath: string; ipcFiles: IpcFiles }) => {
     setDirPath(data.dirPath)
-    setFiles(parseIpcFiles(data.ipcFiles))
+    setFiles(transformIpcFiles(data.ipcFiles, t))
     setSelectedFile(null)
   }
 
@@ -92,33 +81,6 @@ export function useFiles() {
     } catch (e) {
       handleError({ e, title: t('Read Folder Error') })
     }
-  }
-
-  function parseIpcFiles(ipcFiles: IpcFiles): FileInfo[] {
-    return ipcFiles
-      .map(item => {
-        let exifStatus = ExifStatus.SUCCESS
-        let exifMsg = ''
-        const { exifData, exifError } = item
-        if (exifError) {
-          exifStatus = ExifStatus.ERROR
-          exifMsg = exifError === 'Unknown image format' ? t('Unknown image format') : exifError
-        } else if (Object.values(exifData!).some(val => val === null)) {
-          exifStatus = ExifStatus.WARNING
-          exifMsg = t('Missing exif data')
-        }
-
-        return {
-          pathname: item.pathname,
-          filename: item.filename,
-          modified: formatDate(item.modified),
-          size: formatFileSize(item.size),
-          exifStatus,
-          exifMsg,
-          exifData,
-        }
-      })
-      .sort((a, b) => (a.filename.toLowerCase() > b.filename.toLowerCase() ? 1 : -1))
   }
 
   return {

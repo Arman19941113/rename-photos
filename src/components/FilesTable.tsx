@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Selection, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table'
 import { Tooltip } from '@nextui-org/tooltip'
-import { FileInfo } from '@/hooks'
+import { FileInfo } from '@/util'
 import { ExifStatus } from '@/const'
 import { RiAlertLine, RiCheckLine, RiCloseLine } from '@/components/icon'
 
