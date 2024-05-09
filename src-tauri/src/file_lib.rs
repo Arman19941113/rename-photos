@@ -115,7 +115,7 @@ fn read_exif(pathname: &str) -> Result<HashMap<String, Option<String>>, exif::Er
   let exif = exif_reader.read_from_container(&mut buf_reader)?;
 
   let mut exif_data = HashMap::new();
-  exif_data.insert(String::from("Date"), match exif.get_field(Tag::DateTime, In::PRIMARY) {
+  exif_data.insert(String::from("Date"), match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string()),
     None => None,
   });
