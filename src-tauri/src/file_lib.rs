@@ -1,5 +1,7 @@
 use std::collections::HashMap;
+use std::fs::Metadata;
 use std::path::Path;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use exif;
 use exif::{In, Tag};
@@ -79,6 +81,12 @@ impl FileUtil {
   pub fn check_is_system_file(_: &str) -> bool {
     false
   }
+}
+
+pub fn get_created_time(metadata: &Metadata) -> u128 {
+  let modified = metadata.created().unwrap_or(SystemTime::UNIX_EPOCH);
+  let duration = modified.duration_since(UNIX_EPOCH).unwrap();
+  duration.as_millis()
 }
 
 pub struct ExifAnalysis {

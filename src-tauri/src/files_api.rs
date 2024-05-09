@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fs;
 
+use crate::file_lib;
 use crate::file_lib::{ExifAnalysis, FileUtil};
 
 #[derive(serde::Serialize)]
@@ -8,6 +9,7 @@ use crate::file_lib::{ExifAnalysis, FileUtil};
 pub struct FileInfo {
   pathname: String,
   filename: String,
+  created: u128,
   size: u64,
   exif_error: Option<String>,
   exif_data: Option<HashMap<String, Option<String>>>,
@@ -35,6 +37,7 @@ pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<FileInfo>, String> {
     files.push(FileInfo {
       pathname: pathname.to_string(),
       filename: path_buf.file_name().unwrap().to_str().unwrap().to_string(),
+      created: file_lib::get_created_time(&metadata),
       size: metadata.len(),
       exif_error,
       exif_data,
@@ -71,6 +74,7 @@ pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<FileInfo>, String> {
     files.push(FileInfo {
       pathname: pathname.to_string(),
       filename: FileUtil::get_filename(pathname),
+      created: file_lib::get_created_time(&metadata),
       size: metadata.len(),
       exif_error,
       exif_data,

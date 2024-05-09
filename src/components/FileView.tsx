@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { convertFileSrc } from '@tauri-apps/api/core'
 import { MingcuteFileMoreLine } from '@/components/icon'
 import { FileInfo } from '@/util'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   const { t } = useTranslation()
@@ -43,6 +43,7 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
 
       <h2 className="mt-2 break-all text-base font-semibold">{fileInfo.filename}</h2>
       <p className="mt-1 text-xs text-default-500">{fileInfo.size}</p>
+      <p className="mt-1 text-xs text-default-500">{fileInfo.created}</p>
 
       <div className="mb-1 mt-6 border-b pb-1 text-xs	font-bold">{t('Exif Information')}</div>
       <ul className="text-xs">

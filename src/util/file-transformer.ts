@@ -1,7 +1,8 @@
 import { ExifStatus, FormatVar } from '@/const'
-import { formatFileSize, getDirFromFilePath, getValidPath } from './'
+import { formatDate, formatFileSize, getDirFromFilePath, getValidPath } from './'
 
 export interface FileInfo {
+  created: string
   pathname: string
   dirname: string
   filename: string
@@ -28,6 +29,7 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
       }
 
       return {
+        created: formatDate(item.created),
         pathname: item.pathname,
         dirname: getDirFromFilePath(item.pathname),
         filename: item.filename,
@@ -43,7 +45,7 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
   const newNameCounter: Record<string, number> = {}
   // counts new filename
   files.forEach(item => {
-    const newFilename = generateFilename({ format, exifData: item.exifData })
+    const newFilename = generateFilename({ format, created: item.created, exifData: item.exifData })
     nameMap[item.filename] = newFilename
     if (newNameCounter.hasOwnProperty(newFilename)) {
       newNameCounter[newFilename] += 1
@@ -70,10 +72,18 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
   return files
 }
 
-function generateFilename({ format, exifData }: { format: string; exifData: IpcFiles[number]['exifData'] }) {
+function generateFilename({
+  format,
+  created,
+  exifData,
+}: {
+  format: string
+  created: string
+  exifData: IpcFiles[number]['exifData']
+}) {
   try {
     // eg: 2024-03-04 08:33:38
-    const dateTime = exifData?.Date || ''
+    const dateTime = exifData?.Date || created || ''
     const timeList = dateTime.replace(/\s|:/g, '-').split('-')
     const formatValueMap: Record<FormatVar, string> = {
       '{YYYY}': timeList[0] || 'YYYY',
