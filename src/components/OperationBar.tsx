@@ -1,9 +1,9 @@
+import { RiFolderOpenLine } from '@/components/icon'
+import { Button } from '@nextui-org/button'
+import { Input } from '@nextui-org/input'
 import { clsx } from 'clsx'
 import { KeyboardEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@nextui-org/button'
-import { Input } from '@nextui-org/input'
-import { RiFolderOpenLine } from '@/components/icon'
 
 export default function OperationBar({
   hasFiles,
@@ -20,12 +20,15 @@ export default function OperationBar({
 }) {
   const { t } = useTranslation()
 
-  const handleBlur = () => onFormatChange(value)
+  const [value, setValue] = useState(format)
   const handleKeydown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') onFormatChange(value)
   }
-  const [value, setValue] = useState(format)
-  const handleValueChange = (val: string) => setValue(val.trim())
+  const handleBlur = () => {
+    const val = value.trim()
+    setValue(val)
+    onFormatChange(val)
+  }
 
   return (
     <div className="mb-5 flex h-8 shrink-0 items-center justify-between">
@@ -46,9 +49,9 @@ export default function OperationBar({
           variant="underlined"
           color="primary"
           size="sm"
-          onBlur={handleBlur}
+          onValueChange={setValue}
           onKeyDown={handleKeydown}
-          onValueChange={handleValueChange}
+          onBlur={handleBlur}
         />
         <Button radius="sm" size="sm" className="btn--grad-pink ml-4 shrink-0" onClick={onClickRename}>
           {t('Rename')}
