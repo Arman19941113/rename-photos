@@ -42,10 +42,10 @@ function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (row
           {files.map(fileInfo => (
             <TableRow key={fileInfo.pathname}>
               <TableCell>
-                <span className="text-s">{fileInfo.filename}</span>
+                <span className="font-mono text-s">{fileInfo.filename}</span>
               </TableCell>
               <TableCell>
-                <span className="text-s">{fileInfo.newFilename}</span>
+                <span className="font-mono text-s">{fileInfo.newFilename}</span>
               </TableCell>
               <TableCell>
                 <ExifTips fileInfo={fileInfo} />
