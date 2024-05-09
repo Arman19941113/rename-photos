@@ -20,3 +20,9 @@ export function getDirFromFilePath(filePath: string) {
   const pathParts = filePath.split('/')
   return pathParts.slice(0, -1).join('/')
 }
+
+// filter the symbols are not allowed in the filename
+export function getValidPath(path: string): string {
+  if (!path) return ''
+  return path.replace(/[\\/:*?<>|]/g, ' ')
+}

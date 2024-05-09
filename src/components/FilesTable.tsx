@@ -1,9 +1,10 @@
-import { useTranslation } from 'react-i18next'
+import { RiAlertLine, RiCheckLine, RiCloseLine } from '@/components/icon'
+import { ExifStatus } from '@/const'
+import { FileInfo } from '@/util'
+import { ScrollShadow } from '@nextui-org/scroll-shadow'
 import { Selection, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table'
 import { Tooltip } from '@nextui-org/tooltip'
-import { FileInfo } from '@/util'
-import { ExifStatus } from '@/const'
-import { RiAlertLine, RiCheckLine, RiCloseLine } from '@/components/icon'
+import { useTranslation } from 'react-i18next'
 
 function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (rowData: FileInfo | null) => void }) {
   const { t } = useTranslation()
@@ -20,7 +21,7 @@ function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (row
   }
 
   return (
-    <div className="max-h-[calc(100%-58px)] overflow-auto">
+    <ScrollShadow className="h-[calc(100%-52px)]" visibility="bottom" hideScrollBar>
       <Table
         isCompact
         isHeaderSticky
@@ -34,6 +35,7 @@ function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (row
       >
         <TableHeader>
           <TableColumn>{t('Filename')}</TableColumn>
+          <TableColumn>{t('New Filename')}</TableColumn>
           <TableColumn width={48}>{t('Exif')}</TableColumn>
         </TableHeader>
         <TableBody>
@@ -43,13 +45,17 @@ function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (row
                 <span className="text-s">{fileInfo.filename}</span>
               </TableCell>
               <TableCell>
+                <span className="text-s">{fileInfo.newFilename}</span>
+              </TableCell>
+              <TableCell>
                 <ExifTips fileInfo={fileInfo} />
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </div>
+      <div className="h-6"></div>
+    </ScrollShadow>
   )
 }
 
