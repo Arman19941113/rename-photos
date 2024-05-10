@@ -1,10 +1,13 @@
-import { AnimatePresence } from 'framer-motion'
-import { useFiles } from '@/hooks'
-import OperationBar from '@/components/OperationBar.tsx'
-import FilesTable from '@/components/FilesTable.tsx'
-import FileView from '@/components/FileView.tsx'
 import DropGuide from '@/components/DropGuide.tsx'
 import DropModal from '@/components/DropModal.tsx'
+import FilesTable from '@/components/FilesTable.tsx'
+import FileView from '@/components/FileView.tsx'
+import OperationBar from '@/components/OperationBar.tsx'
+import { useFiles } from '@/hooks'
+import { AnimatePresence } from 'framer-motion'
+import { Flip, ToastContainer } from 'react-toastify'
+
+import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
   const {
@@ -37,6 +40,17 @@ function App() {
 
       {/* modal: dragging animation */}
       <AnimatePresence>{hasFiles && isDragging && DropModal()}</AnimatePresence>
+
+      <ToastContainer
+        theme="light"
+        position="top-center"
+        autoClose={1200}
+        draggable
+        closeOnClick
+        pauseOnHover
+        pauseOnFocusLoss={false}
+        transition={Flip}
+      />
     </div>
   )
 }

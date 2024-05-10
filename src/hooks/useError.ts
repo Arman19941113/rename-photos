@@ -1,15 +1,15 @@
-import { useTranslation } from 'react-i18next'
 import { message } from '@tauri-apps/plugin-dialog'
+import { useTranslation } from 'react-i18next'
 
 export function useError() {
   const { t } = useTranslation()
 
-  const handleError = ({ e, title, okLabel }: { e: unknown; title?: string; okLabel?: string }) => {
+  const handleError = ({ err, title, okLabel }: { err: unknown; title?: string; okLabel?: string }) => {
     let errorMsg = t('System Error')
-    if (typeof e === 'string') {
-      errorMsg = e
+    if (typeof err === 'string') {
+      errorMsg = err
     } else {
-      const error = e as Error
+      const error = err as Error
       if (error?.message) {
         errorMsg = error.message
       }

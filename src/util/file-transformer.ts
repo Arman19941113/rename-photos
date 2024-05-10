@@ -45,7 +45,11 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
   const newNameCounter: Record<string, number> = {}
   // counts new filename
   files.forEach(item => {
-    const newFilename = generateFilename({ format, created: item.created, exifData: item.exifData })
+    const newFilename = generateFilename({
+      format,
+      created: item.created,
+      exifData: item.exifData,
+    })
     nameMap[item.filename] = newFilename
     if (newNameCounter.hasOwnProperty(newFilename)) {
       newNameCounter[newFilename] += 1
@@ -57,19 +61,25 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
   const nameSequence: Record<string, number> = {}
   files.forEach(item => {
     const newFilename = nameMap[item.filename]
+    const extName = getExtName(item.filename)
     const duplicates = newNameCounter[newFilename]
     if (duplicates) {
       const maxLength = duplicates.toString().length
       const sequence = nameSequence.hasOwnProperty(newFilename)
         ? ++nameSequence[newFilename]
         : (nameSequence[newFilename] = 1)
-      item.newFilename = newFilename + '_' + sequence.toString().padStart(maxLength, '0')
+      item.newFilename = newFilename + '_' + sequence.toString().padStart(maxLength, '0') + extName
     } else {
-      item.newFilename = newFilename
+      item.newFilename = newFilename + extName
     }
   })
 
   return files
+}
+
+export function getExtName(filename: string): string {
+  const parts = filename.split('.')
+  return parts.length > 1 ? `.${parts[parts.length - 1]}` : ''
 }
 
 function generateFilename({

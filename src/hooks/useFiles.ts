@@ -6,6 +6,7 @@ import { listen, TauriEvent } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'react-toastify'
 
 export function useFiles() {
   const { t } = useTranslation()
@@ -16,20 +17,46 @@ export function useFiles() {
   const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null)
   const [format, setFormat] = useState(getInitialFormat())
 
-  const handleOpenFolder = async () => {
-    try {
-      const data = await open({
-        multiple: false,
-        directory: true,
-        recursive: false,
+  const handleOpenFolder = () => {
+    open({
+      multiple: false,
+      directory: true,
+      recursive: false,
+    })
+      .then(data => {
+        if (!data) return
+        invokeDir(data).catch(() => {})
       })
-      if (!data) return
-      invokeFromDir(data).catch(() => {})
-    } catch (e) {}
+      .catch(err => {
+        handleError({ err, title: t('Read Files Error') })
+      })
   }
 
+  let isRenaming = false
   const handleClickRename = async () => {
-    localStorage.setItem(StorageKey.FORMAT, format)
+    if (isRenaming) return
+    try {
+      isRenaming = true
+      localStorage.setItem(StorageKey.FORMAT, format)
+      const time = Date.now()
+      const renamePathData = files
+        .filter(item => item.filename !== item.newFilename)
+        .map(item => [
+          `${item.dirname}/${item.filename}`,
+          `${item.dirname}/${item.newFilename}`,
+          `${item.dirname}/${time}_${item.filename}`,
+        ])
+      if (renamePathData.length) {
+        const res = await invokeRename(renamePathData)
+        if (res) toast.success(t('Rename Success!'), {})
+      } else {
+        toast.info(t('No need to perform renaming'))
+      }
+    } catch (err) {
+      // impossible
+    } finally {
+      isRenaming = false
+    }
   }
 
   useEffect(() => {
@@ -43,7 +70,7 @@ export function useFiles() {
       }),
       listen<{ paths: string[] }>(TauriEvent.DROP, event => {
         setIsDragging(false)
-        invokeFromPaths(event.payload.paths).catch(() => {})
+        invokePaths(event.payload.paths).catch(() => {})
       }),
       listen(TauriEvent.DROP_CANCELLED, () => {
         setIsDragging(false)
@@ -59,23 +86,42 @@ export function useFiles() {
     }
   }, [])
 
-  async function invokeFromPaths(paths: string[]) {
+  async function invokePaths(paths: string[]): Promise<boolean> {
     try {
-      if (!paths.length) return
-      setIpcFiles(await invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_PATHS, { paths }))
+      if (!paths.length) return true
+      const ipcFiles = await invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_PATHS, { paths })
+      setIpcFiles(ipcFiles)
       setSelectedFile(null)
-    } catch (e) {
-      handleError({ e, title: t('Read Files Error') })
+      return true
+    } catch (err) {
+      handleError({ err, title: t('Read Files Error') })
+      return false
     }
   }
 
-  async function invokeFromDir(dirPath: string) {
+  async function invokeDir(dirPath: string): Promise<boolean> {
     try {
-      if (!dirPath) return
-      setIpcFiles(await invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_DIR, { dirPath }))
+      if (!dirPath) return true
+      const ipcFiles = await invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_DIR, { dirPath })
+      setIpcFiles(ipcFiles)
       setSelectedFile(null)
-    } catch (e) {
-      handleError({ e, title: t('Read Folder Error') })
+      return true
+    } catch (err) {
+      handleError({ err, title: t('Read Folder Error') })
+      return false
+    }
+  }
+
+  async function invokeRename(renamePathData: string[][]): Promise<boolean> {
+    try {
+      if (!renamePathData.length) return true
+      const ipcFiles = await invoke<IpcFiles>(TauriCommand.RENAME_FILES, { renamePathData })
+      setIpcFiles(ipcFiles)
+      setSelectedFile(null)
+      return true
+    } catch (err) {
+      handleError({ err, title: t('Rename Files Error') })
+      return false
     }
   }
 

@@ -1,6 +1,7 @@
 export const enum TauriCommand {
   GET_FILES_FROM_DIR = 'get_files_from_dir',
   GET_FILES_FROM_PATHS = 'get_files_from_paths',
+  RENAME_FILES = 'rename_files',
 }
 
 export const enum ExifStatus {
