@@ -31,7 +31,7 @@ export default function OperationBar({
   }
 
   return (
-    <div className="mb-5 flex h-8 shrink-0 items-center justify-between">
+    <div className="mb-4 flex h-8 shrink-0 items-center justify-between">
       <Button
         radius="sm"
         size="sm"

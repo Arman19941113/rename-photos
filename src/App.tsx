@@ -23,7 +23,7 @@ function App() {
   const hasFiles = files.length > 0
 
   return (
-    <div className="flex h-[100vh] p-5">
+    <div className="flex h-[100vh] p-4">
       <div className="flex w-full flex-col">
         <OperationBar
           hasFiles={hasFiles}

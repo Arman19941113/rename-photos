@@ -49,7 +49,7 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
       <ul className="text-xs">
         {exifData.map(item => (
           <li className="mb-1 flex justify-between border-b pb-1" key={item[0]}>
-            <span className="mr-6 shrink-0 font-semibold text-default-500">{item[0]}</span>
+            <span className="mr-6 shrink-0 font-medium text-default-500">{item[0]}</span>
             <span className="text-right font-medium">{item[1]}</span>
           </li>
         ))}

@@ -11,9 +11,11 @@
   "app": {
     "windows": [
       {
-        "title": "name-photos",
-        "width": 800,
-        "height": 600
+        "hiddenTitle": true,
+        "minWidth": 900,
+        "minHeight": 560,
+        "width": 1000,
+        "height": 640
       }
     ],
     "security": {

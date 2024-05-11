@@ -21,7 +21,7 @@ function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (row
   }
 
   return (
-    <ScrollShadow className="h-[calc(100%-52px)]" visibility="bottom" hideScrollBar>
+    <ScrollShadow className="h-full" visibility="bottom" hideScrollBar>
       <Table
         isCompact
         isHeaderSticky
@@ -42,10 +42,10 @@ function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (row
           {files.map(fileInfo => (
             <TableRow key={fileInfo.pathname}>
               <TableCell>
-                <span className="font-mono text-s">{fileInfo.filename}</span>
+                <span className="font-mono text-s xl:text-sm">{fileInfo.filename}</span>
               </TableCell>
               <TableCell>
-                <span className="font-mono text-s">{fileInfo.newFilename}</span>
+                <span className="font-mono text-s xl:text-sm">{fileInfo.newFilename}</span>
               </TableCell>
               <TableCell>
                 <ExifTips fileInfo={fileInfo} />
@@ -64,14 +64,14 @@ function ExifTips({ fileInfo }: { fileInfo: FileInfo }) {
     case ExifStatus.SUCCESS:
       return (
         <div className="px-1">
-          <RiCheckLine className="text-base text-success" />
+          <RiCheckLine className="text-base text-success xl:text-large" />
         </div>
       )
     case ExifStatus.WARNING:
       return (
         <Tooltip color="warning" size="sm" showArrow radius="none" closeDelay={100} content={fileInfo.exifMsg}>
           <div className="px-1">
-            <RiAlertLine className="text-base text-warning" />
+            <RiAlertLine className="text-base text-warning xl:text-large" />
           </div>
         </Tooltip>
       )
@@ -79,7 +79,7 @@ function ExifTips({ fileInfo }: { fileInfo: FileInfo }) {
       return (
         <Tooltip color="danger" size="sm" showArrow radius="none" closeDelay={100} content={fileInfo.exifMsg}>
           <div className="px-1">
-            <RiCloseLine className="text-base text-danger" />
+            <RiCloseLine className="text-base text-danger xl:text-large" />
           </div>
         </Tooltip>
       )

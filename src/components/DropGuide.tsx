@@ -12,7 +12,7 @@ function DropGuide({ isDragging }: { isDragging: boolean }) {
         isDragging ? 'border-pink-400' : 'border-default-400',
       )}
     >
-      <p className=" text-lg text-default-500">{t('Drop Files')}</p>
+      <p className="text-lg text-default-500 xl:text-xl">{t('Drop Files')}</p>
     </div>
   )
 }
