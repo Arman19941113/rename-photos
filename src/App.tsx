@@ -17,7 +17,7 @@ function App() {
     format,
     handleOpenFolder,
     handleClickRename,
-    handleSelectFile,
+    handleSelectedKeyChange,
     handleFormatChange,
   } = useFiles()
   const hasFiles = files.length > 0
@@ -26,17 +26,21 @@ function App() {
     <div className="flex h-[100vh] p-4">
       <div className="flex w-full flex-col">
         <OperationBar
-          hasFiles={hasFiles}
           format={format}
+          onFormatChange={handleFormatChange}
+          hasFiles={hasFiles}
           onClickOpen={handleOpenFolder}
           onClickRename={handleClickRename}
-          onFormatChange={handleFormatChange}
         />
 
-        {hasFiles ? <FilesTable files={files} onRowClick={handleSelectFile} /> : <DropGuide isDragging={isDragging} />}
+        {hasFiles ? (
+          <FilesTable files={files} onSelectedKeyChange={handleSelectedKeyChange} />
+        ) : (
+          <DropGuide isDragging={isDragging} />
+        )}
       </div>
 
-      {selectedFile && <FileView fileInfo={selectedFile} />}
+      {selectedFile && <FileView fileInfo={selectedFile} key={selectedFile.pathname} />}
 
       {/* modal: dragging animation */}
       <AnimatePresence>{hasFiles && isDragging && DropModal()}</AnimatePresence>

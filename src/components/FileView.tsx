@@ -1,9 +1,10 @@
 import { MingcuteFileMoreLine } from '@/components/icon'
 import { FileInfo } from '@/util'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+// reset state by key
 function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   const { t } = useTranslation()
 
@@ -11,7 +12,6 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   const imageSrc = convertFileSrc(fileInfo.pathname)
   const [isImgError, setIsImgError] = useState(false)
   const onImgError = () => setIsImgError(true)
-  useEffect(() => setIsImgError(false), [fileInfo])
 
   /* exif data */
   let focalLength = fileInfo.exifData?.FocalLength

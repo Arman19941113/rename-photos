@@ -6,17 +6,22 @@ import { Selection, Table, TableBody, TableCell, TableColumn, TableHeader, Table
 import { Tooltip } from '@nextui-org/tooltip'
 import { useTranslation } from 'react-i18next'
 
-function FilesTable({ files, onRowClick }: { files: FileInfo[]; onRowClick: (rowData: FileInfo | null) => void }) {
+function FilesTable({
+  files,
+  onSelectedKeyChange,
+}: {
+  files: FileInfo[]
+  onSelectedKeyChange: (key: string | null) => void
+}) {
   const { t } = useTranslation()
 
   const handleSelectionChange = (selection: Selection) => {
     if (typeof selection === 'string') return
     if (selection.size) {
       const [key] = selection
-      const file = files.find(item => item.pathname === key)
-      file ? onRowClick(file) : onRowClick(null)
+      onSelectedKeyChange(key as string)
     } else {
-      onRowClick(null)
+      onSelectedKeyChange(null)
     }
   }
 

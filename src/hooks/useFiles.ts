@@ -1,21 +1,23 @@
 import { getInitialFormat, StorageKey, TauriCommand } from '@/const'
 import { useError } from '@/hooks'
-import { FileInfo, transformIpcFiles } from '@/util'
+import { transformIpcFiles } from '@/util'
 import { invoke } from '@tauri-apps/api/core'
 import { listen, TauriEvent } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
 export function useFiles() {
   const { t } = useTranslation()
   const { handleError } = useError()
-  const [isDragging, setIsDragging] = useState(false)
-  const [ipcFiles, setIpcFiles] = useState<IpcFiles>([])
-  const [files, setFiles] = useState<FileInfo[]>([])
-  const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null)
   const [format, setFormat] = useState(getInitialFormat())
+  const [isDragging, setIsDragging] = useState(false)
+
+  const [ipcFiles, setIpcFiles] = useState<IpcFiles>([])
+  const files = useMemo(() => transformIpcFiles({ ipcFiles, format, t }), [ipcFiles, format, t])
+  const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const selectedFile = files.find(file => file.pathname === selectedKey) ?? null
 
   const handleOpenFolder = () => {
     open({
@@ -32,11 +34,11 @@ export function useFiles() {
       })
   }
 
-  let isRenaming = false
+  const [isRenaming, setIsRenaming] = useState(false)
   const handleClickRename = async () => {
     if (isRenaming) return
     try {
-      isRenaming = true
+      setIsRenaming(true)
       localStorage.setItem(StorageKey.FORMAT, format)
       const time = Date.now()
       const renamePathData = files
@@ -55,13 +57,9 @@ export function useFiles() {
     } catch (err) {
       // impossible
     } finally {
-      isRenaming = false
+      setIsRenaming(false)
     }
   }
-
-  useEffect(() => {
-    setFiles(transformIpcFiles({ ipcFiles, format, t }))
-  }, [ipcFiles, format, t])
 
   useEffect(() => {
     const promises = Promise.all([
@@ -91,7 +89,6 @@ export function useFiles() {
       if (!paths.length) return true
       const ipcFiles = await invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_PATHS, { paths })
       setIpcFiles(ipcFiles)
-      setSelectedFile(null)
       return true
     } catch (err) {
       handleError({ err, title: t('Read Files Error') })
@@ -104,7 +101,6 @@ export function useFiles() {
       if (!dirPath) return true
       const ipcFiles = await invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_DIR, { dirPath })
       setIpcFiles(ipcFiles)
-      setSelectedFile(null)
       return true
     } catch (err) {
       handleError({ err, title: t('Read Folder Error') })
@@ -117,7 +113,6 @@ export function useFiles() {
       if (!renamePathData.length) return true
       const ipcFiles = await invoke<IpcFiles>(TauriCommand.RENAME_FILES, { renamePathData })
       setIpcFiles(ipcFiles)
-      setSelectedFile(null)
       return true
     } catch (err) {
       handleError({ err, title: t('Rename Files Error') })
@@ -131,7 +126,7 @@ export function useFiles() {
     selectedFile,
     format,
     handleOpenFolder,
-    handleSelectFile: setSelectedFile,
+    handleSelectedKeyChange: setSelectedKey,
     handleFormatChange: setFormat,
     handleClickRename,
   }

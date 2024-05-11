@@ -6,17 +6,17 @@ import { KeyboardEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export default function OperationBar({
-  hasFiles,
   format,
+  onFormatChange,
+  hasFiles,
   onClickOpen,
   onClickRename,
-  onFormatChange,
 }: {
-  hasFiles: boolean
   format: string
+  onFormatChange: (format: string) => void
+  hasFiles: boolean
   onClickOpen: () => void
   onClickRename: () => void
-  onFormatChange: (format: string) => void
 }) {
   const { t } = useTranslation()
 
