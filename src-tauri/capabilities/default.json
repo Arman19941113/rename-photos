@@ -5,7 +5,6 @@
   "windows": ["main"],
   "platforms": ["linux", "macOS", "windows"],
   "permissions": [
-    "fs:default",
     "path:default",
     "event:default",
     "window:default",
@@ -15,7 +14,6 @@
     "menu:default",
     "tray:default",
     "dialog:allow-open",
-    "dialog:allow-message",
-    "shell:allow-open"
+    "dialog:allow-message"
   ]
 }

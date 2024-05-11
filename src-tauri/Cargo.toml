@@ -12,10 +12,8 @@ tauri-build = { version = "2.0.0-beta", features = [] }
 
 [dependencies]
 tauri = { version = "2.0.0-beta", features = ["protocol-asset"] }
-tauri-plugin-shell = "2.0.0-beta"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri-plugin-fs = "2.0.0-beta.6"
 tauri-plugin-dialog = "2.0.0-beta.6"
 kamadak-exif = "0.5.5"
 
