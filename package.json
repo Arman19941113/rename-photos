@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "lint": "eslint src",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
@@ -35,12 +36,25 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.0.0",
+    "eslint-config-react-app": "^7.0.1",
     "postcss-preset-env": "^9.5.11",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "3.4.3",
     "typescript": "^5.4.5",
     "vite": "^5.2.11"
+  },
+  "eslintConfig": {
+    "extends": "react-app",
+    "rules": {
+      "react/self-closing-comp": [
+        "error", {
+          "component": true,
+          "html": true
+        }
+      ]
+    }
   },
   "prettier": {
     "$schema": "https://json.schemastore.org/prettierrc",

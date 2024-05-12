@@ -66,7 +66,7 @@ function Settings() {
   return (
     <div className="fixed inset-0 flex flex-col items-center bg-white p-4">
       <Tabs items={tabs} color="secondary" variant="underlined" defaultSelectedKey="Help">
-        {item => <Tab key={item.id} title={item.title} children={item.content}></Tab>}
+        {item => <Tab key={item.id} title={item.title} children={item.content} />}
       </Tabs>
     </div>
   )

@@ -1,4 +1,4 @@
-export default {
+const enUs = {
   // common
   Ok: 'Ok',
   'System Error': 'System Error',
@@ -35,3 +35,5 @@ export default {
   Language: 'Language',
   About: 'About',
 }
+
+export default enUs

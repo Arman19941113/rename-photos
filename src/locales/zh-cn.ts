@@ -1,4 +1,4 @@
-export default {
+const zhCn = {
   // common
   Ok: '好的',
   'System Error': '系统错误',
@@ -35,3 +35,5 @@ export default {
   Language: '语言',
   About: '关于',
 }
+
+export default zhCn

@@ -59,7 +59,7 @@ function FilesTable({
           ))}
         </TableBody>
       </Table>
-      <div className="h-6"></div>
+      <div className="h-6" />
     </ScrollShadow>
   )
 }
