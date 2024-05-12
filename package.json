@@ -11,9 +11,11 @@
   "dependencies": {
     "@nextui-org/button": "^2.0.31",
     "@nextui-org/input": "^2.1.21",
+    "@nextui-org/radio": "^2.0.28",
     "@nextui-org/scroll-shadow": "^2.1.16",
     "@nextui-org/system": "^2.1.2",
     "@nextui-org/table": "^2.0.33",
+    "@nextui-org/tabs": "^2.0.29",
     "@nextui-org/theme": "^2.2.3",
     "@nextui-org/tooltip": "^2.0.33",
     "@tauri-apps/api": "^2.0.0-beta.11",

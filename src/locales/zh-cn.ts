@@ -5,6 +5,7 @@ export default {
 
   // business
   'Open Folder': '打开文件夹',
+  'Open Folder Error': '打开文件夹出错',
   'Read Folder Error': '读取文件夹出错',
   'Drop Files': '拖放文件',
   'Read Files Error': '读取文件出错',
@@ -27,4 +28,10 @@ export default {
   Aperture: '光圈',
   Shutter: '快门',
   ISO: 'ISO',
+
+  // settings
+  Settings: '设置',
+  Help: '帮助',
+  Language: '语言',
+  About: '关于',
 }

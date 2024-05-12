@@ -5,6 +5,7 @@ export default {
 
   // business
   'Open Folder': 'Open Folder',
+  'Open Folder Error': 'Open Folder Error',
   'Read Folder Error': 'Read Folder Error',
   'Drop Files': 'Drop Files',
   'Read Files Error': 'Read Files Error',
@@ -27,4 +28,10 @@ export default {
   Aperture: 'Aperture',
   Shutter: 'Shutter',
   ISO: 'ISO',
+
+  // settings
+  Settings: 'Settings',
+  Help: 'Help',
+  Language: 'Language',
+  About: 'About',
 }

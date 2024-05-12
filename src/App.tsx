@@ -3,24 +3,30 @@ import DropModal from '@/components/DropModal.tsx'
 import FilesTable from '@/components/FilesTable.tsx'
 import FileView from '@/components/FileView.tsx'
 import OperationBar from '@/components/OperationBar.tsx'
-import { useFiles } from '@/hooks'
+import Settings from '@/components/Settings.tsx'
+import SettingsTrigger from '@/components/SettingsTrigger.tsx'
+import { useDragging, useFiles } from '@/hooks'
 import { AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
 import { Flip, ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
+  const [showSettings, setShowSettings] = useState(false)
   const {
-    isDragging,
+    format,
+    handleFormatChange,
     files,
     selectedFile,
-    format,
     handleOpenFolder,
-    handleClickRename,
+    handleDropFiles,
+    handleRename,
     handleSelectedKeyChange,
-    handleFormatChange,
   } = useFiles()
   const hasFiles = files.length > 0
+  const { isDragging } = useDragging({ disabled: showSettings, onDrop: handleDropFiles })
+  const showDropModal = hasFiles && isDragging
 
   return (
     <div className="flex h-[100vh] p-4">
@@ -30,7 +36,7 @@ function App() {
           onFormatChange={handleFormatChange}
           hasFiles={hasFiles}
           onClickOpen={handleOpenFolder}
-          onClickRename={handleClickRename}
+          onClickRename={handleRename}
         />
 
         {hasFiles ? (
@@ -42,8 +48,10 @@ function App() {
 
       {selectedFile && <FileView fileInfo={selectedFile} key={selectedFile.pathname} />}
 
-      {/* modal: dragging animation */}
-      <AnimatePresence>{hasFiles && isDragging && DropModal()}</AnimatePresence>
+      {showSettings && <Settings />}
+      {hasFiles && <SettingsTrigger onClick={() => setShowSettings(!showSettings)} />}
+
+      <AnimatePresence>{showDropModal && <DropModal />}</AnimatePresence>
 
       <ToastContainer
         theme="light"

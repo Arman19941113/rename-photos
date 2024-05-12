@@ -11,7 +11,13 @@ export const enum ExifStatus {
 }
 
 export const enum StorageKey {
+  LANGUAGE = 'LANGUAGE',
   FORMAT = 'FORMAT',
+}
+
+export const enum Language {
+  EN = 'EN',
+  ZH = 'ZH',
 }
 
 type DateVar = '{YYYY}' | '{MM}' | '{DD}' | '{hh}' | '{mm}' | '{ss}'
