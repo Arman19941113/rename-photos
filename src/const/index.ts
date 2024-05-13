@@ -23,6 +23,22 @@ export const enum Language {
 type DateVar = '{YYYY}' | '{MM}' | '{DD}' | '{hh}' | '{mm}' | '{ss}'
 type ExifVar = '{Date}' | '{Make}' | '{Camera}' | '{Lens}' | '{FocalLength}' | '{Aperture}' | '{Shutter}' | '{ISO}'
 export type FormatVar = ExifVar | DateVar
+export const formatVars: FormatVar[] = [
+  '{YYYY}',
+  '{MM}',
+  '{DD}',
+  '{hh}',
+  '{mm}',
+  '{ss}',
+  '{Date}',
+  '{Make}',
+  '{Camera}',
+  '{Lens}',
+  '{FocalLength}',
+  '{Aperture}',
+  '{Shutter}',
+  '{ISO}',
+]
 
 export function getInitialFormat() {
   const defaultVal = '{Make} {YYYY}.{MM}.{DD} {hh}.{mm}.{ss}'

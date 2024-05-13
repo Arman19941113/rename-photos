@@ -31,8 +31,14 @@ const enUs = {
 
   // settings
   Settings: 'Settings',
-  Help: 'Help',
   Language: 'Language',
+  Help: 'Help',
+  '1. Select a folder or drag and drop files': '1. Select a folder or drag and drop files',
+  'Selected files will be displayed in the table.': 'Selected files will be displayed in the table.',
+  '2. Enter the rename rule': '2. Enter the rename rule',
+  'The variables listed below are supported, and you can preview the expected new name in the table.':
+    'The variables listed below are supported, and you can preview the expected new name in the table.',
+  '3. Click `Rename` button to change names': '3. Click `Rename` button to change names',
   About: 'About',
 }
 
