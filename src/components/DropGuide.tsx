@@ -8,7 +8,7 @@ function DropGuide({ isDragging }: { isDragging: boolean }) {
     <div
       aria-hidden
       className={clsx(
-        'flex-center h-full w-full cursor-default select-none rounded-3xl border-2 border-dashed',
+        'flex-center mb-5 h-full w-full cursor-default select-none rounded-3xl border-2 border-dashed',
         isDragging ? 'border-pink-400' : 'border-default-400',
       )}
     >

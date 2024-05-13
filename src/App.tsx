@@ -3,17 +3,17 @@ import DropModal from '@/components/DropModal.tsx'
 import FilesTable from '@/components/FilesTable.tsx'
 import FileView from '@/components/FileView.tsx'
 import OperationBar from '@/components/OperationBar.tsx'
-import Settings from '@/components/Settings.tsx'
-import SettingsTrigger from '@/components/SettingsTrigger.tsx'
+import Settings from '@/components/settings/Settings.tsx'
+import SettingsTrigger from '@/components/settings/SettingsTrigger.tsx'
 import { useDragging, useFiles } from '@/hooks'
+import { useSettingsVisible } from '@/hooks/useSettingsVisible.ts'
 import { AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
 import { Flip, ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
-  const [showSettings, setShowSettings] = useState(false)
+  const { showSettings, setShowSettings } = useSettingsVisible()
   const {
     format,
     setFormat,
@@ -49,7 +49,7 @@ function App() {
       {selectedFile && <FileView fileInfo={selectedFile} key={selectedFile.pathname} />}
 
       {showSettings && <Settings />}
-      {hasFiles && <SettingsTrigger onClick={() => setShowSettings(!showSettings)} />}
+      <SettingsTrigger onClick={() => setShowSettings(val => !val)} />
 
       <AnimatePresence>{showDropModal && <DropModal />}</AnimatePresence>
 
