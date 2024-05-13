@@ -26,25 +26,6 @@ impl FileUtil {
       .to_string()
   }
 
-  /// Check if a file/dir is a symlink
-  #[cfg(windows)]
-  #[inline]
-  pub fn check_is_symlink(file_path: &str) -> bool {
-    let symlink_metadata = match fs::symlink_metadata(file_path) {
-      Ok(result) => result,
-      Err(_) => return true,
-    };
-
-    symlink_metadata.file_attributes() == 1040
-  }
-
-  /// Check if a file/dir is a symlink
-  #[cfg(unix)]
-  #[inline]
-  pub fn check_is_symlink(_: &str) -> bool {
-    false
-  }
-
   /// Check if a file is hidden
   ///
   /// Checking file_attributes metadata of a file and check if it is hidden

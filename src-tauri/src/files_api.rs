@@ -23,13 +23,12 @@ pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<IpcFile>, String> {
   for dir_entry in dir_data {
     let dir_entry = dir_entry.map_err(|err| err.to_string())?;
     let metadata = dir_entry.metadata().map_err(|err| err.to_string())?;
-    // jump dir
-    if metadata.is_dir() { continue; }
-
     let path_buf = dir_entry.path();
     let pathname = path_buf.to_str().unwrap();
-    // jump invalid file
-    if FileUtil::check_is_symlink(pathname) { continue; }
+
+    // filter file
+    if metadata.is_dir() { continue; }
+    if metadata.is_symlink() { continue; }
     if FileUtil::check_is_hidden(pathname) { continue; }
     if FileUtil::check_is_system_file(pathname) { continue; }
 
@@ -63,10 +62,10 @@ pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IpcFile>, String> {
 
   for pathname in paths {
     let metadata = fs::metadata(pathname).map_err(|err| err.to_string())?;
-    // jump dir
+
+    // filter file
     if metadata.is_dir() { continue; }
-    // jump invalid file
-    if FileUtil::check_is_symlink(pathname) { continue; }
+    if metadata.is_symlink() { continue; }
     if FileUtil::check_is_hidden(pathname) { continue; }
     if FileUtil::check_is_system_file(pathname) { continue; }
 
