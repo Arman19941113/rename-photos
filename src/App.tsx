@@ -16,13 +16,13 @@ function App() {
   const [showSettings, setShowSettings] = useState(false)
   const {
     format,
-    handleFormatChange,
+    setFormat,
+    setSelectedKey,
     files,
     selectedFile,
     handleOpenFolder,
     handleDropFiles,
-    handleRename,
-    handleSelectedKeyChange,
+    handleClickRename,
   } = useFiles()
   const hasFiles = files.length > 0
   const { isDragging } = useDragging({ disabled: showSettings, onDrop: handleDropFiles })
@@ -33,14 +33,14 @@ function App() {
       <div className="flex w-full flex-col">
         <OperationBar
           format={format}
-          onFormatChange={handleFormatChange}
+          onFormatChange={setFormat}
           hasFiles={hasFiles}
           onClickOpen={handleOpenFolder}
-          onClickRename={handleRename}
+          onClickRename={handleClickRename}
         />
 
         {hasFiles ? (
-          <FilesTable files={files} onSelectedKeyChange={handleSelectedKeyChange} />
+          <FilesTable files={files} onSelectedKeyChange={setSelectedKey} />
         ) : (
           <DropGuide isDragging={isDragging} />
         )}

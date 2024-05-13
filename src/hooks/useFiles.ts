@@ -40,7 +40,7 @@ export function useFiles() {
   }
 
   const [isRenaming, setIsRenaming] = useState(false)
-  const handleRename = () => {
+  const handleClickRename = () => {
     if (isRenaming) return
 
     const time = Date.now()
@@ -69,12 +69,12 @@ export function useFiles() {
 
   return {
     format,
-    handleFormatChange: setFormat,
+    setFormat,
+    setSelectedKey,
     files,
     selectedFile,
     handleOpenFolder,
     handleDropFiles,
-    handleRename,
-    handleSelectedKeyChange: setSelectedKey,
+    handleClickRename,
   }
 }

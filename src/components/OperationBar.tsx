@@ -5,7 +5,7 @@ import { clsx } from 'clsx'
 import { KeyboardEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function OperationBar({
+function OperationBar({
   format,
   onFormatChange,
   hasFiles,
@@ -61,3 +61,5 @@ export default function OperationBar({
     </div>
   )
 }
+
+export default OperationBar

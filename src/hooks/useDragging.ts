@@ -1,22 +1,27 @@
 import { listen, TauriEvent } from '@tauri-apps/api/event'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export function useDragging({ disabled, onDrop }: { disabled: boolean; onDrop: (paths: string[]) => void }) {
   const [isDragging, setIsDragging] = useState(false)
+  // FIX ME: useEffectEvent
+  const refDisabled = useRef(disabled)
+  refDisabled.current = disabled
+  const refOnDrop = useRef(onDrop)
+  refOnDrop.current = onDrop
 
   useEffect(() => {
     const promises = Promise.all([
       listen(TauriEvent.DRAG, () => {
-        if (disabled) return
+        if (refDisabled.current) return
         setIsDragging(true)
       }),
       listen<{ paths: string[] }>(TauriEvent.DROP, event => {
-        if (disabled) return
+        if (refDisabled.current) return
         setIsDragging(false)
-        onDrop(event.payload.paths)
+        refOnDrop.current(event.payload.paths)
       }),
       listen(TauriEvent.DROP_CANCELLED, () => {
-        if (disabled) return
+        if (refDisabled.current) return
         setIsDragging(false)
       }),
     ])
