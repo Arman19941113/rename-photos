@@ -3,7 +3,8 @@ import SponsorModal from '@/components/settings/SponsorModal.tsx'
 import { getVersion } from '@tauri-apps/api/app'
 import { useTranslation } from 'react-i18next'
 
-const appVersion = await getVersion()
+let appVersion = '0.0.0'
+getVersion().then(version => (appVersion = version))
 
 function About() {
   const { t } = useTranslation()
