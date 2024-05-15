@@ -1,4 +1,6 @@
 const zhCn = {
+  'Rename Photos': '图片重命名工具',
+
   // common
   Ok: '好的',
   'System Error': '系统错误',
@@ -40,6 +42,9 @@ const zhCn = {
     '下方列举了支持的变量，你可以在表格中预览预期的新文件名',
   '3. Click `Rename` button to change names': '3. 点击`重命名`按钮执行修改操作',
   About: '关于',
+  'This software is completely free and open source on Github.': '软件完全免费并在 Github 开源。',
+  'If you find this tool helpful, you can': '如果您觉得这个工具对您有所帮助，您可以',
+  'buy me a cup of coffee': '请我喝杯咖啡',
 }
 
 export default zhCn

@@ -1,4 +1,6 @@
 const enUs = {
+  'Rename Photos': 'Rename Photos',
+
   // common
   Ok: 'Ok',
   'System Error': 'System Error',
@@ -40,6 +42,10 @@ const enUs = {
     'The variables listed below are supported, and you can preview the expected new name in the table.',
   '3. Click `Rename` button to change names': '3. Click `Rename` button to change names',
   About: 'About',
+  'This software is completely free and open source on Github.':
+    'This software is completely free and open source on Github.',
+  'If you find this tool helpful, you can': 'If you find this tool helpful, you can',
+  'buy me a cup of coffee': 'buy me a cup of coffee',
 }
 
 export default enUs

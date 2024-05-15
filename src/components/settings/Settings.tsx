@@ -1,4 +1,5 @@
 import { MingcuteHeartLine, RiSettings4Line, TablerHelpSquareRounded } from '@/components/icon'
+import About from '@/components/settings/About.tsx'
 import HelpDoc from '@/components/settings/HelpDoc.tsx'
 import { Language, StorageKey } from '@/const'
 import { Radio, RadioGroup } from '@nextui-org/radio'
@@ -60,7 +61,7 @@ function Settings() {
           <span>{t('About')}</span>
         </div>
       ),
-      content: <div>About</div>,
+      content: <About />,
     },
   ]
 

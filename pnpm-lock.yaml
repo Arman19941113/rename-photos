@@ -14,6 +14,9 @@ importers:
       '@nextui-org/input':
         specifier: ^2.1.21
         version: 2.1.21(@nextui-org/system@2.1.2(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3)))(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(@types/react@18.3.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@nextui-org/modal':
+        specifier: ^2.0.33
+        version: 2.0.33(@nextui-org/system@2.1.2(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3)))(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(framer-motion@11.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3))
       '@nextui-org/radio':
         specifier: ^2.0.28
         version: 2.0.28(@nextui-org/system@2.1.2(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3)))(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1328,6 +1331,15 @@ packages:
       react: '>=18'
       react-dom: '>=18'
 
+  '@nextui-org/modal@2.0.33':
+    resolution: {integrity: sha512-YCgWUMNiVMXAgd6SmU4yH7Ifrz+cmtlF2sK9DBL8kaIZtqAjuhPQj0uQnetvXpY649vomJWVdh9QYHNfD1Jv1Q==}
+    peerDependencies:
+      '@nextui-org/system': '>=2.0.0'
+      '@nextui-org/theme': '>=2.1.0'
+      framer-motion: '>=4.0.0'
+      react: '>=18'
+      react-dom: '>=18'
+
   '@nextui-org/radio@2.0.28':
     resolution: {integrity: sha512-h8SSQTDj0NzB13r77RrcEDuWNSpE00ioO7GJKTROd09YQSmck/AID1+ktsDMRQYjoPMPJ7vgwJHuRoKIjXn1CQ==}
     peerDependencies:
@@ -1441,6 +1453,12 @@ packages:
     peerDependencies:
       react: '>=18'
 
+  '@nextui-org/use-aria-modal-overlay@2.0.8':
+    resolution: {integrity: sha512-fzMh/UtNEzYKOcjXyM1esGoxorB4nBPkg8vyGqVgkhU+QeI0JdWPEnC6nXAU6j57eh3ZYx/jLEMh1Jeu5IAEmw==}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+
   '@nextui-org/use-callback-ref@2.0.5':
     resolution: {integrity: sha512-lcjlV5yaDTiFSv06E5RtQNqy+O6XqH/Q/yz+ka1ZBlZF/FdzEPNRfJ0shN2D7Sh3DdbvV2lySbA2g/0d94geaw==}
     peerDependencies:
@@ -1453,6 +1471,11 @@ packages:
 
   '@nextui-org/use-data-scroll-overflow@2.1.4':
     resolution: {integrity: sha512-0YqUAe/b9aZftUQOH7sWqBMJHGLyC2Q/ixFyjq8Q1TijrqEyGESGQ2tm0+FHytI04drV+mnsbf6+q2QIKyqGSg==}
+    peerDependencies:
+      react: '>=18'
+
+  '@nextui-org/use-disclosure@2.0.7':
+    resolution: {integrity: sha512-h86z6H/eTQ6RMAYkWBvItgV0uh4UDTbJIa8hvDguzYLyGk5Ji+7HXotCUwKELrK/+QuOtAFYcJ6+Cp8zp7tZuA==}
     peerDependencies:
       react: '>=18'
 
@@ -1504,6 +1527,12 @@ packages:
     resolution: {integrity: sha512-PeXTEfURrZZBN80YJUyVPAvkT7gwpPtwBgtKxg1ars+D1iDV4Yp48yh5pKaNSf0/rlLNOgKJSCpcFzY7V3ipFw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+
+  '@react-aria/dialog@3.5.13':
+    resolution: {integrity: sha512-GUwY7sQtPMtO6LFHyoIGFMEv8tEBrNCrSNwEKilFLxvNUCo/1sY3N+7L2TcoeyDkcRWBJ9Uz9iR0iJ6EsCBWng==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
 
   '@react-aria/focus@3.17.0':
     resolution: {integrity: sha512-aRzBw1WTUkcIV3xFrqPA6aB8ZVt3XyGpTaSHAypU0Pgoy2wRq9YeJYpbunsKj9CJmskuffvTqXwAjTcaQish1Q==}
@@ -1679,6 +1708,11 @@ packages:
 
   '@react-types/checkbox@3.8.0':
     resolution: {integrity: sha512-IBJ2bAsb3xoXaL+f0pwfRLDvRkhxfcX/q4NRJ2oT9jeHLU+j6svgK1Dqk8IGmY+vw1ltKbbMlIVeVonKQ3fgHw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+
+  '@react-types/dialog@3.5.9':
+    resolution: {integrity: sha512-8r9P1b1gq/cUv2bTPPNL3IFVEj9R5sIPACoSXznXkpXxh5FLU6yUPHDeQjvmM50q7KlEOgrPYhGl5pW525kLww==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
 
@@ -5192,6 +5226,30 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
+  '@nextui-org/modal@2.0.33(@nextui-org/system@2.1.2(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3)))(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(framer-motion@11.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3))':
+    dependencies:
+      '@nextui-org/framer-utils': 2.0.18(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(framer-motion@11.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3))
+      '@nextui-org/react-utils': 2.0.13(react@18.3.1)
+      '@nextui-org/shared-icons': 2.0.7(react@18.3.1)
+      '@nextui-org/shared-utils': 2.0.5
+      '@nextui-org/system': 2.1.2(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3))
+      '@nextui-org/theme': 2.2.3(tailwindcss@3.4.3)
+      '@nextui-org/use-aria-button': 2.0.7(react@18.3.1)
+      '@nextui-org/use-aria-modal-overlay': 2.0.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@nextui-org/use-disclosure': 2.0.7(react@18.3.1)
+      '@react-aria/dialog': 3.5.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/focus': 3.17.0(react@18.3.1)
+      '@react-aria/interactions': 3.21.2(react@18.3.1)
+      '@react-aria/overlays': 3.22.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/utils': 3.24.0(react@18.3.1)
+      '@react-stately/overlays': 3.6.6(react@18.3.1)
+      '@react-types/overlays': 3.8.6(react@18.3.1)
+      framer-motion: 11.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    transitivePeerDependencies:
+      - tailwind-variants
+
   '@nextui-org/radio@2.0.28(@nextui-org/system@2.1.2(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-variants@0.2.1(tailwindcss@3.4.3)))(@nextui-org/theme@2.2.3(tailwindcss@3.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@nextui-org/react-utils': 2.0.13(react@18.3.1)
@@ -5397,6 +5455,15 @@ snapshots:
       '@react-types/shared': 3.23.0(react@18.3.1)
       react: 18.3.1
 
+  '@nextui-org/use-aria-modal-overlay@2.0.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@react-aria/overlays': 3.22.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/utils': 3.24.0(react@18.3.1)
+      '@react-stately/overlays': 3.6.6(react@18.3.1)
+      '@react-types/shared': 3.23.0(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   '@nextui-org/use-callback-ref@2.0.5(react@18.3.1)':
     dependencies:
       '@nextui-org/use-safe-layout-effect': 2.0.5(react@18.3.1)
@@ -5409,6 +5476,13 @@ snapshots:
   '@nextui-org/use-data-scroll-overflow@2.1.4(react@18.3.1)':
     dependencies:
       '@nextui-org/shared-utils': 2.0.5
+      react: 18.3.1
+
+  '@nextui-org/use-disclosure@2.0.7(react@18.3.1)':
+    dependencies:
+      '@nextui-org/use-callback-ref': 2.0.5(react@18.3.1)
+      '@react-aria/utils': 3.24.0(react@18.3.1)
+      '@react-stately/utils': 3.10.0(react@18.3.1)
       react: 18.3.1
 
   '@nextui-org/use-is-mounted@2.0.5(react@18.3.1)':
@@ -5471,6 +5545,17 @@ snapshots:
       '@react-types/shared': 3.23.0(react@18.3.1)
       '@swc/helpers': 0.5.11
       react: 18.3.1
+
+  '@react-aria/dialog@3.5.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@react-aria/focus': 3.17.0(react@18.3.1)
+      '@react-aria/overlays': 3.22.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/utils': 3.24.0(react@18.3.1)
+      '@react-types/dialog': 3.5.9(react@18.3.1)
+      '@react-types/shared': 3.23.0(react@18.3.1)
+      '@swc/helpers': 0.5.11
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@react-aria/focus@3.17.0(react@18.3.1)':
     dependencies:
@@ -5793,6 +5878,12 @@ snapshots:
 
   '@react-types/checkbox@3.8.0(react@18.3.1)':
     dependencies:
+      '@react-types/shared': 3.23.0(react@18.3.1)
+      react: 18.3.1
+
+  '@react-types/dialog@3.5.9(react@18.3.1)':
+    dependencies:
+      '@react-types/overlays': 3.8.6(react@18.3.1)
       '@react-types/shared': 3.23.0(react@18.3.1)
       react: 18.3.1
 
