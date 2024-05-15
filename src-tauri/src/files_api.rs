@@ -88,6 +88,9 @@ pub fn rename_files(rename_path_data: Vec<(&str, &str, &str)>) -> Result<Vec<Ipc
   // check exists
   for paths in &rename_path_data {
     let new_path = paths.1;
+    if rename_path_data.iter().any(|item| item.0 == new_path) {
+      continue;
+    }
     let path_buf = std::path::PathBuf::from(new_path);
     if path_buf.exists() {
       let msg = format!("The file \"{}\" already exist", new_path);
