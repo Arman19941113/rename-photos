@@ -1,5 +1,8 @@
 use std::collections::HashMap;
+use std::fs;
 use std::fs::Metadata;
+#[cfg(windows)]
+use std::os::windows::prelude::*;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -90,7 +93,7 @@ impl ExifAnalysis {
 }
 
 fn read_exif(pathname: &str) -> Result<HashMap<String, Option<String>>, exif::Error> {
-  let file = std::fs::File::open(pathname)?;
+  let file = fs::File::open(pathname)?;
   let mut buf_reader = std::io::BufReader::new(&file);
   let exif_reader = exif::Reader::new();
   let exif = exif_reader.read_from_container(&mut buf_reader)?;
