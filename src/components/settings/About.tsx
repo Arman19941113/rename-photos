@@ -9,7 +9,7 @@ getVersion().then(version => (appVersion = version))
 function About() {
   const { t } = useTranslation()
   return (
-    <div className="w-[490px]">
+    <div className="w-[564px]">
       <div className="mt-2 rounded-md border bg-default-100 px-4 py-3">
         <h2 className="mb-2 text-base font-semibold	">
           {t('Rename Photos')}

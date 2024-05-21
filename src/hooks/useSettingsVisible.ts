@@ -5,9 +5,7 @@ export function useSettingsVisible() {
 
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setShowSettings(false)
-      } else if ((event.metaKey || event.ctrlKey) && (event.key === ',' || event.key === '/')) {
+      if ((event.metaKey || event.ctrlKey) && (event.key === ',' || event.key === '/')) {
         setShowSettings(val => !val)
       }
     }

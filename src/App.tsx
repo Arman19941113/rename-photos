@@ -4,7 +4,6 @@ import FilesTable from '@/components/FilesTable.tsx'
 import FileView from '@/components/FileView.tsx'
 import OperationBar from '@/components/OperationBar.tsx'
 import Settings from '@/components/settings/Settings.tsx'
-import SettingsTrigger from '@/components/settings/SettingsTrigger.tsx'
 import { useDragging, useFiles } from '@/hooks'
 import { useSettingsVisible } from '@/hooks/useSettingsVisible.ts'
 import { AnimatePresence } from 'framer-motion'
@@ -48,8 +47,7 @@ function App() {
 
       {selectedFile && <FileView fileInfo={selectedFile} key={selectedFile.pathname} />}
 
-      {showSettings && <Settings />}
-      <SettingsTrigger onClick={() => setShowSettings(val => !val)} />
+      <Settings showSettings={showSettings} onSettingsChange={setShowSettings} />
 
       <AnimatePresence>{showDropModal && <DropModal />}</AnimatePresence>
 
