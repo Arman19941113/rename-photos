@@ -1,5 +1,5 @@
 [package]
-name = "name-photos"
+name = "rename-photos"
 version = "0.0.0"
 description = "A Tauri App"
 authors = ["you"]

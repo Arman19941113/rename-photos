@@ -14,7 +14,7 @@ function About() {
         <h2 className="mb-2 text-base font-semibold	">
           {t('Rename Photos')}
           <a
-            href="https://github.com/Arman19941113/name-photos/releases"
+            href="https://github.com/Arman19941113/rename-photos/releases"
             target="_blank"
             className="ml-1 text-secondary underline"
             rel="noreferrer"
@@ -24,7 +24,7 @@ function About() {
         </h2>
         <p>
           <a
-            href="https://github.com/Arman19941113/name-photos"
+            href="https://github.com/Arman19941113/rename-photos"
             target="_blank"
             className="flex items-center text-secondary underline"
             rel="noreferrer"

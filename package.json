@@ -1,6 +1,19 @@
 {
-  "name": "name-photos",
+  "name": "rename-photos",
   "private": true,
+  "description": "A cross-platform desktop-app for renaming photos using EXIF data",
+  "keywords": [
+    "cross-platform",
+    "desktop-app",
+    "rename photos",
+    "rename files"
+  ],
+  "license": "MIT",
+  "author": "Arman Tang",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arman19941113/rename-photos"
+  },
   "type": "module",
   "scripts": {
     "lint": "eslint src",
