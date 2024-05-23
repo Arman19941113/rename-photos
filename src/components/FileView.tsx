@@ -1,6 +1,8 @@
 import { MingcuteFileMoreLine } from '@/components/icon'
 import { FileInfo } from '@/util'
 import { convertFileSrc } from '@tauri-apps/api/core'
+
+import { clsx } from 'clsx'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -9,9 +11,12 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   const { t } = useTranslation()
 
   /* image source */
-  const imageSrc = convertFileSrc(fileInfo.pathname)
+  const imageSrc = fileInfo.preview ? convertFileSrc(fileInfo.pathname) : ''
+  const [isImgLoad, setIsImgLoad] = useState(false)
   const [isImgError, setIsImgError] = useState(false)
+  const onImgLoad = () => setIsImgLoad(true)
   const onImgError = () => setIsImgError(true)
+  const showFileIcon = !imageSrc || isImgError
 
   /* exif data */
   let focalLength = fileInfo.exifData?.FocalLength
@@ -32,11 +37,11 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   return (
     <div className="ml-4 w-[248px] shrink-0 overflow-auto">
       <div className="flex-center h-[143px]">
-        {isImgError ? (
+        {showFileIcon ? (
           <MingcuteFileMoreLine className="text-5xl text-default-500" />
         ) : (
-          <div className="p-1 pt-0 shadow-md">
-            <img src={imageSrc} alt="" className="h-[135px] object-contain" onError={onImgError} />
+          <div className={clsx('p-1 pt-0', isImgLoad && 'shadow-md')}>
+            <img src={imageSrc} alt="" className="h-[135px] object-contain" onLoad={onImgLoad} onError={onImgError} />
           </div>
         )}
       </div>

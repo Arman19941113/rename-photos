@@ -1,4 +1,5 @@
 import { ExifStatus, FormatVar } from '@/const'
+import mime from 'mime/lite'
 import { formatDate, formatFileSize, getDirFromFilePath, getValidPath } from './'
 
 export interface FileInfo {
@@ -8,6 +9,7 @@ export interface FileInfo {
   filename: string
   newFilename: string
   size: string
+  preview: boolean
   exifStatus: ExifStatus
   exifMsg: string
   exifData: IpcFiles[number]['exifData']
@@ -35,6 +37,7 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
         filename: item.filename,
         newFilename: '',
         size: formatFileSize(item.size),
+        preview: checkPreview(item.filename, item.size),
         exifStatus,
         exifMsg,
         exifData,
@@ -119,4 +122,14 @@ function generateFilename({
   } catch (e) {
     return format
   }
+}
+
+export function checkPreview(filename: string, size: number) {
+  const maxSize = 50_000_000
+  if (size > maxSize) return false
+
+  const mimeType = mime.getType(filename)
+  if (!mimeType) return false
+
+  return mimeType.startsWith('image') || mimeType.startsWith('video')
 }
