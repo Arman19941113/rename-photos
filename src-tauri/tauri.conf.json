@@ -11,6 +11,7 @@
   "app": {
     "windows": [
       {
+        "title": "Rename Photos",
         "hiddenTitle": true,
         "minWidth": 900,
         "minHeight": 560,
