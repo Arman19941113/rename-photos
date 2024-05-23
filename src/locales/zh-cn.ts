@@ -1,5 +1,5 @@
 const zhCn = {
-  'Rename Photos': '图片重命名工具',
+  'Rename Photos': '图片重命名工具 Rename Photos',
 
   // common
   Ok: '好的',

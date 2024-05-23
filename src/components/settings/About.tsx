@@ -16,10 +16,10 @@ function About() {
           <a
             href="https://github.com/Arman19941113/rename-photos/releases"
             target="_blank"
-            className="ml-1 text-secondary underline"
+            className="ml-2 text-secondary underline"
             rel="noreferrer"
           >
-            {appVersion}
+            v{appVersion}
           </a>
         </h2>
         <p>
