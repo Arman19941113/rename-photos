@@ -58,9 +58,13 @@ export function useFiles() {
 
     localStorage.setItem(StorageKey.FORMAT, format)
     setIsRenaming(true)
-    invoke<IpcFiles>(TauriCommand.RENAME_FILES, { renamePathData })
-      .then(ipcFiles => {
-        setIpcFiles(ipcFiles)
+    invoke<string[]>(TauriCommand.RENAME_FILES, { renamePathData })
+      .then(res => {
+        const pathnameList = files
+          .filter(item => item.filename === item.newFilename)
+          .map(item => item.pathname)
+          .concat(res)
+        handleDropFiles(pathnameList)
         toast.success(t('Rename Success!'))
       })
       .catch(err => handleError({ err, title: t('Rename Files Error') }))

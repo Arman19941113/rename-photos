@@ -84,7 +84,7 @@ pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IpcFile>, String> {
 }
 
 #[tauri::command]
-pub fn rename_files(rename_path_data: Vec<(&str, &str, &str)>) -> Result<Vec<IpcFile>, String> {
+pub fn rename_files(rename_path_data: Vec<(&str, &str, &str)>) -> Result<Vec<String>, String> {
   // check exists
   for paths in &rename_path_data {
     let new_path = paths.1;
@@ -106,7 +106,7 @@ pub fn rename_files(rename_path_data: Vec<(&str, &str, &str)>) -> Result<Vec<Ipc
     let (_, new_name, temp_name) = path_info;
     fs::rename(temp_name, new_name).map_err(|err| err.to_string())?;
   }
-  let new_paths = rename_path_data.iter().map(|item| item.1).collect();
+  let new_paths = rename_path_data.iter().map(|item| item.1.to_string()).collect();
 
-  get_files_from_paths(new_paths)
+  Ok(new_paths)
 }
