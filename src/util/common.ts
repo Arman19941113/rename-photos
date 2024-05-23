@@ -42,8 +42,10 @@ export function formatFileSize(bytes: number, decimalPlaces = 1): string {
 }
 
 export function getDirFromFilePath(filePath: string) {
-  const pathParts = filePath.split('/')
-  return pathParts.slice(0, -1).join('/')
+  const isWindows = window.navigator.userAgent.toLowerCase().includes('windows')
+  const separator = isWindows ? '\\' : '/'
+  const pathParts = filePath.split(separator)
+  return pathParts.slice(0, -1).join(separator)
 }
 
 // filter the symbols are not allowed in the filename
