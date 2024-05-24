@@ -1,30 +1,32 @@
 <div align="center">
 
-<img src="./docs/images/coverview-zh.jpg" alt=""/>
+<img src="./docs/images/coverview-en.jpg" alt=""/>
 
 <h1>Rename Photos</h1>
 
-Rename Photos 是一个使用 EXIF 数据给图片重命名的跨平台桌面应用。
+Rename Photos is a cross-platform desktop-app for renaming photos using EXIF data.
 
-如果你的文件缺少 EXIF 数据，软件也能工作。[了解更多...](https://armantang.fun/rename-photos-zh)
+If your files lack EXIF data, it also works. [See more...](https://armantang.fun/rename-photos)
 
-软件安装包仅 4MB 左右，请放心食用。
+This app has a compact bundle size of just 4MB. Feel free to use it.
 
 </div>
 
-## 下载
+## Download
 
 - [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.1/Rename.Photos_0.0.1_aarch64.dmg)
 - [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.1/Rename.Photos_0.0.1_x64.dmg)
 - [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.1/Rename.Photos_0.0.1_x64_en-US.msi)
 - [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.1/rename-photos_0.0.1_amd64.deb)
 
-### MacOS：软件已损坏，无法打开。
+### "App is damaged and can't be opened" on MacOS
 
-打开终端输入以下命令：
+Open Terminal and then enter the following command:
 ```bash
 sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app
 ```
-### 软件是否安全？
+### Is this app safe?
 
-是的！所有代码都是开源的！软件只提供文件重命名功能，不会收集任何用户隐私信息。
+Yes! The codes are open-source.
+
+We don't collect any user privacy information, and our only function is to rename files. 
