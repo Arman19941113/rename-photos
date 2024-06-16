@@ -2,7 +2,7 @@ import { RiFolderOpenLine } from '@/components/icon'
 import { Button } from '@nextui-org/button'
 import { Input } from '@nextui-org/input'
 import { clsx } from 'clsx'
-import { KeyboardEvent, useState } from 'react'
+import { KeyboardEvent, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 function OperationBar({
@@ -20,9 +20,27 @@ function OperationBar({
 }) {
   const { t } = useTranslation()
 
+  const inputRef = useRef<HTMLInputElement>(null)
+  const compositionRef = useRef(false)
   const [value, setValue] = useState(format)
+
+  const handleCompositionStart = () => {
+    compositionRef.current = true
+  }
+  const handleCompositionEnd = () => {
+    compositionRef.current = false
+    onFormatChange(value.trim())
+  }
+  const handleValueChange = (val: string) => {
+    setValue(val)
+    if (!compositionRef.current) {
+      onFormatChange(val.trim())
+    }
+  }
   const handleKeydown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') onFormatChange(value)
+    if (event.key === 'Enter' || event.key === 'Escape') {
+      inputRef.current?.blur()
+    }
   }
   const handleBlur = () => {
     const val = value.trim()
@@ -44,12 +62,15 @@ function OperationBar({
 
       <div className={clsx(hasFiles ? 'flex' : 'hidden', 'w-full items-center justify-end pl-20')}>
         <Input
+          ref={inputRef}
           value={value}
           className="max-w-80"
           variant="underlined"
           color="primary"
           size="sm"
-          onValueChange={setValue}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
+          onValueChange={handleValueChange}
           onKeyDown={handleKeydown}
           onBlur={handleBlur}
         />
