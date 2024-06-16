@@ -1,7 +1,9 @@
+import { useConfigStore } from '@/store/useConfigStore.ts'
 import { listen, TauriEvent } from '@tauri-apps/api/event'
 import { useEffect, useRef, useState } from 'react'
 
-export function useDragging({ disabled, onDrop }: { disabled: boolean; onDrop: (paths: string[]) => void }) {
+export function useDragging({ onDrop }: { onDrop: (paths: string[]) => void }) {
+  const disabled = useConfigStore(state => state.visible)
   const [isDragging, setIsDragging] = useState(false)
   // FIX ME: useEffectEvent
   const refDisabled = useRef(disabled)

@@ -15,7 +15,17 @@ export interface FileInfo {
   exifData: IpcFiles[number]['exifData']
 }
 
-export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles; format: string; t: any }): FileInfo[] {
+export function transformIpcFiles({
+  ipcFiles,
+  exifMode,
+  format,
+  t,
+}: {
+  ipcFiles: IpcFiles
+  exifMode: boolean
+  format: string
+  t: any
+}): FileInfo[] {
   const files = ipcFiles
     .sort((a, b) => a.filename.localeCompare(b.filename, undefined, { numeric: true }))
     .map(item => {
@@ -27,7 +37,7 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
         exifMsg = exifError === 'Unknown image format' ? t('Unknown image format') : exifError
       } else if (Object.values(exifData!).some(val => val === null)) {
         exifStatus = ExifStatus.WARNING
-        exifMsg = t('Missing exif data')
+        exifMsg = t('Missing EXIF data')
       }
 
       return {
@@ -44,15 +54,20 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
       }
     })
 
+  // This block generates unique new filenames.
   const nameMap: Record<string, string> = {}
   const newNameCounter: Record<string, number> = {}
   // counts new filename
   files.forEach(item => {
-    const newFilename = generateFilename({
-      format,
-      created: item.created,
-      exifData: item.exifData,
-    })
+    const isKeepName = exifMode && item.exifStatus !== ExifStatus.SUCCESS
+    // add name to counter to avoid being overwritten
+    const newFilename = isKeepName
+      ? item.filename
+      : generateFilename({
+          format,
+          created: item.created,
+          exifData: item.exifData,
+        })
     nameMap[item.filename] = newFilename
     if (newNameCounter.hasOwnProperty(newFilename)) {
       newNameCounter[newFilename] += 1
@@ -63,6 +78,11 @@ export function transformIpcFiles({ ipcFiles, format, t }: { ipcFiles: IpcFiles;
   // handle duplicates
   const nameSequence: Record<string, number> = {}
   files.forEach(item => {
+    const isKeepName = exifMode && item.exifStatus !== ExifStatus.SUCCESS
+    if (isKeepName) {
+      item.newFilename = '--'
+      return
+    }
     const newFilename = nameMap[item.filename]
     const extName = getExtName(item.filename)
     const duplicates = newNameCounter[newFilename]

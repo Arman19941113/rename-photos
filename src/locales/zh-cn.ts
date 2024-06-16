@@ -16,12 +16,12 @@ const zhCn = {
   'Rename Files Error': '重命名出错',
   'No need to perform renaming': '无需执行重命名操作',
   'Unknown image format': '未知图片格式',
-  'Missing exif data': 'EXIF 数据缺失',
+  'Missing EXIF data': 'EXIF 数据缺失',
   Filename: '文件名',
   'New Filename': '新文件名',
 
-  // exif field
-  'Exif Information': 'Exif 信息',
+  // EXIF field
+  'EXIF Information': 'EXIF 信息',
   Date: '拍摄日期',
   Make: '制造商',
   Camera: '相机',
@@ -34,6 +34,8 @@ const zhCn = {
   // settings
   Settings: '设置',
   Language: '语言',
+  'EXIF Mode': 'EXIF模式',
+  'If enabled, only rename files with EXIF data.': '只处理含有 EXIF 数据的文件',
   Help: '帮助',
   '1. Select a folder or drag and drop files': '1. 选择文件夹或者直接拖拽文件',
   'Selected files will be displayed in the table.': '选中的文件会显示在表格中。',

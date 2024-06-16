@@ -1,29 +1,32 @@
 import { MingcuteHeartLine, RiSettings4Line, TablerHelpSquareRounded } from '@/components/icon'
 import About from '@/components/settings/About.tsx'
+import Basic from '@/components/settings/Basic.tsx'
 import HelpDoc from '@/components/settings/HelpDoc.tsx'
-import { Language, StorageKey } from '@/const'
+import { toggleVisible, updateVisible, useConfigStore } from '@/store/useConfigStore.ts'
 import { Modal, ModalBody, ModalContent } from '@nextui-org/modal'
-import { Radio, RadioGroup } from '@nextui-org/radio'
 import { Tab, Tabs } from '@nextui-org/tabs'
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-function Settings({
-  showSettings,
-  onSettingsChange,
-}: {
-  showSettings: boolean
-  onSettingsChange: (val: boolean) => void
-}) {
-  const { t, i18n } = useTranslation()
-  const currentLang = i18n.language
-  const handleLangChange = (val: string) => {
-    i18n
-      .changeLanguage(val)
-      .then(() => localStorage.setItem(StorageKey.LANGUAGE, val))
-      .catch(() => {})
-  }
+function Settings() {
+  const { t } = useTranslation()
 
+  // open or close settings page
+  const visible = useConfigStore(state => state.visible)
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && (event.key === ',' || event.key === '/')) toggleVisible()
+    }
+    document.addEventListener('keydown', handleKeydown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeydown)
+    }
+  }, [])
+
+  // setting tabs
+  const [tab, setTab] = useState('Help')
   let tabs = [
     {
       id: 'Settings',
@@ -33,25 +36,7 @@ function Settings({
           <span>{t('Settings')}</span>
         </div>
       ),
-      content: (
-        <div className="w-[564px]">
-          <div className="mt-2 flex justify-between rounded-md border bg-default-100 px-4 py-3">
-            <div>{t('Language')}</div>
-            <RadioGroup
-              size="sm"
-              color="secondary"
-              orientation="horizontal"
-              defaultValue={currentLang}
-              onValueChange={handleLangChange}
-            >
-              <Radio value={Language.EN} className="mr-1">
-                English
-              </Radio>
-              <Radio value={Language.ZH}>简体中文</Radio>
-            </RadioGroup>
-          </div>
-        </div>
-      ),
+      content: <Basic />,
     },
     {
       id: 'Help',
@@ -82,7 +67,7 @@ function Settings({
           className="p-1 outline-none"
           whileHover={{ scale: 1.6, rotate: 90 }}
           whileTap={{ scale: 1.2, rotate: 180 }}
-          onClick={() => onSettingsChange(true)}
+          onClick={() => updateVisible(true)}
         >
           <RiSettings4Line />
         </motion.button>
@@ -90,14 +75,20 @@ function Settings({
 
       <Modal
         backdrop="blur"
-        isOpen={showSettings}
-        onOpenChange={onSettingsChange}
+        isOpen={visible}
+        onOpenChange={updateVisible}
         classNames={{ base: 'max-w-[652px] h-[500px] !my-0' }}
       >
         <ModalContent>
           <ModalBody>
             <div className="flex flex-col items-center bg-white p-4">
-              <Tabs items={tabs} color="secondary" variant="underlined" defaultSelectedKey="Help">
+              <Tabs
+                items={tabs}
+                selectedKey={tab}
+                onSelectionChange={key => setTab(key as string)}
+                color="secondary"
+                variant="underlined"
+              >
                 {item => <Tab key={item.id} title={item.title} children={item.content} />}
               </Tabs>
             </div>

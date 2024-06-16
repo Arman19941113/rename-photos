@@ -5,14 +5,12 @@ import FileView from '@/components/FileView.tsx'
 import OperationBar from '@/components/OperationBar.tsx'
 import Settings from '@/components/settings/Settings.tsx'
 import { useDragging, useFiles } from '@/hooks'
-import { useSettingsVisible } from '@/hooks/useSettingsVisible.ts'
 import { AnimatePresence } from 'framer-motion'
 import { Flip, ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
-  const { showSettings, setShowSettings } = useSettingsVisible()
   const {
     format,
     setFormat,
@@ -24,7 +22,7 @@ function App() {
     handleClickRename,
   } = useFiles()
   const hasFiles = files.length > 0
-  const { isDragging } = useDragging({ disabled: showSettings, onDrop: handleDropFiles })
+  const { isDragging } = useDragging({ onDrop: handleDropFiles })
   const showDropModal = hasFiles && isDragging
 
   return (
@@ -47,7 +45,7 @@ function App() {
 
       {selectedFile && <FileView fileInfo={selectedFile} key={selectedFile.pathname} />}
 
-      <Settings showSettings={showSettings} onSettingsChange={setShowSettings} />
+      <Settings />
 
       <AnimatePresence>{showDropModal && <DropModal />}</AnimatePresence>
 

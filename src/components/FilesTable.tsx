@@ -41,7 +41,7 @@ function FilesTable({
         <TableHeader>
           <TableColumn>{t('Filename')}</TableColumn>
           <TableColumn>{t('New Filename')}</TableColumn>
-          <TableColumn width={48}>{t('Exif')}</TableColumn>
+          <TableColumn width={48}>EXIF</TableColumn>
         </TableHeader>
         <TableBody>
           {files.map(fileInfo => (

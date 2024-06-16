@@ -50,7 +50,7 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
       <p className="mt-1 text-xs text-default-500">{fileInfo.size}</p>
       <p className="mt-1 text-xs text-default-500">{fileInfo.created}</p>
 
-      <div className="mb-1 mt-6 border-b pb-1 text-xs	font-bold">{t('Exif Information')}</div>
+      <div className="mb-1 mt-6 border-b pb-1 text-xs font-bold">{t('EXIF Information')}</div>
       <ul className="text-xs">
         {exifData.map(item => (
           <li className="mb-1 flex justify-between border-b pb-1" key={item[0]}>

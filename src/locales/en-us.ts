@@ -16,12 +16,12 @@ const enUs = {
   'Rename Files Error': 'Rename Files Error',
   'No need to perform renaming': 'No need to perform renaming',
   'Unknown image format': 'Unknown image format',
-  'Missing exif data': 'Missing exif data',
+  'Missing EXIF data': 'Missing EXIF data',
   Filename: 'Name',
   'New Filename': 'New Name',
 
-  // exif field
-  'Exif Information': 'Exif Information',
+  // EXIF field
+  'EXIF Information': 'EXIF Information',
   Date: 'Date',
   Make: 'Device make',
   Camera: 'Camera',
@@ -34,6 +34,8 @@ const enUs = {
   // settings
   Settings: 'Settings',
   Language: 'Language',
+  'EXIF Mode': 'EXIF Mode',
+  'If enabled, only rename files with EXIF data.': 'If enabled, only rename files with EXIF data.',
   Help: 'Help',
   '1. Select a folder or drag and drop files': '1. Select a folder or drag and drop files',
   'Selected files will be displayed in the table.': 'Selected files will be displayed in the table.',

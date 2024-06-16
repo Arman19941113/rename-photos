@@ -1,5 +1,6 @@
-import { getInitialFormat, StorageKey, TauriCommand } from '@/const'
+import { ExifStatus, getInitialFormat, StorageKey, TauriCommand } from '@/const'
 import { useError } from '@/hooks'
+import { useConfigStore } from '@/store/useConfigStore.ts'
 import { transformIpcFiles } from '@/util'
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -8,11 +9,12 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
 export function useFiles() {
+  const exifMode = useConfigStore(state => state.mode.exif)
   const { t } = useTranslation()
   const { handleError } = useError()
   const [format, setFormat] = useState(getInitialFormat())
   const [ipcFiles, setIpcFiles] = useState<IpcFiles>([])
-  const files = useMemo(() => transformIpcFiles({ ipcFiles, format, t }), [ipcFiles, format, t])
+  const files = useMemo(() => transformIpcFiles({ ipcFiles, exifMode, format, t }), [ipcFiles, exifMode, format, t])
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const selectedFile = files.find(file => file.pathname === selectedKey) ?? null
 
@@ -45,7 +47,11 @@ export function useFiles() {
 
     const time = Date.now()
     const renamePathData = files
-      .filter(item => item.filename !== item.newFilename)
+      .filter(item => {
+        // filter exif mode and same name files
+        const isKeepName = exifMode && item.exifStatus !== ExifStatus.SUCCESS
+        return !isKeepName && item.filename !== item.newFilename
+      })
       .map(item => [
         `${item.dirname}/${item.filename}`,
         `${item.dirname}/${item.newFilename}`,
@@ -60,8 +66,12 @@ export function useFiles() {
     setIsRenaming(true)
     invoke<string[]>(TauriCommand.RENAME_FILES, { renamePathData })
       .then(res => {
+        // contact exif mode and same name files
         const pathnameList = files
-          .filter(item => item.filename === item.newFilename)
+          .filter(item => {
+            const isKeepName = exifMode && item.exifStatus !== ExifStatus.SUCCESS
+            return isKeepName || item.filename === item.newFilename
+          })
           .map(item => item.pathname)
           .concat(res)
         handleDropFiles(pathnameList)
