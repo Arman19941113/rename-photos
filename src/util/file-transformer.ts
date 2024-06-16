@@ -64,6 +64,7 @@ export function transformIpcFiles({
     const newFilename = isKeepName
       ? item.filename
       : generateFilename({
+          filename: item.filename,
           format,
           created: item.created,
           exifData: item.exifData,
@@ -100,16 +101,23 @@ export function transformIpcFiles({
   return files
 }
 
+export function getBaseName(filename: string) {
+  const parts = filename.split('.')
+  return parts.length > 1 ? parts.slice(0, -1).join('.') : filename
+}
+
 export function getExtName(filename: string): string {
   const parts = filename.split('.')
   return parts.length > 1 ? `.${parts[parts.length - 1]}` : ''
 }
 
 function generateFilename({
+  filename,
   format,
   created,
   exifData,
 }: {
+  filename: string
   format: string
   created: string
   exifData: IpcFiles[number]['exifData']
@@ -133,6 +141,8 @@ function generateFilename({
       '{Aperture}': exifData?.Aperture || 'Aperture',
       '{Shutter}': exifData?.Shutter || 'Shutter',
       '{ISO}': exifData?.ISO || 'ISO',
+      '{Current}': getBaseName(filename) || 'Current',
+      '{current}': getBaseName(filename) || 'Current',
     }
     let newFilename = format
     Object.entries(formatValueMap).forEach(([key, value]) => {
