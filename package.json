@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@nextui-org/button": "^2.0.34",
+    "@nextui-org/dropdown": "^2.1.26",
     "@nextui-org/input": "^2.2.2",
     "@nextui-org/modal": "^2.0.36",
     "@nextui-org/radio": "^2.1.2",

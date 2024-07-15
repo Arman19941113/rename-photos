@@ -12,8 +12,8 @@ export const enum ExifStatus {
 
 export const enum StorageKey {
   LANGUAGE = 'LANGUAGE',
-  FORMAT = 'FORMAT',
   MODE_EXIF = 'MODE_EXIF',
+  INPUT_HISTORY = 'INPUT_HISTORY',
 }
 
 export const enum Language {
@@ -43,8 +43,3 @@ export const formatVars: FormatVar[] = [
   '{Current}',
   '{current}',
 ]
-
-export function getInitialFormat() {
-  const defaultVal = '{Make} {YYYY}.{MM}.{DD} {hh}.{mm}.{ss}'
-  return localStorage.getItem(StorageKey.FORMAT) || defaultVal
-}

@@ -1,19 +1,26 @@
-import { RiFolderOpenLine } from '@/components/icon'
+import { RiChatHistoryLine, RiFolderOpenLine } from '@/components/icon'
 import { Button } from '@nextui-org/button'
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
 import { Input } from '@nextui-org/input'
 import { clsx } from 'clsx'
-import { KeyboardEvent, useRef, useState } from 'react'
+import { KeyboardEvent, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 function OperationBar({
+  inputValue,
+  onInputValueChange,
   format,
+  formatOptions,
   onFormatChange,
   hasFiles,
   onClickOpen,
   onClickRename,
 }: {
+  inputValue: string
+  onInputValueChange: (value: string) => void
   format: string
   onFormatChange: (format: string) => void
+  formatOptions: string[]
   hasFiles: boolean
   onClickOpen: () => void
   onClickRename: () => void
@@ -22,17 +29,17 @@ function OperationBar({
 
   const inputRef = useRef<HTMLInputElement>(null)
   const compositionRef = useRef(false)
-  const [value, setValue] = useState(format)
+  const items = formatOptions.map(option => ({ key: option, value: option }))
 
   const handleCompositionStart = () => {
     compositionRef.current = true
   }
   const handleCompositionEnd = () => {
     compositionRef.current = false
-    onFormatChange(value.trim())
+    onFormatChange(inputValue.trim())
   }
   const handleValueChange = (val: string) => {
-    setValue(val)
+    onInputValueChange(val)
     if (!compositionRef.current) {
       onFormatChange(val.trim())
     }
@@ -43,8 +50,14 @@ function OperationBar({
     }
   }
   const handleBlur = () => {
-    const val = value.trim()
-    setValue(val)
+    const val = inputValue.trim()
+    onInputValueChange(val)
+    onFormatChange(val)
+  }
+
+  const handleSelect = (selection: any) => {
+    const [val] = [...selection]
+    onInputValueChange(val)
     onFormatChange(val)
   }
 
@@ -63,7 +76,7 @@ function OperationBar({
       <div className={clsx(hasFiles ? 'flex' : 'hidden', 'w-full items-center justify-end pl-20')}>
         <Input
           ref={inputRef}
-          value={value}
+          value={inputValue}
           className="max-w-80"
           variant="underlined"
           color="primary"
@@ -74,6 +87,24 @@ function OperationBar({
           onKeyDown={handleKeydown}
           onBlur={handleBlur}
         />
+        <Dropdown placement="bottom-end" offset={14}>
+          <DropdownTrigger>
+            <div>
+              <RiChatHistoryLine className="cursor-pointer text-large text-default-500" />
+            </div>
+          </DropdownTrigger>
+          <DropdownMenu
+            color="secondary"
+            variant="light"
+            disallowEmptySelection
+            selectionMode="single"
+            selectedKeys={[format]}
+            onSelectionChange={handleSelect}
+            items={items}
+          >
+            {item => <DropdownItem key={item.key}>{item.value}</DropdownItem>}
+          </DropdownMenu>
+        </Dropdown>
         <Button radius="sm" size="sm" className="btn--grad-pink ml-4 shrink-0" onClick={onClickRename}>
           {t('Rename')}
           <span>🚀</span>

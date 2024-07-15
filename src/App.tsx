@@ -5,22 +5,18 @@ import FileView from '@/components/FileView.tsx'
 import OperationBar from '@/components/OperationBar.tsx'
 import Settings from '@/components/settings/Settings.tsx'
 import { useDragging, useFiles } from '@/hooks'
+import { useInputFormat } from '@/hooks/useInputFormat.ts'
 import { AnimatePresence } from 'framer-motion'
 import { Flip, ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
-  const {
+  const { inputValue, setInputValue, format, setFormat, formatOptions, addFormatOption } = useInputFormat()
+  const { setSelectedKey, files, selectedFile, handleOpenFolder, handleDropFiles, handleClickRename } = useFiles({
     format,
-    setFormat,
-    setSelectedKey,
-    files,
-    selectedFile,
-    handleOpenFolder,
-    handleDropFiles,
-    handleClickRename,
-  } = useFiles()
+    onRenamed: () => addFormatOption(format),
+  })
   const hasFiles = files.length > 0
   const { isDragging } = useDragging({ onDrop: handleDropFiles })
   const showDropModal = hasFiles && isDragging
@@ -29,9 +25,12 @@ function App() {
     <div className="flex h-[100vh] p-4">
       <div className="flex w-full flex-col">
         <OperationBar
+          inputValue={inputValue}
           format={format}
-          onFormatChange={setFormat}
+          formatOptions={formatOptions}
           hasFiles={hasFiles}
+          onInputValueChange={setInputValue}
+          onFormatChange={setFormat}
           onClickOpen={handleOpenFolder}
           onClickRename={handleClickRename}
         />
