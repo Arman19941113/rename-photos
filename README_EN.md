@@ -14,10 +14,10 @@ This app has a compact bundle size of just 4MB. Feel free to use it.
 
 ## Download
 
-- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.2/Rename.Photos_0.0.2_aarch64.dmg)
-- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.2/Rename.Photos_0.0.2_x64.dmg)
-- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.2/Rename.Photos_0.0.2_x64_en-US.msi)
-- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.2/rename-photos_0.0.2_amd64.deb)
+- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.3/Rename.Photos_0.0.3_aarch64.dmg)
+- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.3/Rename.Photos_0.0.3_x64.dmg)
+- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.3/Rename.Photos_0.0.3_x64_en-US.msi)
+- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.3/rename-photos_0.0.3_amd64.deb)
 
 ### "App is damaged and can't be opened" on MacOS
 

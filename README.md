@@ -16,10 +16,10 @@ Rename Photos 是一个使用 EXIF 数据给图片重命名的跨平台桌面应
 
 ## 下载
 
-- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.2/Rename.Photos_0.0.2_aarch64.dmg)
-- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.2/Rename.Photos_0.0.2_x64.dmg)
-- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.2/Rename.Photos_0.0.2_x64_en-US.msi)
-- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.2/rename-photos_0.0.2_amd64.deb)
+- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.3/Rename.Photos_0.0.3_aarch64.dmg)
+- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.3/Rename.Photos_0.0.3_x64.dmg)
+- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.3/Rename.Photos_0.0.3_x64_en-US.msi)
+- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.0.3/rename-photos_0.0.3_amd64.deb)
 
 ### MacOS：软件已损坏，无法打开。
 
