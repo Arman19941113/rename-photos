@@ -77,7 +77,7 @@ function Settings() {
         backdrop="blur"
         isOpen={visible}
         onOpenChange={updateVisible}
-        classNames={{ base: 'max-w-[652px] h-[500px] !my-0' }}
+        classNames={{ base: 'max-w-[652px] h-[540px] !my-0' }}
       >
         <ModalContent>
           <ModalBody>

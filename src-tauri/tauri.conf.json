@@ -14,7 +14,7 @@
         "title": "Rename Photos",
         "hiddenTitle": true,
         "minWidth": 900,
-        "minHeight": 560,
+        "minHeight": 620,
         "width": 1000,
         "height": 640
       }
@@ -32,12 +32,6 @@
     "targets": "all",
     "category": "Utilities",
     "shortDescription": "A cross-platform desktop-app for renaming photos using EXIF data",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
   }
 }
