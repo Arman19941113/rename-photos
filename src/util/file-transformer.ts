@@ -59,16 +59,21 @@ export function transformIpcFiles({
   const newNameCounter: Record<string, number> = {}
   // counts new filename
   files.forEach(item => {
-    const isKeepName = exifMode && item.exifStatus !== ExifStatus.SUCCESS
-    // add name to counter to avoid being overwritten
-    const newFilename = isKeepName
-      ? item.filename
-      : generateFilename({
-          filename: item.filename,
-          format,
-          created: item.created,
-          exifData: item.exifData,
-        })
+    // get lowercase filename to avoid name conflicts
+    let newFilename = ''
+    if (exifMode && item.exifStatus !== ExifStatus.SUCCESS) {
+      // in exifMode, if on exif data, keep old filename
+      newFilename = transformExtNameToLowerCase(item.filename)
+    } else {
+      // with lower case extname
+      newFilename = generateFilename({
+        filename: item.filename,
+        format,
+        created: item.created,
+        exifData: item.exifData,
+      })
+    }
+
     nameMap[item.filename] = newFilename
     if (newNameCounter.hasOwnProperty(newFilename)) {
       newNameCounter[newFilename] += 1
@@ -79,11 +84,12 @@ export function transformIpcFiles({
   // handle duplicates
   const nameSequence: Record<string, number> = {}
   files.forEach(item => {
-    const isKeepName = exifMode && item.exifStatus !== ExifStatus.SUCCESS
-    if (isKeepName) {
-      item.newFilename = '--'
+    if (exifMode && item.exifStatus !== ExifStatus.SUCCESS) {
+      // keep old filename, no need to rename
+      item.newFilename = item.filename
       return
     }
+
     const newFilename = nameMap[item.filename]
     const extName = getExtName(item.filename)
     const duplicates = newNameCounter[newFilename]
@@ -92,23 +98,37 @@ export function transformIpcFiles({
       const sequence = nameSequence.hasOwnProperty(newFilename)
         ? ++nameSequence[newFilename]
         : (nameSequence[newFilename] = 1)
-      item.newFilename = newFilename + '_' + sequence.toString().padStart(maxLength, '0') + extName
+      item.newFilename = removeExtName(newFilename) + '_' + sequence.toString().padStart(maxLength, '0') + extName
     } else {
-      item.newFilename = newFilename + extName
+      item.newFilename = removeExtName(newFilename) + extName
     }
   })
 
   return files
 }
 
-export function getBaseName(filename: string) {
+function getBaseName(filename: string): string {
   const parts = filename.split('.')
   return parts.length > 1 ? parts.slice(0, -1).join('.') : filename
 }
 
-export function getExtName(filename: string): string {
+function getExtName(filename: string): string {
   const parts = filename.split('.')
   return parts.length > 1 ? `.${parts[parts.length - 1]}` : ''
+}
+
+function removeExtName(filename: string): string {
+  const parts = filename.split('.')
+  return parts.slice(0, parts.length - 1).join('.')
+}
+
+function transformExtNameToLowerCase(filename: string): string {
+  const parts = filename.split('.')
+  if (parts.length > 1) {
+    parts[parts.length - 1] = parts[parts.length - 1].toLowerCase()
+    return parts.join('.')
+  }
+  return filename
 }
 
 function generateFilename({
@@ -148,13 +168,13 @@ function generateFilename({
     Object.entries(formatValueMap).forEach(([key, value]) => {
       newFilename = newFilename.replace(new RegExp(key, 'g'), getValidPath(value))
     })
-    return newFilename
+    return newFilename + getExtName(filename).toLocaleLowerCase()
   } catch (e) {
     return format
   }
 }
 
-export function checkPreview(filename: string, size: number) {
+function checkPreview(filename: string, size: number) {
   const maxSize = 50_000_000
   if (size > maxSize) return false
 

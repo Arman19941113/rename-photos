@@ -1,4 +1,4 @@
-import { ExifStatus, TauriCommand } from '@/const'
+import { TauriCommand } from '@/const'
 import { useError } from '@/hooks'
 import { useConfigStore } from '@/store/useConfigStore.ts'
 import { transformIpcFiles } from '@/util'
@@ -46,11 +46,7 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
 
     const time = Date.now()
     const renamePathData = files
-      .filter(item => {
-        // filter exif mode and same name files
-        const isKeepName = exifMode && item.exifStatus !== ExifStatus.SUCCESS
-        return !isKeepName && item.filename !== item.newFilename
-      })
+      .filter(item => item.newFilename !== item.filename)
       .map(item => [
         `${item.dirname}/${item.filename}`,
         `${item.dirname}/${item.newFilename}`,
@@ -64,12 +60,8 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
     setIsRenaming(true)
     invoke<string[]>(TauriCommand.RENAME_FILES, { renamePathData })
       .then(res => {
-        // contact exif mode and same name files
         const pathnameList = files
-          .filter(item => {
-            const isKeepName = exifMode && item.exifStatus !== ExifStatus.SUCCESS
-            return isKeepName || item.filename === item.newFilename
-          })
+          .filter(item => item.newFilename === item.filename)
           .map(item => item.pathname)
           .concat(res)
         handleDropFiles(pathnameList)
