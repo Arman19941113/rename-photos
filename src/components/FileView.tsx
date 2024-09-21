@@ -46,16 +46,22 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
         )}
       </div>
 
-      <h2 className="mt-2 break-all text-base font-semibold">{fileInfo.filename}</h2>
-      <p className="mt-1 text-xs text-default-500">{fileInfo.size}</p>
-      <p className="mt-1 text-xs text-default-500">{fileInfo.created}</p>
+      <h2 className="mt-2 break-all text-center text-base font-semibold">{fileInfo.filename}</h2>
+      <p className="mt-1 flex justify-between text-xs text-default-500">
+        <span>{t('File Size')}</span>
+        <span>{fileInfo.size}</span>
+      </p>
+      <p className="mt-1 flex justify-between text-xs text-default-500">
+        <span>{t('Date Created')}</span>
+        <span>{fileInfo.created}</span>
+      </p>
 
       <div className="mb-1 mt-6 border-b pb-1 text-xs font-bold">{t('EXIF Information')}</div>
-      <ul className="text-xs">
+      <ul className="text-xs font-medium">
         {exifData.map(item => (
           <li className="mb-1 flex justify-between border-b pb-1" key={item[0]}>
-            <span className="mr-6 shrink-0 font-medium text-default-500">{item[0]}</span>
-            <span className="text-right font-medium">{item[1]}</span>
+            <span className="mr-6 shrink-0 text-default-500">{item[0]}</span>
+            <span className="text-right">{item[1]}</span>
           </li>
         ))}
       </ul>

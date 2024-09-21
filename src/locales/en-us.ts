@@ -20,6 +20,10 @@ const enUs = {
   Filename: 'Name',
   'New Filename': 'New Name',
 
+  // file info
+  'File Size': 'File Size',
+  'Date Created': 'Date Created',
+
   // EXIF field
   'EXIF Information': 'EXIF Information',
   Date: 'Date',

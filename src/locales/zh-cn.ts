@@ -20,6 +20,10 @@ const zhCn = {
   Filename: '文件名',
   'New Filename': '新文件名',
 
+  // file info
+  'File Size': '文件大小',
+  'Date Created': '创建日期',
+
   // EXIF field
   'EXIF Information': 'EXIF 信息',
   Date: '拍摄日期',
