@@ -13,16 +13,16 @@ export function useDragging({ onDrop }: { onDrop: (paths: string[]) => void }) {
 
   useEffect(() => {
     const promises = Promise.all([
-      listen(TauriEvent.DRAG, () => {
+      listen(TauriEvent.DRAG_ENTER, () => {
         if (refDisabled.current) return
         setIsDragging(true)
       }),
-      listen<{ paths: string[] }>(TauriEvent.DROP, event => {
+      listen<{ paths: string[] }>(TauriEvent.DRAG_DROP, event => {
         if (refDisabled.current) return
         setIsDragging(false)
         refOnDrop.current(event.payload.paths)
       }),
-      listen(TauriEvent.DROP_CANCELLED, () => {
+      listen(TauriEvent.DRAG_LEAVE, () => {
         if (refDisabled.current) return
         setIsDragging(false)
       }),
