@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fs;
 use std::fs::Metadata;
 #[cfg(windows)]
@@ -6,9 +5,10 @@ use std::os::windows::prelude::*;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use chrono::prelude::{DateTime, FixedOffset};
 use exif;
 use exif::{In, Tag};
-
+use nom_exif::{MediaParser, MediaSource, TrackInfo, TrackInfoTag};
 // pathname filepath
 //   dirname
 //   filename
@@ -74,8 +74,20 @@ pub fn get_created_time(metadata: &Metadata) -> u128 {
 }
 
 pub struct ExifAnalysis {
-  pub exif_data: Option<HashMap<String, Option<String>>>,
+  pub exif_data: Option<ExifData>,
   pub exif_error: Option<String>,
+}
+
+#[derive(serde::Serialize)]
+pub struct ExifData {
+  Date: Option<String>,
+  Make: Option<String>,
+  Camera: Option<String>,
+  Lens: Option<String>,
+  FocalLength: Option<String>,
+  Aperture: Option<String>,
+  Shutter: Option<String>,
+  ISO: Option<String>,
 }
 
 impl ExifAnalysis {
@@ -84,7 +96,7 @@ impl ExifAnalysis {
     let exif_data = match read_exif(pathname) {
       Ok(data) => Some(data),
       Err(err) => {
-        exif_error = Some(err.to_string());
+        exif_error = Some(err);
         None
       }
     };
@@ -92,45 +104,88 @@ impl ExifAnalysis {
   }
 }
 
-fn read_exif(pathname: &str) -> Result<HashMap<String, Option<String>>, exif::Error> {
-  let file = fs::File::open(pathname)?;
+
+fn read_exif(pathname: &str) -> Result<ExifData, String> {
+  let mut exif_data = ExifData {
+    Date: None,
+    Make: None,
+    Camera: None,
+    Lens: None,
+    FocalLength: None,
+    Aperture: None,
+    Shutter: None,
+    ISO: None,
+  };
+
+  // Video
+  let mut parser = MediaParser::new();
+  let ms = match MediaSource::file_path(pathname) {
+    Ok(data) => data,
+    Err(err) => return Err(err.to_string())
+  };
+  if ms.has_track() {
+    let info: TrackInfo = match parser.parse(ms) {
+      Ok(info) => info,
+      Err(err) => return Err(err.to_string())
+    };
+    exif_data.Date = match info.get(TrackInfoTag::CreateDate) {
+      Some(field) => Some(field.to_string().parse::<DateTime<FixedOffset>>().unwrap().format("%Y-%m-%d %H:%M:%S").to_string()),
+      None => None,
+    };
+    exif_data.Make = match info.get(TrackInfoTag::Make) {
+      Some(field) => Some(field.to_string()),
+      None => None,
+    };
+    exif_data.Camera = match info.get(TrackInfoTag::Model) {
+      Some(field) => Some(field.to_string()),
+      None => None,
+    };
+    return Ok(exif_data);
+  }
+
+  // Image
+  let file = match fs::File::open(pathname) {
+    Ok(file) => file,
+    Err(err) => return Err(err.to_string())
+  };
   let mut buf_reader = std::io::BufReader::new(&file);
   let exif_reader = exif::Reader::new();
-  let exif = exif_reader.read_from_container(&mut buf_reader)?;
+  let exif = match exif_reader.read_from_container(&mut buf_reader) {
+    Ok(exif) => exif,
+    Err(err) => return Err(err.to_string())
+  };
 
-  let mut exif_data = HashMap::new();
-  exif_data.insert(String::from("Date"), match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+  exif_data.Date = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string()),
     None => None,
-  });
-  exif_data.insert(String::from("Make"), match exif.get_field(Tag::Make, In::PRIMARY) {
+  };
+  exif_data.Make = match exif.get_field(Tag::Make, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string().trim_matches('"').into()),
     None => None,
-  });
-  exif_data.insert(String::from("Camera"), match exif.get_field(Tag::Model, In::PRIMARY) {
+  };
+  exif_data.Camera = match exif.get_field(Tag::Model, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string().trim_matches('"').into()),
     None => None,
-  });
-  exif_data.insert(String::from("Lens"), match exif.get_field(Tag::LensModel, In::PRIMARY) {
+  };
+  exif_data.Lens = match exif.get_field(Tag::LensModel, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string().trim_matches('"').into()),
     None => None,
-  });
-  exif_data.insert(String::from("FocalLength"), match exif.get_field(Tag::FocalLengthIn35mmFilm, In::PRIMARY) {
+  };
+  exif_data.FocalLength = match exif.get_field(Tag::FocalLengthIn35mmFilm, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string()),
     None => None,
-  });
-  exif_data.insert(String::from("Aperture"), match exif.get_field(Tag::FNumber, In::PRIMARY) {
+  };
+  exif_data.Aperture = match exif.get_field(Tag::FNumber, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string()),
     None => None,
-  });
-  exif_data.insert(String::from("Shutter"), match exif.get_field(Tag::ExposureTime, In::PRIMARY) {
+  };
+  exif_data.Shutter = match exif.get_field(Tag::ExposureTime, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string()),
     None => None,
-  });
-  exif_data.insert(String::from("ISO"), match exif.get_field(Tag::PhotographicSensitivity, In::PRIMARY) {
+  };
+  exif_data.ISO = match exif.get_field(Tag::PhotographicSensitivity, In::PRIMARY) {
     Some(field) => Some(field.display_value().to_string()),
     None => None,
-  });
-
+  };
   Ok(exif_data)
 }

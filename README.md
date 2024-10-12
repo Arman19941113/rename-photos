@@ -8,6 +8,8 @@ English / [简体中文](./README_CN.md)
 
 Rename Photos is a cross-platform desktop-app for renaming photos using EXIF data.
 
+Additionally, it is compatible with videos that include metadata like `Date`, `Make`, `Camera`.
+
 If your files lack EXIF data, it also works. [See more...](https://armantang.fun/rename-photos)
 
 This app has a compact bundle size of just 4MB. Feel free to use it.

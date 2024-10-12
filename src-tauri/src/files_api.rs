@@ -1,8 +1,7 @@
-use std::collections::HashMap;
 use std::fs;
 
 use crate::file_lib;
-use crate::file_lib::{ExifAnalysis, FileUtil};
+use crate::file_lib::{ExifAnalysis, ExifData, FileUtil};
 
 #[derive(serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -12,7 +11,7 @@ pub struct IpcFile {
   created: u128,
   size: u64,
   exif_error: Option<String>,
-  exif_data: Option<HashMap<String, Option<String>>>,
+  exif_data: Option<ExifData>,
 }
 
 #[tauri::command]
