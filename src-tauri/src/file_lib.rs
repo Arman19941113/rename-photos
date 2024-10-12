@@ -4,8 +4,7 @@ use std::fs::Metadata;
 use std::os::windows::prelude::*;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
-
-use chrono::prelude::{DateTime, FixedOffset};
+use chrono::prelude::{DateTime, Local};
 use exif;
 use exif::{In, Tag};
 use nom_exif::{MediaParser, MediaSource, TrackInfo, TrackInfoTag};
@@ -129,7 +128,7 @@ fn read_exif(pathname: &str) -> Result<ExifData, String> {
       Err(err) => return Err(err.to_string())
     };
     exif_data.Date = match info.get(TrackInfoTag::CreateDate) {
-      Some(field) => Some(field.to_string().parse::<DateTime<FixedOffset>>().unwrap().format("%Y-%m-%d %H:%M:%S").to_string()),
+      Some(field) => Some(field.to_string().parse::<DateTime<Local>>().unwrap().format("%Y-%m-%d %H:%M:%S").to_string()),
       None => None,
     };
     exif_data.Make = match info.get(TrackInfoTag::Make) {
