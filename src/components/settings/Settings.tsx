@@ -46,7 +46,7 @@ function Settings() {
           <span>{t('Help')}</span>
         </div>
       ),
-      content: <HelpDoc />,
+      content: <HelpDoc toggleVisible={toggleVisible} />,
     },
     {
       id: 'About',

@@ -2,7 +2,7 @@ import { formatVars } from '@/const'
 import { Snippet } from '@nextui-org/snippet'
 import { useTranslation } from 'react-i18next'
 
-function HelpDoc() {
+function HelpDoc({ toggleVisible }: { toggleVisible: () => void }) {
   const { t } = useTranslation()
 
   return (
@@ -25,6 +25,7 @@ function HelpDoc() {
                 radius="sm"
                 color="secondary"
                 classNames={{ base: 'gap-0 pl-2.5', copyButton: 'ml-0 text-sm' }}
+                onCopy={toggleVisible}
               >
                 {item}
               </Snippet>
