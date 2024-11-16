@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+    color: #11181C;
+    overscroll-behavior: none;
+  }
+}
+
+@layer components {
+  .btn--grad-blue {
+    color: white;
+    background-image: linear-gradient(to right, #77A1D3 0%, #79CBCA 51%, #77A1D3 100%);
+    background-size: 200% auto;
+    outline: none;
+    user-select: none;
+  }
+
+  .btn--grad-blue:hover {
+    background-position: right center;
+  }
+
+  .btn--grad-pink {
+    color: white;
+    background-image: linear-gradient(to right, #FF6E7F 0%, #A4D8F3 51%, #FF6E7F 100%);
+    background-size: 200% auto;
+    background-position: right center;
+    outline: none;
+    user-select: none;
+  }
+
+  .btn--grad-pink:hover {
+    background-position: left center;
+  }
+}
+
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+}

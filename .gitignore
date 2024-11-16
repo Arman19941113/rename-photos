@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# next.js
+.next/
+out/
+# typescript
+*.tsbuildinfo
+next-env.d.ts
