@@ -11,6 +11,7 @@
     "@nextui-org/snippet": "^2.0.43",
     "@nextui-org/system": "^2.2.6",
     "@nextui-org/theme": "^2.2.11",
+    "@vercel/analytics": "^1.4.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.17",
     "next": "15.0.3",
