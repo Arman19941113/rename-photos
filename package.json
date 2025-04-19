@@ -64,44 +64,8 @@
     "typescript": "^5.4.5",
     "vite": "^5.2.11"
   },
-  "eslintConfig": {
-    "extends": "react-app",
-    "rules": {
-      "react/self-closing-comp": [
-        "error",
-        {
-          "component": true,
-          "html": true
-        }
-      ]
-    }
-  },
-  "prettier": {
-    "$schema": "https://json.schemastore.org/prettierrc",
-    "plugins": [
-      "prettier-plugin-tailwindcss"
-    ],
-    "printWidth": 120,
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": false,
-    "singleQuote": true,
-    "quoteProps": "as-needed",
-    "jsxSingleQuote": false,
-    "trailingComma": "all",
-    "bracketSpacing": true,
-    "bracketSameLine": false,
-    "arrowParens": "avoid",
-    "htmlWhitespaceSensitivity": "css",
-    "overrides": [
-      {
-        "files": [
-          "**/*.css"
-        ],
-        "options": {
-          "singleQuote": false
-        }
-      }
-    ]
+  "volta": {
+    "node": "22.14.0",
+    "pnpm": "10.8.0"
   }
 }
