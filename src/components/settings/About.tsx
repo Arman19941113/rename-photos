@@ -1,4 +1,5 @@
 import { RiGithubFill } from '@/components/icon'
+import CheckForUpdates from '@/components/settings/CheckForUpdates.tsx'
 import SponsorModal from '@/components/settings/SponsorModal.tsx'
 import { getVersion } from '@tauri-apps/api/app'
 import { useTranslation } from 'react-i18next'
@@ -11,16 +12,17 @@ function About() {
   return (
     <div className="w-[564px]">
       <div className="mt-2 rounded-md border bg-default-100 px-4 py-3">
-        <h2 className="mb-2 text-base font-semibold	">
+        <h2 className="mb-2 flex items-center text-base font-semibold">
           {t('Rename Photos')}
           <a
             href="https://github.com/Arman19941113/rename-photos/releases"
             target="_blank"
-            className="ml-2 text-secondary underline"
+            className="mx-2 text-secondary underline"
             rel="noreferrer"
           >
             v{appVersion}
           </a>
+          <CheckForUpdates />
         </h2>
         <p>
           <a

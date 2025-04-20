@@ -48,6 +48,9 @@ const enUs = {
     'The variables listed below are supported, and you can preview the expected new name in the table.',
   '3. Click `Rename` button to change names': '3. Click `Rename` button to change names',
   About: 'About',
+  'Check for Updates': 'Check for Updates',
+  'New version v{{version}} detected, will automatically install after download.':
+    'New version v{{version}} detected, will automatically install after download.',
   'This software is completely free and open source on Github.':
     'This software is completely free and open source on Github.',
   'If you find this tool helpful, you can': 'If you find this tool helpful, you can',
