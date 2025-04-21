@@ -1,6 +1,5 @@
 import { RiGithubFill } from '@/components/icon'
 import CheckForUpdates from '@/components/settings/CheckForUpdates.tsx'
-import SponsorModal from '@/components/settings/SponsorModal.tsx'
 import { getVersion } from '@tauri-apps/api/app'
 import { useTranslation } from 'react-i18next'
 
@@ -40,7 +39,14 @@ function About() {
       <div className="mt-3 rounded-md border bg-default-100 px-4 py-3">
         <p>
           <span>{t('If you find this tool helpful, you can')}</span>
-          <SponsorModal />
+          <a
+            href="https://github.com/Arman19941113/rename-photos"
+            target="_blank"
+            className="text-secondary underline"
+            rel="noreferrer"
+          >
+            {t('star this project')}
+          </a>
         </p>
       </div>
     </div>

@@ -53,7 +53,7 @@ const zhCn = {
     '检测到新版本 v{{version}}，下载完成后将会自动安装更新。',
   'This software is completely free and open source on Github.': '软件完全免费并在 Github 开源。',
   'If you find this tool helpful, you can': '如果您觉得这个工具对您有所帮助，您可以',
-  'buy me a cup of coffee': '请我喝杯咖啡',
+  'star this project': '在 Github 点下收藏⭐',
 }
 
 export default zhCn

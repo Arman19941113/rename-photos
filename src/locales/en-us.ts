@@ -54,7 +54,7 @@ const enUs = {
   'This software is completely free and open source on Github.':
     'This software is completely free and open source on Github.',
   'If you find this tool helpful, you can': 'If you find this tool helpful, you can',
-  'buy me a cup of coffee': 'buy me a cup of coffee',
+  'star this project': ' star this project.',
 }
 
 export default enUs
