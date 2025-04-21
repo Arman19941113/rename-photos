@@ -14,10 +14,10 @@
 
 软件安装包仅 4MB 左右：
 
-- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.1/Rename.Photos_0.1.1_aarch64.dmg)
-- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.1/Rename.Photos_0.1.1_x64.dmg)
-- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.1/Rename.Photos_0.1.1_x64_en-US.msi)
-- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.1/Rename.Photos_0.1.1_amd64.deb)
+- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_aarch64.dmg)
+- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64.dmg)
+- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64_en-US.msi)
+- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_amd64.deb)
 
 ### MacOS：软件已损坏，无法打开。
 

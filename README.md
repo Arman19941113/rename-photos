@@ -16,10 +16,10 @@ Compatible with videos that include metadata like `Date`, `Make`, `Camera`
 
 A compact bundle size of just 4MB:
 
-- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.1/Rename.Photos_0.1.1_aarch64.dmg)
-- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.1/Rename.Photos_0.1.1_x64.dmg)
-- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.1/Rename.Photos_0.1.1_x64_en-US.msi)
-- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.1/Rename.Photos_0.1.1_amd64.deb)
+- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_aarch64.dmg)
+- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64.dmg)
+- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64_en-US.msi)
+- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_amd64.deb)
 
 ### "App is damaged and can't be opened" on MacOS
 
