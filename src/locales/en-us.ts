@@ -51,6 +51,7 @@ const enUs = {
   'Check for Updates': 'Check for Updates',
   'New version v{{version}} detected, will automatically install after download.':
     'New version v{{version}} detected, will automatically install after download.',
+  'There are currently no updates available.': 'There are currently no updates available.',
   'This software is completely free and open source on Github.':
     'This software is completely free and open source on Github.',
   'If you find this tool helpful, you can': 'If you find this tool helpful, you can',

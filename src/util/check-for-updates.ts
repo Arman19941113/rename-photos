@@ -32,6 +32,7 @@ function downloadAndInstall(update: Update) {
 export async function checkForUpdates({ t }: { t: TFunction }) {
   const update = await check()
   if (update) {
+    downloadAndInstall(update)
     toast.info(
       t('New version v{{version}} detected, will automatically install after download.', { version: update.version }),
       {
@@ -43,9 +44,11 @@ export async function checkForUpdates({ t }: { t: TFunction }) {
         draggable: false,
       },
     )
-
-    downloadAndInstall(update)
     return true
   }
+
+  toast.info(t('There are currently no updates available.'), {
+    position: 'bottom-right',
+  })
   return false
 }
