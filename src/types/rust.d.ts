@@ -1,4 +1,4 @@
-declare type ExifField = 'Date' | 'Make' | 'Camera' | 'Lens' | 'FocalLength' | 'Aperture' | 'Shutter' | 'ISO'
+declare type ExifField = 'date' | 'make' | 'camera' | 'lens' | 'focal_length' | 'aperture' | 'shutter' | 'iso'
 
 declare type IpcFiles = Array<{
   pathname: string

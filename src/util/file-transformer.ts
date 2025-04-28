@@ -144,7 +144,7 @@ function generateFilename({
 }) {
   try {
     // eg: 2024-03-04 08:33:38
-    const dateTime = exifData?.Date || created || ''
+    const dateTime = exifData?.date || created || ''
     const timeList = dateTime.replace(/\s|:/g, '-').split('-')
     const formatValueMap: Record<FormatVar, string> = {
       '{YYYY}': timeList[0] || 'YYYY',
@@ -153,14 +153,14 @@ function generateFilename({
       '{hh}': timeList[3] || 'hh',
       '{mm}': timeList[4] || 'mm',
       '{ss}': timeList[5] || 'ss',
-      '{Date}': exifData?.Date?.replace(/:/g, '.') || 'Date',
-      '{Make}': exifData?.Make || 'Make',
-      '{Camera}': exifData?.Camera || 'Camera',
-      '{Lens}': exifData?.Lens || 'Lens',
-      '{FocalLength}': exifData?.FocalLength || 'FocalLength',
-      '{Aperture}': exifData?.Aperture || 'Aperture',
-      '{Shutter}': exifData?.Shutter || 'Shutter',
-      '{ISO}': exifData?.ISO || 'ISO',
+      '{Date}': exifData?.date?.replace(/:/g, '.') || 'Date',
+      '{Make}': exifData?.make || 'Make',
+      '{Camera}': exifData?.camera || 'Camera',
+      '{Lens}': exifData?.lens || 'Lens',
+      '{FocalLength}': exifData?.focal_length || 'FocalLength',
+      '{Aperture}': exifData?.aperture || 'Aperture',
+      '{Shutter}': exifData?.shutter || 'Shutter',
+      '{ISO}': exifData?.iso || 'ISO',
       '{Current}': getBaseName(filename) || 'Current',
       '{current}': getBaseName(filename) || 'Current',
     }

@@ -80,14 +80,14 @@ pub struct ExifAnalysis {
 
 #[derive(serde::Serialize)]
 pub struct ExifData {
-    Date: Option<String>,
-    Make: Option<String>,
-    Camera: Option<String>,
-    Lens: Option<String>,
-    FocalLength: Option<String>,
-    Aperture: Option<String>,
-    Shutter: Option<String>,
-    ISO: Option<String>,
+    date: Option<String>,
+    make: Option<String>,
+    camera: Option<String>,
+    lens: Option<String>,
+    focal_length: Option<String>,
+    aperture: Option<String>,
+    shutter: Option<String>,
+    iso: Option<String>,
 }
 
 impl ExifAnalysis {
@@ -109,14 +109,14 @@ impl ExifAnalysis {
 
 fn read_exif(pathname: &str) -> Result<ExifData, String> {
     let mut exif_data = ExifData {
-        Date: None,
-        Make: None,
-        Camera: None,
-        Lens: None,
-        FocalLength: None,
-        Aperture: None,
-        Shutter: None,
-        ISO: None,
+        date: None,
+        make: None,
+        camera: None,
+        lens: None,
+        focal_length: None,
+        aperture: None,
+        shutter: None,
+        iso: None,
     };
 
     // Video
@@ -130,7 +130,7 @@ fn read_exif(pathname: &str) -> Result<ExifData, String> {
             Ok(info) => info,
             Err(err) => return Err(err.to_string()),
         };
-        exif_data.Date = match info.get(TrackInfoTag::CreateDate) {
+        exif_data.date = match info.get(TrackInfoTag::CreateDate) {
             Some(field) => Some(
                 field
                     .to_string()
@@ -141,11 +141,11 @@ fn read_exif(pathname: &str) -> Result<ExifData, String> {
             ),
             None => None,
         };
-        exif_data.Make = match info.get(TrackInfoTag::Make) {
+        exif_data.make = match info.get(TrackInfoTag::Make) {
             Some(field) => Some(field.to_string()),
             None => None,
         };
-        exif_data.Camera = match info.get(TrackInfoTag::Model) {
+        exif_data.camera = match info.get(TrackInfoTag::Model) {
             Some(field) => Some(field.to_string()),
             None => None,
         };
@@ -164,35 +164,35 @@ fn read_exif(pathname: &str) -> Result<ExifData, String> {
         Err(err) => return Err(err.to_string()),
     };
 
-    exif_data.Date = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+    exif_data.date = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
         Some(field) => Some(field.display_value().to_string()),
         None => None,
     };
-    exif_data.Make = match exif.get_field(Tag::Make, In::PRIMARY) {
+    exif_data.make = match exif.get_field(Tag::Make, In::PRIMARY) {
         Some(field) => Some(field.display_value().to_string().trim_matches('"').into()),
         None => None,
     };
-    exif_data.Camera = match exif.get_field(Tag::Model, In::PRIMARY) {
+    exif_data.camera = match exif.get_field(Tag::Model, In::PRIMARY) {
         Some(field) => Some(field.display_value().to_string().trim_matches('"').into()),
         None => None,
     };
-    exif_data.Lens = match exif.get_field(Tag::LensModel, In::PRIMARY) {
+    exif_data.lens = match exif.get_field(Tag::LensModel, In::PRIMARY) {
         Some(field) => Some(field.display_value().to_string().trim_matches('"').into()),
         None => None,
     };
-    exif_data.FocalLength = match exif.get_field(Tag::FocalLengthIn35mmFilm, In::PRIMARY) {
+    exif_data.focal_length = match exif.get_field(Tag::FocalLengthIn35mmFilm, In::PRIMARY) {
         Some(field) => Some(field.display_value().to_string()),
         None => None,
     };
-    exif_data.Aperture = match exif.get_field(Tag::FNumber, In::PRIMARY) {
+    exif_data.aperture = match exif.get_field(Tag::FNumber, In::PRIMARY) {
         Some(field) => Some(field.display_value().to_string()),
         None => None,
     };
-    exif_data.Shutter = match exif.get_field(Tag::ExposureTime, In::PRIMARY) {
+    exif_data.shutter = match exif.get_field(Tag::ExposureTime, In::PRIMARY) {
         Some(field) => Some(field.display_value().to_string()),
         None => None,
     };
-    exif_data.ISO = match exif.get_field(Tag::PhotographicSensitivity, In::PRIMARY) {
+    exif_data.iso = match exif.get_field(Tag::PhotographicSensitivity, In::PRIMARY) {
         Some(field) => Some(field.display_value().to_string()),
         None => None,
     };

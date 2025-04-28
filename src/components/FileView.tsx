@@ -19,19 +19,16 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   const showFileIcon = !imageSrc || isImgError
 
   /* exif data */
-  let focalLength = fileInfo.exifData?.FocalLength
-  focalLength = focalLength ? `${focalLength} mm` : ''
-  let aperture = fileInfo.exifData?.Aperture
-  aperture = aperture ? `f/${aperture}` : ''
+  const rawData = fileInfo.exifData
   const exifData: Array<[string, string]> = [
-    [t('Date'), fileInfo.exifData?.Date || '--'],
-    [t('Make'), fileInfo.exifData?.Make || '--'],
-    [t('Camera'), fileInfo.exifData?.Camera || '--'],
-    [t('Lens'), fileInfo.exifData?.Lens || '--'],
-    [t('FocalLength'), focalLength || '--'],
-    [t('Aperture'), aperture || '--'],
-    [t('Shutter'), fileInfo.exifData?.Shutter || '--'],
-    [t('ISO'), fileInfo.exifData?.ISO || '--'],
+    [t('Date'), rawData?.date || '--'],
+    [t('Make'), rawData?.make || '--'],
+    [t('Camera'), rawData?.camera || '--'],
+    [t('Lens'), rawData?.lens || '--'],
+    [t('FocalLength'), rawData?.focal_length ? `${rawData.focal_length} mm` : '--'],
+    [t('Aperture'), rawData?.aperture ? `f/${rawData.aperture}` : '--'],
+    [t('Shutter'), rawData?.shutter || '--'],
+    [t('ISO'), rawData?.iso || '--'],
   ]
 
   return (
