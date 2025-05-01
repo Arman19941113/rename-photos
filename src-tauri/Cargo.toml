@@ -1,9 +1,9 @@
 [package]
 name = "rename-photos"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
-edition = "2021"
+description = "A cross-platform desktop-app for renaming photos using EXIF data"
+authors = ["Arman Tang"]
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,14 +11,14 @@ edition = "2021"
 tauri-build = { version = "2.2.0", features = [] }
 
 [dependencies]
-tauri = { version = "2.5.0", features = ["protocol-asset", "devtools"] }
+tauri = { version = "2.5.1", features = ["protocol-asset", "devtools"] }
 tauri-plugin-shell = "2.2.1"
 tauri-plugin-dialog = "2.2.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-kamadak-exif = "0.5.5"
+kamadak-exif = "0.6.1"
 nom-exif = "2.5.1"
-chrono = "0.4.40"
+chrono = "0.4.41"
 tauri-plugin-process = "2.2.1"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
