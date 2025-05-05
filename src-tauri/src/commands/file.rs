@@ -1,7 +1,6 @@
 use std::fs;
 
-use crate::file_lib;
-use crate::file_lib::{ExifAnalysis, ExifData, FileUtil};
+use crate::utils::file::{get_created_time, ExifAnalysis, ExifData, FileUtil};
 
 #[derive(serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -46,7 +45,7 @@ pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<IpcFile>, String> {
         files.push(IpcFile {
             pathname: pathname.to_string(),
             filename: path_buf.file_name().unwrap().to_str().unwrap().to_string(),
-            created: file_lib::get_created_time(&metadata),
+            created: get_created_time(&metadata),
             size: metadata.len(),
             exif_error,
             exif_data,
@@ -94,7 +93,7 @@ pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IpcFile>, String> {
         files.push(IpcFile {
             pathname: pathname.to_string(),
             filename: FileUtil::get_filename(pathname),
-            created: file_lib::get_created_time(&metadata),
+            created: get_created_time(&metadata),
             size: metadata.len(),
             exif_error,
             exif_data,

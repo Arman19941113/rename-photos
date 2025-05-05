@@ -91,7 +91,7 @@ pub struct ExifData {
 }
 
 impl ExifAnalysis {
-    pub fn new(pathname: &str) -> ExifAnalysis {
+    pub fn new(pathname: &str) -> Self {
         let mut exif_error = None;
         let exif_data = match read_exif(pathname) {
             Ok(data) => Some(data),
@@ -100,7 +100,7 @@ impl ExifAnalysis {
                 None
             }
         };
-        ExifAnalysis {
+        Self {
             exif_data,
             exif_error,
         }
