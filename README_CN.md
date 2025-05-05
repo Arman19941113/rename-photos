@@ -19,9 +19,21 @@
 - [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64_en-US.msi)
 - [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_amd64.deb)
 
-### MacOS：软件已损坏，无法打开。
+## Q & A
 
-打开终端输入以下命令：
+### 支持的图片格式？
+
+使用 [exif-rs](https://github.com/kamadak/exif-rs) 解析 EXIF 数据:
+
+- TIFF and some RAW image formats based on it
+- JPEG
+- HEIF and coding-specific variations including HEIC and AVIF
+- PNG
+- WebP
+
+### MacOS：软件已损坏，无法打开？
+
+代码签名很贵，打开终端输入以下命令可以解决这个问题：
 
 ```bash
 sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app

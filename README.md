@@ -21,9 +21,21 @@ A compact bundle size of just 4MB:
 - [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64_en-US.msi)
 - [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_amd64.deb)
 
-### "App is damaged and can't be opened" on MacOS
+## Q & A
 
-Open Terminal and then enter the following command:
+### Supported image formats?
+
+Using [exif-rs](https://github.com/kamadak/exif-rs) to parse EXIF data:
+
+- TIFF and some RAW image formats based on it
+- JPEG
+- HEIF and coding-specific variations including HEIC and AVIF
+- PNG
+- WebP
+
+### MacOS: App is damaged and can't be opened?
+
+Code signing is expensive, open Terminal and then enter the following command to fix this issue:
 
 ```bash
 sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app
