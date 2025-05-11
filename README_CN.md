@@ -1,18 +1,15 @@
-<div align="center">
+![](./docs/images/coverview-zh.jpg)
 
-<img src="./docs/images/coverview-zh.jpg" alt=""/>
+# Rename Photos
 
-<h1>Rename Photos</h1>
+Rename Photos 是一个主要专注于照片重命名的跨平台桌面端软件，可以使用图片的 EXIF 数据来对文件进行重命名。
 
-一个使用 EXIF 数据给图片重命名的跨平台桌面应用
-
-支持有 `Date`, `Make`, `Camera` 相关元数据的视频文件
-
-</div>
+- 兼容含有相关元数据的视频文件，比如 `Date`, `Make`, `Camera`。
+- 对于其他没有 EXIF 数据的文件，也可以使用日期相关的变量，相关数据从文件的创建日期中解析。
 
 ## 下载
 
-软件安装包仅 4MB 左右：
+软件安装包仅 6MB 左右：
 
 - [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_aarch64.dmg)
 - [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64.dmg)

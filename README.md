@@ -1,20 +1,15 @@
-<div align="center">
+![](./docs/images/coverview-en.jpg)
 
-<img src="./docs/images/coverview-en.jpg" alt=""/>
+# Rename Photos
 
-<h1>Rename Photos</h1>
+Rename Photos is a cross-platform desktop application primarily focused on renaming photos. It uses the image's EXIF data to rename files.
 
-English / [简体中文](./README_CN.md)
-
-A cross-platform desktop-app for renaming photos using EXIF data
-
-Compatible with videos that include metadata like `Date`, `Make`, `Camera`
-
-</div>
+- It's also compatible with videos that include metadata like `Date`, `Make`, `Camera`.
+- For files without EXIF data, date-related variables can be used, with the data parsed from the file's created date.
 
 ## Download
 
-A compact bundle size of just 4MB:
+A compact bundle size of just 6MB:
 
 - [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_aarch64.dmg)
 - [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64.dmg)
