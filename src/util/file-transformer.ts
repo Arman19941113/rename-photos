@@ -36,10 +36,10 @@ export function transformIpcFiles({
       const { exifData, exifError } = item
       if (exifError) {
         exifStatus = ExifStatus.ERROR
-        exifMsg = exifError === 'Unknown image format' ? t('Unknown image format') : exifError
+        exifMsg = exifError === 'Unknown image format' ? t('errors.unknownImageFormat') : exifError
       } else if (Object.values(exifData!).some(val => val === null)) {
         exifStatus = ExifStatus.WARNING
-        exifMsg = t('Missing EXIF data')
+        exifMsg = t('errors.missingExifData')
       }
 
       return {

@@ -19,6 +19,7 @@ function Basic() {
 
   // exif mode setting
   const exifMode = useConfigStore(state => state.mode.exif)
+  const exifModeTooltip = t('settings.exif.tooltip')
   // use created date setting
   const useCreatedDate = useConfigStore(state => state.useCreatedDate)
 
@@ -27,7 +28,7 @@ function Basic() {
       {/* language setting */}
       <div className="mt-2 flex min-h-12 items-center justify-between rounded-md border bg-default-100 px-4">
         <div className="flex items-center">
-          <h2 className="text-base font-medium">{t('Language')}</h2>
+          <h2 className="text-base font-medium">{t('settings.language')}</h2>
         </div>
         <RadioGroup
           size="sm"
@@ -46,13 +47,13 @@ function Basic() {
       {/* exif mode setting */}
       <div className="mt-3 flex min-h-12 items-center justify-between rounded-md border bg-default-100 px-4">
         <div className="flex items-center">
-          <h2 className="text-base font-medium">{t('EXIF Mode')}</h2>
+          <h2 className="text-base font-medium">{t('settings.exif.title')}</h2>
           <Tooltip
             color="secondary"
             showArrow
             radius="none"
             placement="right"
-            content={t('If enabled, only rename files with EXIF data.')}
+            content={exifModeTooltip}
           >
             <div className="px-1">
               <RiInformationLine className="text-large text-default-500" />
@@ -65,13 +66,13 @@ function Basic() {
       {/* use created date setting */}
       <div className="mt-3 flex min-h-12 items-center justify-between rounded-md border bg-default-100 px-4">
         <div className="flex items-center">
-          <h2 className="text-base font-medium">{t('Use Created Date')}</h2>
+          <h2 className="text-base font-medium">{t('settings.creationDate.title')}</h2>
           <Tooltip
             color="secondary"
             showArrow
             radius="none"
             placement="right"
-            content={t('When enabled, date variables use the file creation date rather than the EXIF date.')}
+            content={t('settings.creationDate.tooltip')}
           >
             <div className="px-1">
               <RiInformationLine className="text-large text-default-500" />

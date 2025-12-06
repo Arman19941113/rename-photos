@@ -7,7 +7,7 @@ export function useError() {
 
   const handleError = useCallback(
     ({ err, title, okLabel }: { err: unknown; title?: string; okLabel?: string }) => {
-      let errorMsg = t('System Error')
+      let errorMsg = t('errors.system')
       if (typeof err === 'string') {
         errorMsg = err
       } else {
@@ -18,9 +18,9 @@ export function useError() {
       }
 
       message(errorMsg, {
-        title: title || t('System Error'),
+        title: title || t('errors.system'),
         kind: 'error',
-        okLabel: okLabel || t('Ok'),
+        okLabel: okLabel || t('common.ok'),
       }).catch(() => {})
     },
     [t],

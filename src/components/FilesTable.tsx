@@ -40,8 +40,8 @@ function FilesTable({
         onSelectionChange={handleSelectionChange}
       >
         <TableHeader>
-          <TableColumn>{t('Filename')}</TableColumn>
-          <TableColumn>{t('New Filename')}</TableColumn>
+          <TableColumn>{t('table.filename')}</TableColumn>
+          <TableColumn>{t('table.newFilename')}</TableColumn>
           <TableColumn width={48}>EXIF</TableColumn>
         </TableHeader>
         <TableBody>

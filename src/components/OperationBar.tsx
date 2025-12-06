@@ -70,7 +70,7 @@ function OperationBar({
         onClick={onClickOpen}
         startContent={<RiFolderOpenLine className="text-base" />}
       >
-        {t('Open Folder')}
+        {t('buttons.openFolder')}
       </Button>
 
       <div className={clsx(hasFiles ? 'flex' : 'hidden', 'w-full items-center justify-end pl-20')}>
@@ -106,7 +106,7 @@ function OperationBar({
           </DropdownMenu>
         </Dropdown>
         <Button radius="sm" size="sm" className="btn--grad-pink ml-4 shrink-0" onClick={onClickRename}>
-          {t('Rename')}
+          {t('buttons.rename')}
           <span>🚀</span>
         </Button>
       </div>

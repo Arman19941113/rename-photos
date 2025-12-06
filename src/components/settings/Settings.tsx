@@ -33,7 +33,7 @@ function Settings() {
       title: (
         <div className="flex items-center">
           <RiSettings4Line className="mr-1 text-large" />
-          <span>{t('Settings')}</span>
+          <span>{t('settings.title')}</span>
         </div>
       ),
       content: <Basic />,
@@ -43,7 +43,7 @@ function Settings() {
       title: (
         <div className="flex items-center">
           <TablerHelpSquareRounded className="mr-1 text-large" />
-          <span>{t('Help')}</span>
+          <span>{t('settings.help')}</span>
         </div>
       ),
       content: <HelpDoc toggleVisible={toggleVisible} />,
@@ -53,7 +53,7 @@ function Settings() {
       title: (
         <div className="flex items-center">
           <MingcuteHeartLine className="mr-1 text-large" />
-          <span>{t('About')}</span>
+          <span>{t('settings.about')}</span>
         </div>
       ),
       content: <About />,

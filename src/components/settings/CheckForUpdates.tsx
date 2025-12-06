@@ -24,7 +24,7 @@ function CheckForUpdates() {
         isLoading={isChecking}
         onPress={handleCheck}
       >
-        🚀 {t('Check for Updates')}
+        🚀 {t('settings.checkForUpdates')}
       </Button>
     </>
   )
