@@ -136,11 +136,12 @@ export default function NamePhotos() {
           <h1 className="text-2xl font-bold">Q&A: Lack EXIF data</h1>
           <ul className="pt-3 text-default-600">
             <li className="py-1">
-              If some files lack EXIF data, we will use the created time as Date, And other fields will be replaced with
-              placeholder. So you can rename any file, even if it&apos;s not an image file.
+              If a file lacks EXIF data, placeholders will be used. This lets you rename any file, even if it&apos;s not
+              an image file.
             </li>
             <li className="py-1">
-              If you enable the EXIF mode in the settings, files without EXIF data will be ignored.
+              If you enable the EXIF mode in the settings, files without EXIF data will be ignored (only files with
+              valid EXIF data are processed).
             </li>
           </ul>
         </div>

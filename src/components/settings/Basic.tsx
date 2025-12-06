@@ -1,13 +1,13 @@
 import { RiInformationLine } from '@/components/icon'
 import { Language, StorageKey } from '@/const'
-import { updateExifMode, useConfigStore } from '@/store/useConfigStore.ts'
+import { updateExifMode, updateUseCreatedDate, useConfigStore } from '@/store/useConfigStore.ts'
 import { Radio, RadioGroup } from '@nextui-org/radio'
 import { Switch } from '@nextui-org/switch'
 import { Tooltip } from '@nextui-org/tooltip'
 import { useTranslation } from 'react-i18next'
 
 function Basic() {
-  const exifMode = useConfigStore(state => state.mode.exif)
+  // language setting
   const { t, i18n } = useTranslation()
   const currentLang = i18n.language
   const handleLangChange = (val: string) => {
@@ -16,6 +16,11 @@ function Basic() {
       .then(() => localStorage.setItem(StorageKey.LANGUAGE, val))
       .catch(() => {})
   }
+
+  // exif mode setting
+  const exifMode = useConfigStore(state => state.mode.exif)
+  // use created date setting
+  const useCreatedDate = useConfigStore(state => state.useCreatedDate)
 
   return (
     <div className="w-[564px]">
@@ -55,6 +60,25 @@ function Basic() {
           </Tooltip>
         </div>
         <Switch size="sm" color="secondary" isSelected={exifMode} onValueChange={updateExifMode} />
+      </div>
+
+      {/* use created date setting */}
+      <div className="mt-3 flex min-h-12 items-center justify-between rounded-md border bg-default-100 px-4">
+        <div className="flex items-center">
+          <h2 className="text-base font-medium">{t('Use Created Date')}</h2>
+          <Tooltip
+            color="secondary"
+            showArrow
+            radius="none"
+            placement="right"
+            content={t('When enabled, date variables use the file creation date rather than the EXIF date.')}
+          >
+            <div className="px-1">
+              <RiInformationLine className="text-large text-default-500" />
+            </div>
+          </Tooltip>
+        </div>
+        <Switch size="sm" color="secondary" isSelected={useCreatedDate} onValueChange={updateUseCreatedDate} />
       </div>
     </div>
   )

@@ -1,15 +1,15 @@
 import { Language, StorageKey } from '@/const'
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import enUs from './en-us.ts'
-import zhCn from './zh-cn.ts'
+import en from './en.json'
+import zh from './zh.json'
 
 const resources = {
   [Language.EN]: {
-    translation: enUs,
+    translation: en,
   },
   [Language.ZH]: {
-    translation: zhCn,
+    translation: zh,
   },
 }
 const language = localStorage.getItem(StorageKey.LANGUAGE) || navigator.language || Language.EN

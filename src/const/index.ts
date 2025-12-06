@@ -13,6 +13,7 @@ export const enum ExifStatus {
 export const enum StorageKey {
   LANGUAGE = 'LANGUAGE',
   MODE_EXIF = 'MODE_EXIF',
+  MODE_USE_CREATED_DATE = 'MODE_USE_CREATED_DATE',
   INPUT_HISTORY = 'INPUT_HISTORY',
 }
 

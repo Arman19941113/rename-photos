@@ -18,11 +18,13 @@ export interface FileInfo {
 export function transformIpcFiles({
   ipcFiles,
   exifMode,
+  useCreatedDate,
   format,
   t,
 }: {
   ipcFiles: IpcFiles
   exifMode: boolean
+  useCreatedDate: boolean
   format: string
   t: any
 }): FileInfo[] {
@@ -71,6 +73,7 @@ export function transformIpcFiles({
         format,
         created: item.created,
         exifData: item.exifData,
+        useCreatedDate,
       })
     }
 
@@ -136,15 +139,17 @@ function generateFilename({
   format,
   created,
   exifData,
+  useCreatedDate,
 }: {
   filename: string
   format: string
   created: string
   exifData: IpcFiles[number]['exifData']
+  useCreatedDate: boolean
 }) {
   try {
     // eg: 2024-03-04 08:33:38
-    const dateTime = exifData?.date || created || ''
+    const dateTime = (useCreatedDate ? created : exifData?.date) ?? ''
     const timeList = dateTime.replace(/\s|:/g, '-').split('-')
     const formatValueMap: Record<FormatVar, string> = {
       '{YYYY}': timeList[0] || 'YYYY',
@@ -153,7 +158,7 @@ function generateFilename({
       '{hh}': timeList[3] || 'hh',
       '{mm}': timeList[4] || 'mm',
       '{ss}': timeList[5] || 'ss',
-      '{Date}': exifData?.date?.replace(/:/g, '.') || 'Date',
+      '{Date}': dateTime.replace(/:/g, '.') || 'Date',
       '{Make}': exifData?.make || 'Make',
       '{Camera}': exifData?.camera || 'Camera',
       '{Lens}': exifData?.lens || 'Lens',

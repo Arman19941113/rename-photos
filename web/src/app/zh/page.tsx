@@ -133,10 +133,11 @@ export default function NamePhotos() {
           <h1 className="text-2xl font-bold">Q&A：缺少 EXIF 数据</h1>
           <ul className="pt-3 text-default-600">
             <li className="py-1">
-              如果一些文件缺少 EXIF
-              数据，软件将使用创建时间作为日期，其他字段会使用占位符替换。因此你可以重命名任何文件，即使它不是图像文件。
+              如果文件缺少 EXIF 数据，将使用占位符替换。因此你可以重命名任何文件，即使它不是图像文件。
             </li>
-            <li className="py-1">如果在设置中开启 EXIF 模式，会忽略缺少 EXIF 数据的文件。</li>
+            <li className="py-1">
+              如果在设置中开启 EXIF 模式，会忽略缺少 EXIF 数据的文件（即只处理含有正确 EXIF 数据的文件）。
+            </li>
           </ul>
         </div>
       </div>
