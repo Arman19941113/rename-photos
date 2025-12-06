@@ -47,10 +47,10 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
         if (!dirPath) return
         invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_DIR, { dirPath })
           .then(ipcFiles => setIpcFiles(ipcFiles))
-          .catch(err => handleError({ err, title: t('Read Folder Error') }))
+          .catch(err => handleError({ err, title: t('errors.readFolder') }))
       })
       .catch(err => {
-        handleError({ err, title: t('Open Folder Error') })
+        handleError({ err, title: t('errors.openFolder') })
       })
   }
 
@@ -60,7 +60,7 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
   const handleDropFiles = (paths: string[]) => {
     invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_PATHS, { paths })
       .then(ipcFiles => setIpcFiles(ipcFiles))
-      .catch(err => handleError({ err, title: t('Read Files Error') }))
+      .catch(err => handleError({ err, title: t('errors.readFiles') }))
   }
 
   //  Rename Operations
@@ -84,7 +84,7 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
 
     // Skip if no files need renaming
     if (!renamePathData.length) {
-      toast.info(t('No need to perform renaming'))
+      toast.info(t('notifications.noRename'))
       return
     }
 
@@ -97,10 +97,10 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
           .map(item => item.pathname)
           .concat(res)
         handleDropFiles(pathnameList)
-        toast.success(t('Rename Success!'))
+        toast.success(t('notifications.renameSuccess'))
         onRenamed()
       })
-      .catch(err => handleError({ err, title: t('Rename Files Error') }))
+      .catch(err => handleError({ err, title: t('errors.renameFiles') }))
       .finally(() => setIsRenaming(false))
   }
 

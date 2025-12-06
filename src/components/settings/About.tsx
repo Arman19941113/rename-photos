@@ -12,7 +12,7 @@ function About() {
     <div className="w-[564px]">
       <div className="mt-2 rounded-md border bg-default-100 px-4 py-3">
         <h2 className="mb-2 flex items-center text-base font-semibold">
-          {t('Rename Photos')}
+          {t('app.name')}
           <a
             href="https://github.com/Arman19941113/rename-photos/releases"
             target="_blank"
@@ -31,21 +31,21 @@ function About() {
             rel="noreferrer"
           >
             <RiGithubFill className="mr-1 text-large" />
-            {t('This software is completely free and open source on Github.')}
+            {t('about.freeAndOpen')}
           </a>
         </p>
       </div>
 
       <div className="mt-3 rounded-md border bg-default-100 px-4 py-3">
         <p>
-          <span>{t('If you find this tool helpful, you can')}</span>
+          <span>{t('about.ifHelpful')}</span>{' '}
           <a
             href="https://github.com/Arman19941113/rename-photos"
             target="_blank"
             className="text-secondary underline"
             rel="noreferrer"
           >
-            {t('star this project')}
+            {t('about.starProject')}
           </a>
         </p>
       </div>

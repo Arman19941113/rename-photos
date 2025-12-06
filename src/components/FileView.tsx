@@ -21,14 +21,14 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
   /* exif data */
   const rawData = fileInfo.exifData
   const exifData: Array<[string, string]> = [
-    [t('Date'), rawData?.date || '--'],
-    [t('Make'), rawData?.make || '--'],
-    [t('Camera'), rawData?.camera || '--'],
-    [t('Lens'), rawData?.lens || '--'],
-    [t('FocalLength'), rawData?.focal_length ? `${rawData.focal_length} mm` : '--'],
-    [t('Aperture'), rawData?.aperture ? `f/${rawData.aperture}` : '--'],
-    [t('Shutter'), rawData?.shutter || '--'],
-    [t('ISO'), rawData?.iso || '--'],
+    [t('exif.date'), rawData?.date || '--'],
+    [t('exif.make'), rawData?.make || '--'],
+    [t('exif.camera'), rawData?.camera || '--'],
+    [t('exif.lens'), rawData?.lens || '--'],
+    [t('exif.focalLength'), rawData?.focal_length ? `${rawData.focal_length} mm` : '--'],
+    [t('exif.aperture'), rawData?.aperture ? `f/${rawData.aperture}` : '--'],
+    [t('exif.shutter'), rawData?.shutter || '--'],
+    [t('exif.iso'), rawData?.iso || '--'],
   ]
 
   return (
@@ -45,15 +45,15 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
 
       <h2 className="mt-2 break-all text-center text-base font-semibold">{fileInfo.filename}</h2>
       <p className="mt-1 flex justify-between text-xs text-default-500">
-        <span>{t('File Size')}</span>
+        <span>{t('table.fileSize')}</span>
         <span>{fileInfo.size}</span>
       </p>
       <p className="mt-1 flex justify-between text-xs text-default-500">
-        <span>{t('Date Created')}</span>
+        <span>{t('table.dateCreated')}</span>
         <span>{fileInfo.created}</span>
       </p>
 
-      <div className="mb-1 mt-6 border-b pb-1 text-xs font-bold">{t('EXIF Information')}</div>
+      <div className="mb-1 mt-6 border-b pb-1 text-xs font-bold">{t('exif.title')}</div>
       <ul className="text-xs font-medium">
         {exifData.map(item => (
           <li className="mb-1 flex justify-between border-b pb-1" key={item[0]}>

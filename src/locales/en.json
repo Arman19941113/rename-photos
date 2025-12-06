@@ -1,53 +1,74 @@
 {
-  "Rename Photos": "Rename Photos",
-
-  "Ok": "Ok",
-  "System Error": "System Error",
-
-  "Open Folder": "Open Folder",
-  "Open Folder Error": "Open Folder Error",
-  "Read Folder Error": "Read Folder Error",
-  "Drop Files": "Drop Files",
-  "Read Files Error": "Read Files Error",
-  "Rename": "Rename",
-  "Rename Success!": "Rename Success!",
-  "Rename Files Error": "Rename Files Error",
-  "No need to perform renaming": "No need to perform renaming",
-  "Unknown image format": "Unknown image format",
-  "Missing EXIF data": "Missing EXIF data",
-  "Filename": "Name",
-  "New Filename": "New Name",
-
-  "File Size": "File Size",
-  "Date Created": "Date Created",
-
-  "EXIF Information": "EXIF Information",
-  "Date": "Date",
-  "Make": "Device make",
-  "Camera": "Camera",
-  "Lens": "Lens",
-  "FocalLength": "Focal length",
-  "Aperture": "Aperture",
-  "Shutter": "Shutter",
-  "ISO": "ISO",
-
-  "Settings": "Settings",
-  "Language": "Language",
-  "EXIF Mode": "EXIF Mode",
-  "If enabled, only rename files with EXIF data.": "If enabled, only rename files with EXIF data.",
-  "Use Created Date": "Use Created Date",
-  "When enabled, date variables use the file creation date rather than the EXIF date.": "When enabled, date variables use the file creation date rather than the EXIF date.",
-  "Help": "Help",
-  "1. Select a folder or drag and drop files": "1. Select a folder or drag and drop files",
-  "Selected files will be displayed in the table.": "Selected files will be displayed in the table.",
-  "2. Enter the rename rule": "2. Enter the rename rule",
-  "The variables listed below are supported, and you can preview the expected new name in the table.": "The variables listed below are supported, and you can preview the expected new name in the table.",
-  "3. Click `Rename` button to change names": "3. Click `Rename` button to change names",
-  "About": "About",
-  "Check for Updates": "Check for Updates",
-  "New version v{{version}} detected, will automatically install after download.": "New version v{{version}} detected, will automatically install after download.",
-  "There are currently no updates available.": "There are currently no updates available.",
-  "This software is completely free and open source on Github.": "This software is completely free and open source on Github.",
-  "If you find this tool helpful, you can": "If you find this tool helpful, you can",
-  "star this project": " star this project."
+  "app": {
+    "name": "Rename Photos"
+  },
+  "common": {
+    "ok": "OK",
+    "dropFiles": "Drop files here"
+  },
+  "buttons": {
+    "openFolder": "Open Folder",
+    "rename": "Rename"
+  },
+  "errors": {
+    "system": "System Error",
+    "openFolder": "Error Opening Folder",
+    "readFolder": "Error Reading Folder",
+    "readFiles": "Error Reading Files",
+    "renameFiles": "Error Renaming Files",
+    "unknownImageFormat": "Unknown image format",
+    "missingExifData": "No EXIF Data Found"
+  },
+  "notifications": {
+    "noRename": "Nothing to rename",
+    "renameSuccess": "Files renamed successfully!"
+  },
+  "table": {
+    "filename": "Name",
+    "newFilename": "New Filename",
+    "fileSize": "File Size",
+    "dateCreated": "Date Created"
+  },
+  "exif": {
+    "title": "EXIF Information",
+    "date": "Date",
+    "make": "Make",
+    "camera": "Camera",
+    "lens": "Lens",
+    "focalLength": "Focal length",
+    "aperture": "Aperture",
+    "shutter": "Shutter",
+    "iso": "ISO"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "exif": {
+      "title": "EXIF Mode",
+      "tooltip": "If enabled, only rename files with EXIF data."
+    },
+    "creationDate": {
+      "title": "Use Created Date",
+      "tooltip": "When enabled, date variables use the file creation date instead of the EXIF date."
+    },
+    "help": "Help",
+    "about": "About",
+    "checkForUpdates": "Check for Updates"
+  },
+  "helpDoc": {
+    "step1Title": "1. Select a folder or drag and drop files",
+    "step1Desc": "Selected files will be displayed in the table.",
+    "step2Title": "2. Enter the rename rule",
+    "step2Desc": "The variables below are supported, and you can preview the resulting names in the table.",
+    "step3Title": "3. Click Rename to change names"
+  },
+  "updates": {
+    "newVersion": "New version v{{version}} detected, will automatically install after download.",
+    "noUpdates": "No updates are available right now."
+  },
+  "about": {
+    "freeAndOpen": "This software is completely free and open source on Github.",
+    "ifHelpful": "If you find this tool helpful, please",
+    "starProject": "star this project on GitHub"
+  }
 }
