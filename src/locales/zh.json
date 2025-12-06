@@ -1,10 +1,7 @@
 {
-  "app": {
-    "name": "图片重命名工具 Rename Photos"
-  },
   "common": {
     "ok": "好的",
-    "dropFiles": "拖放文件"
+    "dropFiles": "将文件拖到此处"
   },
   "buttons": {
     "openFolder": "打开文件夹",
@@ -45,11 +42,11 @@
     "language": "语言",
     "exif": {
       "title": "EXIF 模式",
-      "tooltip": "只处理含有 EXIF 数据的文件"
+      "tooltip": "开启后只重命名含有 EXIF 数据的图片。"
     },
     "creationDate": {
       "title": "使用创建日期",
-      "tooltip": "开启此选项后，日期变量会以文件创建日期为准，而非 EXIF 日期。"
+      "tooltip": "开启此选项后，日期变量会以文件创建日期为准。"
     },
     "help": "帮助",
     "about": "关于",
@@ -59,16 +56,16 @@
     "step1Title": "1. 选择文件夹或者直接拖拽文件",
     "step1Desc": "选中的文件会显示在表格中。",
     "step2Title": "2. 输入重命名规则",
-    "step2Desc": "下方列举了支持的变量，你可以在表格中预览预期的新文件名",
-    "step3Title": "3. 点击`重命名`按钮执行修改操作"
+    "step2Desc": "下方列举了支持的变量，你可以在表格中预览预期的新文件名。",
+    "step3Title": "3. 点击“重命名”按钮执行修改"
   },
   "updates": {
     "newVersion": "检测到新版本 v{{version}}，下载完成后将会自动安装更新。",
     "noUpdates": "当前没有可用的更新。"
   },
   "about": {
-    "freeAndOpen": "软件完全免费并在 Github 开源。",
+    "freeAndOpen": "软件完全免费并在 GitHub 开源。",
     "ifHelpful": "如果您觉得这个工具对您有所帮助，您可以",
-    "starProject": "在 Github 点下收藏⭐"
+    "starProject": "在 GitHub 给项目点个 star ⭐"
   }
 }

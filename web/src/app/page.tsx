@@ -31,13 +31,13 @@ export default function NamePhotos() {
             className="cursor-pointer text-base font-semibold text-default-600 transition-transform hover:scale-110"
             onClick={() => setPage(5)}
           >
-            Download
+            Download & Install
           </span>
           <Link
             href="https://github.com/Arman19941113/rename-photos"
             className="ml-6 cursor-pointer text-base font-semibold text-default-600 transition-transform hover:scale-110"
           >
-            View on Github
+            View on GitHub
           </Link>
           <div className="ml-6 h-5 w-[1px] bg-default-300" />
           <Link
@@ -53,7 +53,7 @@ export default function NamePhotos() {
       {/* Page0 */}
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
-          <h1 className="text-2xl font-bold">Step1: Choose files to rename</h1>
+          <h1 className="text-2xl font-bold">Step 1: Choose files to rename</h1>
           <ul className="list-disc pl-5 pt-3 text-default-600">
             <li className="py-1">
               Click
@@ -74,10 +74,10 @@ export default function NamePhotos() {
       {/* Page1 */}
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
-          <h1 className="text-2xl font-bold">Step2: Confirm the new names</h1>
+          <h1 className="text-2xl font-bold">Step 2: Confirm the new names</h1>
           <ul className="list-decimal pl-5 pt-3 text-default-600">
-            <li className="py-1">Enter the format in the Input Box</li>
-            <li className="py-1">Preview the new names in the Table</li>
+            <li className="py-1">Enter the format in the input box</li>
+            <li className="py-1">Preview the new names in the table in real time</li>
           </ul>
         </div>
       </div>
@@ -85,12 +85,12 @@ export default function NamePhotos() {
       {/* Page2 */}
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
-          <h1 className="text-2xl font-bold">Step3: Perform Rename</h1>
-          <ul className="pt-3 text-default-600">
+          <h1 className="text-2xl font-bold">Step 3: Apply the rename</h1>
+          <ul className="list-disc pl-5 pt-3 text-default-600">
             <li className="py-1">
               Click
               <Button radius="sm" size="sm" className="btn--grad-pink ml-2">
-                Rename Photos
+                Rename
                 <span>🚀</span>
               </Button>
             </li>
@@ -110,7 +110,7 @@ export default function NamePhotos() {
               in the bottom left corner
             </li>
             <li className="py-1">
-              Use the shortcuts of
+              Use the shortcut
               <span className="ml-2 rounded bg-neutral-200 p-1 font-mono text-sm font-semibold">Ctrl/Command + ,</span>
             </li>
           </ul>
@@ -120,10 +120,10 @@ export default function NamePhotos() {
       {/* Page3 */}
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
-          <h1 className="text-2xl font-bold">Q&A: Have same EXIF data</h1>
-          <ul className="pt-3 text-default-600">
+          <h1 className="text-2xl font-bold">Q&A: Multiple files share metadata</h1>
+          <ul className="list-disc pl-5 pt-3 text-default-600">
             <li className="py-1">
-              If some photos share the same EXIF data, we will automatically generate serial numbers to avoid naming
+              If multiple files share the same metadata, the app automatically adds sequence numbers to avoid naming
               conflicts.
             </li>
           </ul>
@@ -133,16 +133,10 @@ export default function NamePhotos() {
       {/* Page4 */}
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
-          <h1 className="text-2xl font-bold">Q&A: Lack EXIF data</h1>
-          <ul className="pt-3 text-default-600">
-            <li className="py-1">
-              If a file lacks EXIF data, placeholders will be used. This lets you rename any file, even if it&apos;s not
-              an image file.
-            </li>
-            <li className="py-1">
-              If you enable the EXIF mode in the settings, files without EXIF data will be ignored (only files with
-              valid EXIF data are processed).
-            </li>
+          <h1 className="text-2xl font-bold">Q&A: Missing metadata</h1>
+          <ul className="list-disc pl-5 pt-3 text-default-600">
+            <li className="py-1">If a file lacks metadata, placeholders are used.</li>
+            <li className="py-1">If strict mode is enabled in Settings, files without metadata are skipped.</li>
           </ul>
         </div>
       </div>
@@ -150,14 +144,14 @@ export default function NamePhotos() {
       {/* Page5 */}
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
-          <h1 className="text-2xl font-bold">Download</h1>
+          <h1 className="text-2xl font-bold">Download & Install</h1>
           <ul className="ml-4 list-disc pt-3 text-default-600">
             <li className="py-1 underline">
               <a
                 href="https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_aarch64.dmg"
                 download
               >
-                MacOs (Apple silicon)
+                macOS (Apple Silicon)
               </a>
             </li>
             <li className="py-1 underline">
@@ -165,7 +159,7 @@ export default function NamePhotos() {
                 href="https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64.dmg"
                 download
               >
-                MacOs (Intel silicon)
+                macOS (Intel)
               </a>
             </li>
             <li className="py-1 underline">
@@ -192,7 +186,7 @@ export default function NamePhotos() {
         <MacShot>
           {page === 5 ? (
             <div className="ml-5">
-              <h2 className="mt-12 text-lg font-medium">MacOS: App is damaged and can&apos;t be opened</h2>
+              <h2 className="mt-12 text-lg font-medium">macOS: “App is damaged and can&apos;t be opened”</h2>
               <p className="my-3">Open Terminal and then enter the following command:</p>
               <Snippet className="mb-24" color="secondary">
                 sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app

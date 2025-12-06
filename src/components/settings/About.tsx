@@ -12,7 +12,7 @@ function About() {
     <div className="w-[564px]">
       <div className="mt-2 rounded-md border bg-default-100 px-4 py-3">
         <h2 className="mb-2 flex items-center text-base font-semibold">
-          {t('app.name')}
+          Rename Photos
           <a
             href="https://github.com/Arman19941113/rename-photos/releases"
             target="_blank"
