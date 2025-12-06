@@ -37,7 +37,7 @@ export default function NamePhotos() {
             href="https://github.com/Arman19941113/rename-photos"
             className="ml-6 cursor-pointer text-base font-semibold text-default-600 transition-transform hover:scale-110"
           >
-            前往 Github
+            前往 GitHub
           </Link>
           <div className="ml-6 h-5 w-[1px] bg-default-300" />
           <Link
@@ -86,7 +86,7 @@ export default function NamePhotos() {
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
           <h1 className="text-2xl font-bold">第三步：执行重命名操作</h1>
-          <ul className="pt-3 text-default-600">
+          <ul className="list-disc pl-5 pt-3 text-default-600">
             <li className="py-1">
               点击
               <Button radius="sm" size="sm" className="btn--grad-pink ml-2">
@@ -120,9 +120,9 @@ export default function NamePhotos() {
       {/* Page3 */}
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
-          <h1 className="text-2xl font-bold">Q&A：多个文件有相同 EXIF 数据</h1>
-          <ul className="pt-3 text-default-600">
-            <li className="py-1">如果多张照片含有相同的 EXIF 数据，软件将自动生成序列号以避免命名冲突。</li>
+          <h1 className="text-2xl font-bold">Q&A：多个文件元数据相同</h1>
+          <ul className="list-disc pl-5 pt-3 text-default-600">
+            <li className="py-1">如果多个文件含有相同的元数据，软件将自动生成序列号以避免命名冲突。</li>
           </ul>
         </div>
       </div>
@@ -130,14 +130,10 @@ export default function NamePhotos() {
       {/* Page4 */}
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
-          <h1 className="text-2xl font-bold">Q&A：缺少 EXIF 数据</h1>
-          <ul className="pt-3 text-default-600">
-            <li className="py-1">
-              如果文件缺少 EXIF 数据，将使用占位符替换。因此你可以重命名任何文件，即使它不是图像文件。
-            </li>
-            <li className="py-1">
-              如果在设置中开启 EXIF 模式，会忽略缺少 EXIF 数据的文件（即只处理含有正确 EXIF 数据的文件）。
-            </li>
+          <h1 className="text-2xl font-bold">Q&A：缺少元数据</h1>
+          <ul className="list-disc pl-5 pt-3 text-default-600">
+            <li className="py-1">如果文件缺少元数据，将使用占位符补足。</li>
+            <li className="py-1">如果在设置中开启严格模式，会忽略元数据缺失的文件。</li>
           </ul>
         </div>
       </div>
@@ -152,7 +148,7 @@ export default function NamePhotos() {
                 href="https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_aarch64.dmg"
                 download
               >
-                MacOs (Apple silicon)
+                macOS (Apple Silicon)
               </a>
             </li>
             <li className="py-1 underline">
@@ -160,7 +156,7 @@ export default function NamePhotos() {
                 href="https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64.dmg"
                 download
               >
-                MacOs (Intel silicon)
+                macOS (Intel)
               </a>
             </li>
             <li className="py-1 underline">
@@ -187,7 +183,7 @@ export default function NamePhotos() {
         <MacShot>
           {page === 5 ? (
             <div className="ml-5">
-              <h2 className="mt-12 text-lg font-medium">MacOS：软件已损坏，无法打开。</h2>
+              <h2 className="mt-12 text-lg font-medium">macOS：提示“软件已损坏，无法打开”</h2>
               <p className="my-3">打开终端输入以下命令：</p>
               <Snippet className="mb-24" color="secondary">
                 sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app

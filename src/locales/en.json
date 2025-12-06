@@ -1,7 +1,4 @@
 {
-  "app": {
-    "name": "Rename Photos"
-  },
   "common": {
     "ok": "OK",
     "dropFiles": "Drop files here"
@@ -17,7 +14,7 @@
     "readFiles": "Error Reading Files",
     "renameFiles": "Error Renaming Files",
     "unknownImageFormat": "Unknown image format",
-    "missingExifData": "No EXIF Data Found"
+    "missingExifData": "No EXIF data found"
   },
   "notifications": {
     "noRename": "Nothing to rename",
@@ -45,11 +42,11 @@
     "language": "Language",
     "exif": {
       "title": "EXIF Mode",
-      "tooltip": "If enabled, only rename files with EXIF data."
+      "tooltip": "If enabled, only rename images with EXIF data."
     },
     "creationDate": {
       "title": "Use Created Date",
-      "tooltip": "When enabled, date variables use the file creation date instead of the EXIF date."
+      "tooltip": "When enabled, date variables use the file creation date."
     },
     "help": "Help",
     "about": "About",
