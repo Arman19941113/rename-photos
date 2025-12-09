@@ -12,7 +12,7 @@ import { toast } from 'react-toastify'
  * Hook for managing file operations including opening folders,
  * handling drag-and-drop files, and batch renaming.
  */
-export function useFiles({ format, onRenamed }: { format: string; onRenamed: () => void }) {
+export function useFileOperations({ format, onRenamed }: { format: string; onRenamed: () => void }) {
   // Utilities
   const { t } = useTranslation()
   const { handleError } = useError()
@@ -72,15 +72,18 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
   const handleClickRename = () => {
     if (isRenaming) return
 
+    // Collect files that actually need renaming and map their old/new paths
+    const renameTargets = files.filter(item => item.newFilename !== item.filename)
+    // Map: originalPath -> targetPath
+    const renameMapping = new Map(renameTargets.map(item => [item.pathname, `${item.dirname}/${item.newFilename}`]))
+
     // Build rename data: [originalPath, targetPath, tempPath]
     const time = Date.now()
-    const renamePathData = files
-      .filter(item => item.newFilename !== item.filename)
-      .map(item => [
-        `${item.dirname}/${item.filename}`,
-        `${item.dirname}/${item.newFilename}`,
-        `${item.dirname}/${time}_${item.filename}`,
-      ])
+    const renamePathData = renameTargets.map(item => [
+      `${item.dirname}/${item.filename}`,
+      `${item.dirname}/${item.newFilename}`,
+      `${item.dirname}/${time}_${item.filename}`,
+    ])
 
     // Skip if no files need renaming
     if (!renamePathData.length) {
@@ -97,6 +100,11 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
           .map(item => item.pathname)
           .concat(res)
         handleDropFiles(pathnameList)
+        // Preserve selection: move it to the renamed path if applicable
+        if (selectedKey) {
+          const nextKey = renameMapping.get(selectedKey) ?? null
+          setSelectedKey(nextKey)
+        }
         toast.success(t('notifications.renameSuccess'))
         onRenamed()
       })
@@ -105,11 +113,12 @@ export function useFiles({ format, onRenamed }: { format: string; onRenamed: () 
   }
 
   return {
-    setSelectedKey,
     files,
-    selectedFile,
     handleOpenFolder,
     handleDropFiles,
     handleClickRename,
+    selectedKey,
+    selectedFile,
+    setSelectedKey,
   }
 }
