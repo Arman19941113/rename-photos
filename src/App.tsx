@@ -4,7 +4,7 @@ import FilesTable from '@/components/FilesTable.tsx'
 import FileView from '@/components/FileView.tsx'
 import OperationBar from '@/components/OperationBar.tsx'
 import Settings from '@/components/settings/Settings.tsx'
-import { useDragging, useFiles } from '@/hooks'
+import { useDragging, useFileOperations } from '@/hooks'
 import { useInputFormat } from '@/hooks/useInputFormat.ts'
 import { AnimatePresence } from 'framer-motion'
 import { Flip, ToastContainer } from 'react-toastify'
@@ -13,7 +13,16 @@ import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
   const { inputValue, setInputValue, format, setFormat, formatOptions, addFormatOption } = useInputFormat()
-  const { setSelectedKey, files, selectedFile, handleOpenFolder, handleDropFiles, handleClickRename } = useFiles({
+  const {
+    files,
+    handleOpenFolder,
+    handleDropFiles,
+    handleClickRename,
+    // selected file operations
+    selectedKey,
+    selectedFile,
+    setSelectedKey,
+  } = useFileOperations({
     format,
     onRenamed: () => addFormatOption(format),
   })
@@ -36,7 +45,7 @@ function App() {
         />
 
         {hasFiles ? (
-          <FilesTable files={files} onSelectedKeyChange={setSelectedKey} />
+          <FilesTable files={files} selectedKey={selectedKey} onSelectedKeyChange={setSelectedKey} />
         ) : (
           <DropGuide isDragging={isDragging} />
         )}

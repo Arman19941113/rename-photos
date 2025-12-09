@@ -9,13 +9,16 @@ import { useTranslation } from 'react-i18next'
 
 function FilesTable({
   files,
+  selectedKey,
   onSelectedKeyChange,
 }: {
   files: FileInfo[]
+  selectedKey: string | null
   onSelectedKeyChange: (key: string | null) => void
 }) {
   const { t } = useTranslation()
 
+  const selectedKeys: Set<string> = selectedKey ? new Set([selectedKey]) : new Set()
   const handleSelectionChange = (selection: Selection) => {
     if (typeof selection === 'string') return
     if (selection.size) {
@@ -37,6 +40,7 @@ function FilesTable({
         selectionMode="single"
         selectionBehavior="replace"
         classNames={{ tr: '!outline-none', td: '!outline-none' }}
+        selectedKeys={selectedKeys}
         onSelectionChange={handleSelectionChange}
       >
         <TableHeader>
