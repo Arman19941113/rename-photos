@@ -1,40 +1,31 @@
-import { StorageKey } from '@/const'
 import { useEffect, useState } from 'react'
+import { storageService } from '@/services'
 
 export function useInputFormat() {
-  const [format, setFormat] = useState('')
   const [inputValue, setInputValue] = useState('')
+  const [format, setFormat] = useState('')
   const [formatOptions, setFormatOptions] = useState<string[]>([])
 
   useEffect(() => {
-    let history = localStorage.getItem(StorageKey.INPUT_HISTORY) || ''
-    if (!history) {
-      const history = JSON.stringify(['{YYYY}{MM}{DD} {hh}.{mm}.{ss}'])
-      localStorage.setItem(StorageKey.INPUT_HISTORY, history)
-    }
-    try {
-      const newHistory = JSON.parse(history)
-      setInputValue(newHistory[0])
-      setFormat(newHistory[0])
-      setFormatOptions(newHistory)
-    } catch (e) {}
+    const history = storageService.getFormatOptions()
+    setInputValue(history[0])
+    setFormat(history[0])
+    setFormatOptions(history)
+    storageService.setFormatOptions(history)
   }, [])
 
-  function addFormatOption(val: string) {
-    const index = formatOptions.indexOf(val)
-    if (index !== -1) formatOptions.splice(index, 1)
-
-    const newHistory = [val, ...formatOptions].slice(0, 5)
+  function updateLatestFormat(val: string) {
+    const newHistory = [val, ...formatOptions.filter(item => item !== val)].slice(0, 5)
     setFormatOptions(newHistory)
-    localStorage.setItem(StorageKey.INPUT_HISTORY, JSON.stringify(newHistory))
+    storageService.setFormatOptions(newHistory)
   }
 
   return {
-    format,
-    setFormat,
     inputValue,
     setInputValue,
+    format,
+    setFormat,
     formatOptions,
-    addFormatOption,
+    updateLatestFormat,
   }
 }

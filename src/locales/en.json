@@ -42,7 +42,7 @@
     "language": "Language",
     "exif": {
       "title": "EXIF Mode",
-      "tooltip": "If enabled, only rename images with EXIF data."
+      "tooltip": "If enabled, only rename the files that have EXIF data."
     },
     "creationDate": {
       "title": "Use Created Date",

@@ -1,5 +1,6 @@
 import { RiInformationLine } from '@/components/icon'
-import { Language, StorageKey } from '@/const'
+import { Language } from '@/const'
+import { storageService } from '@/services'
 import { updateExifMode, updateUseCreatedDate, useConfigStore } from '@/store/useConfigStore.ts'
 import { Radio, RadioGroup } from '@nextui-org/radio'
 import { Switch } from '@nextui-org/switch'
@@ -13,7 +14,7 @@ function Basic() {
   const handleLangChange = (val: string) => {
     i18n
       .changeLanguage(val)
-      .then(() => localStorage.setItem(StorageKey.LANGUAGE, val))
+      .then(() => storageService.setLanguage(val as Language))
       .catch(() => {})
   }
 
@@ -48,13 +49,7 @@ function Basic() {
       <div className="mt-3 flex min-h-12 items-center justify-between rounded-md border bg-default-100 px-4">
         <div className="flex items-center">
           <h2 className="text-base font-medium">{t('settings.exif.title')}</h2>
-          <Tooltip
-            color="secondary"
-            showArrow
-            radius="none"
-            placement="right"
-            content={exifModeTooltip}
-          >
+          <Tooltip color="secondary" showArrow radius="none" placement="right" content={exifModeTooltip}>
             <div className="px-1">
               <RiInformationLine className="text-large text-default-500" />
             </div>

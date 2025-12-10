@@ -9,11 +9,10 @@ use std::os::windows::prelude::*;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-// pathname filepath
-//   dirname
-//   filename
-//     basename
-//     extname
+/* Path components:
+ * pathname = dirname + filename
+ * filename = basename + extname
+ */
 
 pub struct FileUtil;
 

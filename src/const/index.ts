@@ -10,16 +10,9 @@ export const enum ExifStatus {
   ERROR,
 }
 
-export const enum StorageKey {
-  LANGUAGE = 'LANGUAGE',
-  MODE_EXIF = 'MODE_EXIF',
-  MODE_USE_CREATED_DATE = 'MODE_USE_CREATED_DATE',
-  INPUT_HISTORY = 'INPUT_HISTORY',
-}
-
 export const enum Language {
-  EN = 'EN',
-  ZH = 'ZH',
+  EN = 'en',
+  ZH = 'zh',
 }
 
 type DateVar = '{YYYY}' | '{MM}' | '{DD}' | '{hh}' | '{mm}' | '{ss}'

@@ -12,7 +12,7 @@ import { Flip, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
-  const { inputValue, setInputValue, format, setFormat, formatOptions, addFormatOption } = useInputFormat()
+  const { inputValue, setInputValue, format, setFormat, formatOptions, updateLatestFormat } = useInputFormat()
   const {
     files,
     handleOpenFolder,
@@ -24,7 +24,7 @@ function App() {
     setSelectedKey,
   } = useFileOperations({
     format,
-    onRenamed: () => addFormatOption(format),
+    onRenamed: () => updateLatestFormat(format),
   })
   const hasFiles = files.length > 0
   const { isDragging } = useDragging({ onDrop: handleDropFiles })

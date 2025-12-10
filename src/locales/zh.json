@@ -42,7 +42,7 @@
     "language": "语言",
     "exif": {
       "title": "EXIF 模式",
-      "tooltip": "开启后只重命名含有 EXIF 数据的图片。"
+      "tooltip": "开启此选项后，只重命名含有 EXIF 数据的文件。"
     },
     "creationDate": {
       "title": "使用创建日期",
