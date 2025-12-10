@@ -1,4 +1,4 @@
-import { checkForUpdates } from '@/util/check-for-updates'
+import { checkForUpdates } from '@/util'
 import { Button } from '@nextui-org/button'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'

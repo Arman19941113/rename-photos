@@ -1,4 +1,4 @@
-import { StorageKey } from '@/const'
+import { storageService } from '@/services'
 import { create } from 'zustand'
 
 type State = {
@@ -12,9 +12,9 @@ type State = {
 export const useConfigStore = create<State>(() => ({
   visible: false,
   mode: {
-    exif: !!localStorage.getItem(StorageKey.MODE_EXIF),
+    exif: storageService.getExifMode(),
   },
-  useCreatedDate: !!localStorage.getItem(StorageKey.MODE_USE_CREATED_DATE),
+  useCreatedDate: storageService.getUseCreatedDate(),
 }))
 
 export const updateVisible = (visible: boolean) => useConfigStore.setState(() => ({ visible }))
@@ -27,18 +27,10 @@ export const updateExifMode = (newVal: boolean) => {
       exif: newVal,
     },
   }))
-  if (newVal) {
-    localStorage.setItem(StorageKey.MODE_EXIF, '1')
-  } else {
-    localStorage.removeItem(StorageKey.MODE_EXIF)
-  }
+  storageService.setExifMode(newVal)
 }
 
 export const updateUseCreatedDate = (newVal: boolean) => {
   useConfigStore.setState(() => ({ useCreatedDate: newVal }))
-  if (newVal) {
-    localStorage.setItem(StorageKey.MODE_USE_CREATED_DATE, '1')
-  } else {
-    localStorage.removeItem(StorageKey.MODE_USE_CREATED_DATE)
-  }
+  storageService.setUseCreatedDate(newVal)
 }
