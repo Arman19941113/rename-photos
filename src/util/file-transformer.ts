@@ -8,6 +8,7 @@ export interface FileInfo {
   dirname: string
   filename: string
   newFilename: string
+  shouldIgnore: boolean
   size: string
   preview: boolean
   exifStatus: ExifStatus
@@ -48,6 +49,7 @@ export function transformIpcFiles({
         dirname: getDirFromFilePath(item.pathname),
         filename: item.filename,
         newFilename: '',
+        shouldIgnore: false,
         size: formatFileSize(item.size),
         preview: checkPreview(item.filename, item.size),
         exifStatus,
@@ -61,7 +63,7 @@ export function transformIpcFiles({
   const newNameCounter: Record<string, number> = {}
   // counts new filename
   files.forEach(item => {
-    // get lowercase filename to avoid name conflicts
+    // get lowercase filename to avoid name conflicts (case-insensitive)
     let newFilename = ''
     if (exifMode && item.exifStatus !== ExifStatus.SUCCESS) {
       // in exifMode, if on exif data, keep old filename
@@ -88,23 +90,29 @@ export function transformIpcFiles({
   const nameSequence: Record<string, number> = {}
   files.forEach(item => {
     if (exifMode && item.exifStatus !== ExifStatus.SUCCESS) {
-      // keep old filename, no need to rename
+      // no need to rename, keep old filename
       item.newFilename = item.filename
+      item.shouldIgnore = true
       return
     }
 
     const newFilename = nameMap[item.filename]
-    const extName = getExtName(item.filename)
-    const duplicates = newNameCounter[newFilename]
-    if (duplicates) {
-      const maxLength = duplicates.toString().length
+    const originExtName = getExtName(item.filename)
+    const duplicateCount = newNameCounter[newFilename]
+    if (duplicateCount) {
+      const countLength = duplicateCount.toString().length
       const sequence = nameSequence.hasOwnProperty(newFilename)
         ? ++nameSequence[newFilename]
         : (nameSequence[newFilename] = 1)
-      item.newFilename = removeExtName(newFilename) + '_' + sequence.toString().padStart(maxLength, '0') + extName
+      const seqString = sequence.toString().padStart(countLength, '0')
+      // new filename with sequence
+      item.newFilename = removeExtName(newFilename) + '_' + seqString + originExtName
     } else {
-      item.newFilename = removeExtName(newFilename) + extName
+      // expected new filename
+      item.newFilename = removeExtName(newFilename) + originExtName
     }
+
+    item.shouldIgnore = item.newFilename === item.filename
   })
 
   return files

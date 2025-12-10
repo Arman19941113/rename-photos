@@ -73,7 +73,7 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
     if (isRenaming) return
 
     // Collect files that actually need renaming and map their old/new paths
-    const renameTargets = files.filter(item => item.newFilename !== item.filename)
+    const renameTargets = files.filter(item => !item.shouldIgnore)
     // Map: originalPath -> targetPath
     const renameMapping = new Map(renameTargets.map(item => [item.pathname, `${item.dirname}/${item.newFilename}`]))
 
@@ -96,7 +96,7 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
       .then(res => {
         // Reload files: combine unchanged files with newly renamed ones
         const pathnameList = files
-          .filter(item => item.newFilename === item.filename)
+          .filter(item => item.shouldIgnore)
           .map(item => item.pathname)
           .concat(res)
         handleDropFiles(pathnameList)
