@@ -4,7 +4,6 @@ import { FileInfo } from '@/util'
 import { ScrollShadow } from '@nextui-org/scroll-shadow'
 import { Selection, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table'
 import { Tooltip } from '@nextui-org/tooltip'
-import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
 
 function FilesTable({
@@ -55,14 +54,7 @@ function FilesTable({
                 <span className="font-mono text-s xl:text-sm">{fileInfo.filename}</span>
               </TableCell>
               <TableCell>
-                <span
-                  className={clsx(
-                    'font-mono text-s xl:text-sm',
-                    fileInfo.newFilename === fileInfo.filename && 'text-default-500',
-                  )}
-                >
-                  {fileInfo.newFilename}
-                </span>
+                <span className="font-mono text-s xl:text-sm">{fileInfo.shouldIgnore ? '' : fileInfo.newFilename}</span>
               </TableCell>
               <TableCell>
                 <ExifTips fileInfo={fileInfo} />
