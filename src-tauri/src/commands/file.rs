@@ -1,55 +1,58 @@
+//! Tauri commands for file system operations.
+//! get_files_from_dir: get files from a directory
+//! get_files_from_paths: get files from a list of paths
+//! rename_files: rename a list of files
+
 use std::fs;
+use std::fs::Metadata;
+use std::path::Path;
 
-use crate::utils::file::{get_created_time, ExifAnalysis, ExifData, FileUtil};
+mod types;
 
-#[derive(serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct IpcFile {
-    pathname: String,
-    filename: String,
-    created: u128,
-    size: u64,
-    exif_error: Option<String>,
-    exif_data: Option<ExifData>,
-}
+use self::types::IpcFile;
+use crate::utils::file::{analyze_exif, get_created_timestamp, get_filename, should_skip_file};
 
 #[tauri::command]
 pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<IpcFile>, String> {
-    let dir_data = fs::read_dir(dir_path).map_err(|err| err.to_string())?;
-    let mut files: Vec<IpcFile> = Vec::new();
+    get_files_from_dir_inner(dir_path).map_err(|err| err.to_string())
+}
 
-    for dir_entry in dir_data {
-        let dir_entry = dir_entry.map_err(|err| err.to_string())?;
-        let metadata = dir_entry.metadata().map_err(|err| err.to_string())?;
-        let path_buf = dir_entry.path();
-        let pathname = path_buf.to_str().unwrap();
+fn build_ipc_file(path_str: &str, metadata: &Metadata) -> IpcFile {
+    let (exif_data, exif_error) = analyze_exif(path_str);
 
-        // filter file
-        if metadata.is_dir() {
-            continue;
-        }
-        if metadata.is_symlink() {
-            continue;
-        }
-        if FileUtil::check_is_hidden(pathname) {
-            continue;
-        }
-        if FileUtil::check_is_system_file(pathname) {
+    IpcFile {
+        pathname: path_str.to_string(),
+        filename: get_filename(path_str),
+        created: get_created_timestamp(metadata),
+        size: metadata.len(),
+        exif_error,
+        exif_data,
+    }
+}
+
+fn get_files_from_dir_inner(dir_path: &str) -> std::io::Result<Vec<IpcFile>> {
+    let dir_entries = fs::read_dir(dir_path)?;
+    let mut files = Vec::new();
+
+    for entry_result in dir_entries {
+        let entry = entry_result?;
+        let path_buf = entry.path();
+        // Use `symlink_metadata` so `file_type().is_symlink()` works as expected.
+        let metadata = fs::symlink_metadata(&path_buf)?;
+        // Get the path as a string.
+        let Some(path_str) = path_buf.to_str() else {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!("Non-UTF-8 path encountered: {}", path_buf.display()),
+            ));
+        };
+
+        // Skip folders, symlinks, hidden files, and (on Windows) system files.
+        if should_skip_file(&path_buf, &metadata) {
             continue;
         }
 
-        let ExifAnalysis {
-            exif_error,
-            exif_data,
-        } = ExifAnalysis::new(pathname);
-        files.push(IpcFile {
-            pathname: pathname.to_string(),
-            filename: path_buf.file_name().unwrap().to_str().unwrap().to_string(),
-            created: get_created_time(&metadata),
-            size: metadata.len(),
-            exif_error,
-            exif_data,
-        })
+        files.push(build_ipc_file(path_str, &metadata))
     }
 
     Ok(files)
@@ -57,47 +60,30 @@ pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<IpcFile>, String> {
 
 #[tauri::command]
 pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IpcFile>, String> {
-    // drop 1 folder
-    if paths.len() == 1 {
-        let pathname = paths[0];
-        let metadata = fs::metadata(pathname).map_err(|err| err.to_string())?;
+    get_files_from_paths_inner(paths).map_err(|err| err.to_string())
+}
+
+fn get_files_from_paths_inner(paths: Vec<&str>) -> std::io::Result<Vec<IpcFile>> {
+    // If the user drops a single folder path, treat it like "open folder".
+    if let [path_str] = paths.as_slice() {
+        let metadata = fs::metadata(path_str)?;
         if metadata.is_dir() {
-            return get_files_from_dir(pathname);
+            return get_files_from_dir_inner(path_str);
         }
     }
 
-    // drop multiple files and folders
-    let mut files: Vec<IpcFile> = Vec::new();
+    // Otherwise treat every input as a file path and ignore directories.
+    let mut files = Vec::new();
 
-    for pathname in paths {
-        let metadata = fs::metadata(pathname).map_err(|err| err.to_string())?;
+    for path_str in paths {
+        let path = Path::new(path_str);
+        let metadata = fs::symlink_metadata(path)?;
 
-        // filter file
-        if metadata.is_dir() {
-            continue;
-        }
-        if metadata.is_symlink() {
-            continue;
-        }
-        if FileUtil::check_is_hidden(pathname) {
-            continue;
-        }
-        if FileUtil::check_is_system_file(pathname) {
+        if should_skip_file(path, &metadata) {
             continue;
         }
 
-        let ExifAnalysis {
-            exif_error,
-            exif_data,
-        } = ExifAnalysis::new(pathname);
-        files.push(IpcFile {
-            pathname: pathname.to_string(),
-            filename: FileUtil::get_filename(pathname),
-            created: get_created_time(&metadata),
-            size: metadata.len(),
-            exif_error,
-            exif_data,
-        })
+        files.push(build_ipc_file(path_str, &metadata))
     }
 
     Ok(files)
@@ -105,30 +91,43 @@ pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IpcFile>, String> {
 
 #[tauri::command]
 pub fn rename_files(rename_path_data: Vec<(&str, &str, &str)>) -> Result<Vec<String>, String> {
-    // check exists
-    for paths in &rename_path_data {
-        let new_path = paths.1;
-        if rename_path_data.iter().any(|item| item.0 == new_path) {
+    rename_files_inner(rename_path_data).map_err(|err| err.to_string())
+}
+
+fn rename_files_inner(rename_path_data: Vec<(&str, &str, &str)>) -> std::io::Result<Vec<String>> {
+    // Frontend input shape: `[[oldPath, newPath, tempPath], ...]`.
+    //
+    // We use a two-phase rename to avoid collisions when multiple files swap names:
+    // 1) oldPath -> tempPath
+    // 2) tempPath -> newPath
+    //
+    // Before renaming, ensure we never overwrite an unrelated existing file.
+    for &(_, new_path, _) in &rename_path_data {
+        // If `new_path` is also one of the `old_path`s in this batch, it will be freed up
+        // during phase 1, so it's safe to proceed.
+        if rename_path_data
+            .iter()
+            .any(|&(old_path, _, _)| old_path == new_path)
+        {
             continue;
         }
-        let path_buf = std::path::PathBuf::from(new_path);
-        if path_buf.exists() {
+        if Path::new(new_path).exists() {
             let msg = format!("The file \"{}\" already exist", new_path);
-            return Err(String::from(msg));
+            return Err(std::io::Error::new(std::io::ErrorKind::AlreadyExists, msg));
         }
     }
 
-    for path_info in &rename_path_data {
-        let (old_name, _, temp_name) = path_info;
-        fs::rename(old_name, temp_name).map_err(|err| err.to_string())?;
+    // Phase 1: move everything to a temporary path.
+    for &(old_path, _, temp_path) in &rename_path_data {
+        fs::rename(old_path, temp_path)?;
     }
-    for path_info in &rename_path_data {
-        let (_, new_name, temp_name) = path_info;
-        fs::rename(temp_name, new_name).map_err(|err| err.to_string())?;
+    // Phase 2: move temporary paths into their final targets.
+    for &(_, new_path, temp_path) in &rename_path_data {
+        fs::rename(temp_path, new_path)?;
     }
-    let new_paths = rename_path_data
-        .iter()
-        .map(|item| item.1.to_string())
+    let new_paths: Vec<String> = rename_path_data
+        .into_iter()
+        .map(|(_, new_path, _)| new_path.to_owned())
         .collect();
 
     Ok(new_paths)

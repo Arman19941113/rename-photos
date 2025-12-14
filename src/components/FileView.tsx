@@ -25,7 +25,7 @@ function FileView({ fileInfo }: { fileInfo: FileInfo }) {
     [t('exif.make'), rawData?.make || '--'],
     [t('exif.camera'), rawData?.camera || '--'],
     [t('exif.lens'), rawData?.lens || '--'],
-    [t('exif.focalLength'), rawData?.focal_length ? `${rawData.focal_length} mm` : '--'],
+    [t('exif.focalLength'), rawData?.focalLength ? `${rawData.focalLength} mm` : '--'],
     [t('exif.aperture'), rawData?.aperture ? `f/${rawData.aperture}` : '--'],
     [t('exif.shutter'), rawData?.shutter || '--'],
     [t('exif.iso'), rawData?.iso || '--'],

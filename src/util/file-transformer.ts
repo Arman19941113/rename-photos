@@ -165,7 +165,7 @@ function generateFilename({
       '{Make}': exifData?.make || 'Make',
       '{Camera}': exifData?.camera || 'Camera',
       '{Lens}': exifData?.lens || 'Lens',
-      '{FocalLength}': exifData?.focal_length || 'FocalLength',
+      '{FocalLength}': exifData?.focalLength || 'FocalLength',
       '{Aperture}': exifData?.aperture || 'Aperture',
       '{Shutter}': exifData?.shutter || 'Shutter',
       '{ISO}': exifData?.iso || 'ISO',
