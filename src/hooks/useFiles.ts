@@ -102,8 +102,10 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
         handleDropFiles(pathnameList)
         // Preserve selection: move it to the renamed path if applicable
         if (selectedKey) {
-          const nextKey = renameMapping.get(selectedKey) ?? null
-          setSelectedKey(nextKey)
+          const nextKey = renameMapping.get(selectedKey)
+          if (nextKey) {
+            setSelectedKey(nextKey)
+          }
         }
         toast.success(t('notifications.renameSuccess'))
         onRenamed()
