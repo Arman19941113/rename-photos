@@ -1,5 +1,4 @@
 import { RiGithubFill } from '@/components/icon'
-import CheckForUpdates from '@/components/settings/CheckForUpdates.tsx'
 import { getVersion } from '@tauri-apps/api/app'
 import { useTranslation } from 'react-i18next'
 
@@ -21,7 +20,6 @@ function About() {
           >
             v{appVersion}
           </a>
-          <CheckForUpdates />
         </h2>
         <p>
           <a
