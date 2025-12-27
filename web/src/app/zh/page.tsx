@@ -145,7 +145,7 @@ export default function NamePhotos() {
           <ul className="ml-4 list-disc pt-3 text-default-600">
             <li className="py-1 underline">
               <a
-                href="https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_aarch64.dmg"
+                href="https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_aarch64.dmg"
                 download
               >
                 macOS (Apple Silicon)
@@ -153,7 +153,7 @@ export default function NamePhotos() {
             </li>
             <li className="py-1 underline">
               <a
-                href="https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64.dmg"
+                href="https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_x64.dmg"
                 download
               >
                 macOS (Intel)
@@ -161,7 +161,7 @@ export default function NamePhotos() {
             </li>
             <li className="py-1 underline">
               <a
-                href="https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_x64_en-US.msi"
+                href="https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_x64_en-US.msi"
                 download
               >
                 Windows
@@ -169,7 +169,7 @@ export default function NamePhotos() {
             </li>
             <li className="py-1 underline">
               <a
-                href="https://github.com/Arman19941113/rename-photos/releases/download/v0.1.2/Rename.Photos_0.1.2_amd64.deb"
+                href="https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_amd64.deb"
                 download
               >
                 Linux
