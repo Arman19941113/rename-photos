@@ -1,7 +1,7 @@
 import { RiInformationLine } from '@/components/icon'
 import { Language } from '@/const'
 import { storageService } from '@/services'
-import { updateExifMode, updateUseCreatedDate, useConfigStore } from '@/store/useConfigStore.ts'
+import { updateStrictMode, updateUseCreatedDate, useConfigStore } from '@/store/useConfigStore.ts'
 import { Radio, RadioGroup } from '@nextui-org/radio'
 import { Switch } from '@nextui-org/switch'
 import { Tooltip } from '@nextui-org/tooltip'
@@ -18,9 +18,9 @@ function Basic() {
       .catch(() => {})
   }
 
-  // exif mode setting
-  const exifMode = useConfigStore(state => state.mode.exif)
-  const exifModeTooltip = t('settings.exif.tooltip')
+  // strict mode setting
+  const strictMode = useConfigStore(state => state.strictMode)
+  const strictModeTooltip = t('settings.strict.tooltip')
   // use created date setting
   const useCreatedDate = useConfigStore(state => state.useCreatedDate)
 
@@ -45,17 +45,17 @@ function Basic() {
         </RadioGroup>
       </div>
 
-      {/* exif mode setting */}
+      {/* strict mode setting */}
       <div className="mt-3 flex min-h-12 items-center justify-between rounded-md border bg-default-100 px-4">
         <div className="flex items-center">
-          <h2 className="text-base font-medium">{t('settings.exif.title')}</h2>
-          <Tooltip color="secondary" showArrow radius="none" placement="right" content={exifModeTooltip}>
+          <h2 className="text-base font-medium">{t('settings.strict.title')}</h2>
+          <Tooltip color="secondary" showArrow radius="none" placement="right" content={strictModeTooltip}>
             <div className="px-1">
               <RiInformationLine className="text-large text-default-500" />
             </div>
           </Tooltip>
         </div>
-        <Switch size="sm" color="secondary" isSelected={exifMode} onValueChange={updateExifMode} />
+        <Switch size="sm" color="secondary" isSelected={strictMode} onValueChange={updateStrictMode} />
       </div>
 
       {/* use created date setting */}

@@ -9,28 +9,56 @@ use std::path::Path;
 
 mod types;
 
-use self::types::IpcFile;
-use crate::utils::file::{analyze_exif, get_created_timestamp, get_filename, should_skip_file};
+use self::types::IPCFile;
+use crate::utils::file::{
+    FileKind, analyze_image_metadata, analyze_video_metadata, detect_file_kind,
+    get_created_timestamp, get_filename, should_exclude_from_ui_file_list,
+};
 
 #[tauri::command]
-pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<IpcFile>, String> {
+pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<IPCFile>, String> {
     get_files_from_dir_inner(dir_path).map_err(|err| err.to_string())
 }
 
-fn build_ipc_file(path_str: &str, metadata: &Metadata) -> IpcFile {
-    let (exif_data, exif_error) = analyze_exif(path_str);
+fn build_ipc_file(path_str: &str, metadata: &Metadata) -> IPCFile {
+    let pathname = path_str.to_string();
+    let filename = get_filename(path_str);
+    let created = get_created_timestamp(metadata);
+    let size = metadata.len();
 
-    IpcFile {
-        pathname: path_str.to_string(),
-        filename: get_filename(path_str),
-        created: get_created_timestamp(metadata),
-        size: metadata.len(),
-        exif_error,
-        exif_data,
+    match detect_file_kind(path_str) {
+        FileKind::Image => {
+            let (metadata, meta_error) = analyze_image_metadata(path_str);
+            IPCFile::Image {
+                pathname,
+                filename,
+                created,
+                size,
+                metadata,
+                meta_error,
+            }
+        }
+        FileKind::Video => {
+            let (metadata, meta_error) = analyze_video_metadata(path_str);
+            IPCFile::Video {
+                pathname,
+                filename,
+                created,
+                size,
+                metadata,
+                meta_error,
+            }
+        }
+        FileKind::Other => IPCFile::Other {
+            pathname,
+            filename,
+            created,
+            size,
+        },
     }
 }
 
-fn get_files_from_dir_inner(dir_path: &str) -> std::io::Result<Vec<IpcFile>> {
+fn get_files_from_dir_inner(dir_path: &str) -> std::io::Result<Vec<IPCFile>> {
     let dir_entries = fs::read_dir(dir_path)?;
     let mut files = Vec::new();
 
@@ -48,7 +76,7 @@ fn get_files_from_dir_inner(dir_path: &str) -> std::io::Result<Vec<IpcFile>> {
         };
 
         // Skip folders, symlinks, hidden files, and (on Windows) system files.
-        if should_skip_file(&path_buf, &metadata) {
+        if should_exclude_from_ui_file_list(&path_buf, &metadata) {
             continue;
         }
 
@@ -59,11 +87,11 @@ fn get_files_from_dir_inner(dir_path: &str) -> std::io::Result<Vec<IpcFile>> {
 }
 
 #[tauri::command]
-pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IpcFile>, String> {
+pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IPCFile>, String> {
     get_files_from_paths_inner(paths).map_err(|err| err.to_string())
 }
 
-fn get_files_from_paths_inner(paths: Vec<&str>) -> std::io::Result<Vec<IpcFile>> {
+fn get_files_from_paths_inner(paths: Vec<&str>) -> std::io::Result<Vec<IPCFile>> {
     // If the user drops a single folder path, treat it like "open folder".
     if let [path_str] = paths.as_slice() {
         let metadata = fs::metadata(path_str)?;
@@ -79,7 +107,7 @@ fn get_files_from_paths_inner(paths: Vec<&str>) -> std::io::Result<Vec<IpcFile>>
         let path = Path::new(path_str);
         let metadata = fs::symlink_metadata(path)?;
 
-        if should_skip_file(path, &metadata) {
+        if should_exclude_from_ui_file_list(path, &metadata) {
             continue;
         }
 

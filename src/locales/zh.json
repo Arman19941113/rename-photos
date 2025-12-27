@@ -14,7 +14,7 @@
     "readFiles": "读取文件出错",
     "renameFiles": "重命名出错",
     "unknownImageFormat": "未知图片格式",
-    "missingExifData": "EXIF 数据缺失"
+    "missingMetadata": "元数据缺失"
   },
   "notifications": {
     "noRename": "无需执行重命名操作",
@@ -24,10 +24,11 @@
     "filename": "文件名",
     "newFilename": "新文件名",
     "fileSize": "文件大小",
-    "dateCreated": "创建日期"
+    "dateCreated": "创建日期",
+    "metadata": "元数据"
   },
-  "exif": {
-    "title": "EXIF 信息",
+  "metadata": {
+    "title": "元数据",
     "date": "拍摄日期",
     "make": "制造商",
     "camera": "相机",
@@ -40,9 +41,9 @@
   "settings": {
     "title": "设置",
     "language": "语言",
-    "exif": {
-      "title": "EXIF 模式",
-      "tooltip": "开启此选项后，只重命名含有 EXIF 数据的文件。"
+    "strict": {
+      "title": "严格模式",
+      "tooltip": "开启此选项后，只重命名当前规则所需元数据齐全的文件。"
     },
     "creationDate": {
       "title": "使用创建日期",

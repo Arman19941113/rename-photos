@@ -17,6 +17,6 @@ tauri-plugin-dialog = "2.2.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 kamadak-exif = "0.6.1"
-nom-exif = "2.5.1"
+nom-exif = "2.5.4"
 chrono = "0.4.41"
 anyhow = "1"

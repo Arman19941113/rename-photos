@@ -4,7 +4,7 @@ use std::os::windows::fs::MetadataExt;
 use std::path::Path;
 
 // Whether the file should be excluded from the UI file list.
-pub(crate) fn should_skip_file(path: &Path, metadata: &Metadata) -> bool {
+pub(crate) fn should_exclude_from_ui_file_list(path: &Path, metadata: &Metadata) -> bool {
     if metadata.is_dir() {
         return true;
     }
