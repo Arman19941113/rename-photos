@@ -1,4 +1,4 @@
-import { MingcuteFileMoreLine } from '@/components/icon'
+import { StreamlineUltimateColorDataFileSearch } from '@/components/icon'
 import type { UIFile } from '@/types/file'
 import { convertFileSrc } from '@tauri-apps/api/core'
 
@@ -50,7 +50,7 @@ function FileView({ fileInfo }: { fileInfo: UIFile }) {
     <div className="ml-4 w-[248px] shrink-0 overflow-auto">
       <div className="flex-center h-[143px]">
         {showFileIcon ? (
-          <MingcuteFileMoreLine className="text-5xl text-default-500" />
+          <StreamlineUltimateColorDataFileSearch className="text-6xl text-default-500" />
         ) : (
           <div className={clsx('p-1 pt-0', isImgLoad && 'shadow-md')}>
             <img src={imageSrc} alt="" className="h-[135px] object-contain" onLoad={onImgLoad} onError={onImgError} />

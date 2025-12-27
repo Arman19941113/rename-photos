@@ -1,4 +1,5 @@
 // https://icon-sets.iconify.design/ri/
+// https://icon-sets.iconify.design/streamline-ultimate-color/
 
 import type { SVGProps } from 'react'
 
@@ -54,15 +55,51 @@ export function RiQuestionnaireLine(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-export function MingcuteFileMoreLine(props: SVGProps<SVGSVGElement>) {
+export function StreamlineUltimateColorDataFileSearch(props: SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
       <g fill="none">
-        <path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
         <path
-          fill="currentColor"
-          d="M13.586 2A2 2 0 0 1 15 2.586L19.414 7A2 2 0 0 1 20 8.414V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM12 4H6v16h12V10h-4.5A1.5 1.5 0 0 1 12 8.5zM9 14a1 1 0 1 1 0 2a1 1 0 0 1 0-2m3 0a1 1 0 1 1 0 2a1 1 0 0 1 0-2m3 0a1 1 0 1 1 0 2a1 1 0 0 1 0-2m-1-9.586V8h3.586z"
-        />
+          fill="#e3e3e3"
+          d="M18.243 23H1.982a.956.956 0 0 1-.957-.957V1.957A.957.957 0 0 1 1.982 1h12.715c.254 0 .497.1.676.28l3.546 3.546c.18.18.28.423.28.676v16.542a.956.956 0 0 1-.956.956"
+        ></path>
+        <path
+          fill="#fff"
+          d="M16.953 2.877L15.356 1.28A.96.96 0 0 0 14.68 1H1.965a.957.957 0 0 0-.957.957v16.865z"
+        ></path>
+        <path
+          stroke="#191919"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12.883 23H1.982a.956.956 0 0 1-.957-.957V1.957A.957.957 0 0 1 1.982 1h12.715c.254 0 .497.1.676.28l3.546 3.546c.18.18.28.423.28.676v4.75"
+          strokeWidth={1}
+        ></path>
+        <path
+          stroke="#191919"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="m4.852 13.829l2.825-2.826A.83.83 0 0 1 8.72 10.9l1.332.889a.826.826 0 0 0 1.061-.123l2.617-2.794"
+          strokeWidth={1}
+        ></path>
+        <path
+          stroke="#191919"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4.852 6.74v9.564h4.782"
+          strokeWidth={1}
+        ></path>
+        <path fill="#66e1ff" d="M16.802 21.133a4.332 4.332 0 1 0 .128-8.663a4.332 4.332 0 0 0-.128 8.663"></path>
+        <path
+          fill="#c2f3ff"
+          d="M16.802 12.469a4.33 4.33 0 0 0-3.05 7.406l6.123-6.122a4.32 4.32 0 0 0-3.073-1.284"
+        ></path>
+        <path
+          stroke="#191919"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M16.802 21.133a4.332 4.332 0 1 0 .128-8.663a4.332 4.332 0 0 0-.128 8.663m6.19 1.856l-3.107-3.107"
+          strokeWidth={1}
+        ></path>
       </g>
     </svg>
   )
