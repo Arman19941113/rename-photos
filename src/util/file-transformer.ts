@@ -1,65 +1,79 @@
-import { ExifStatus, FormatVar } from '@/const'
-import mime from 'mime/lite'
+import { MetadataStatus, formatVars, FormatVar } from '@/const'
+import type { IPCFile, UIFile } from '@/types/file'
+import type { ImageMetadata } from '@/types/file'
 import { formatDate, formatFileSize, getDirFromFilePath, getValidPath } from './'
 
-export interface FileInfo {
-  created: string
-  pathname: string
-  dirname: string
-  filename: string
-  newFilename: string
-  shouldIgnore: boolean
-  size: string
-  preview: boolean
-  exifStatus: ExifStatus
-  exifMsg: string
-  exifData: IpcFiles[number]['exifData']
-}
+type AnyMetadata = UIFile['metadata']
+type OptionalMetadata = Partial<ImageMetadata>
 
-export function transformIpcFiles({
+export function transformIPCFiles({
   ipcFiles,
-  exifMode,
+  strictMode,
   useCreatedDate,
   format,
   t,
 }: {
-  ipcFiles: IpcFiles
-  exifMode: boolean
+  ipcFiles: IPCFile[]
+  strictMode: boolean
   useCreatedDate: boolean
   format: string
   t: any
-}): FileInfo[] {
+}): UIFile[] {
+  const usedVars = formatVars.filter(v => format.includes(v))
+
   // === transform basic info
   const files = ipcFiles
     .sort((a, b) => a.filename.localeCompare(b.filename, undefined, { numeric: true }))
     .map(item => {
-      let exifStatus = ExifStatus.SUCCESS
-      let exifMsg = ''
-      const { exifData, exifError } = item
-      if (exifError) {
-        exifStatus = ExifStatus.ERROR
-        exifMsg = exifError === 'Unknown image format' ? t('errors.unknownImageFormat') : exifError
-      } else if (Object.values(exifData!).some(val => val === null)) {
-        exifStatus = ExifStatus.WARNING
-        exifMsg = t('errors.missingExifData')
-      }
-
-      return {
+      const commonFields = {
         created: formatDate(item.created),
         pathname: item.pathname,
         dirname: getDirFromFilePath(item.pathname),
         filename: item.filename,
         newFilename: '',
-        shouldIgnore: false,
-        size: formatFileSize(item.size),
-        preview: shouldPreview(item.filename, item.size),
-        exifStatus,
-        exifMsg,
-        exifData,
+        shouldSkip: false,
+        size: item.size,
+        fileSize: formatFileSize(item.size),
+      }
+      switch (item.fileType) {
+        case 'image': {
+          const metadata = item.metadata
+          const { metadataStatus, metadataTips } = getMetadataStatusAndTips({ metadata, metaError: item.metaError, t })
+
+          const uiFile: UIFile = {
+            ...commonFields,
+            fileType: 'image',
+            metadata,
+            metadataStatus,
+            metadataTips,
+          }
+          return uiFile
+        }
+        case 'video': {
+          const metadata = item.metadata
+          const { metadataStatus, metadataTips } = getMetadataStatusAndTips({ metadata, metaError: item.metaError, t })
+
+          const uiFile: UIFile = {
+            ...commonFields,
+            fileType: 'video',
+            metadata,
+            metadataStatus,
+            metadataTips,
+          }
+          return uiFile
+        }
+        case 'other': {
+          const uiFile: UIFile = {
+            ...commonFields,
+            fileType: 'other',
+            metadata: null,
+          }
+          return uiFile
+        }
       }
     })
 
-  // === transform newFilename and shouldIgnore
+  // === transform newFilename and shouldSkip
   // nameMap: filename -> newFilename
   const nameMap: Record<string, string> = {}
   // the counts of lowerNewFilename
@@ -67,19 +81,17 @@ export function transformIpcFiles({
   // compute newFilename
   files.forEach(item => {
     let newFilename = ''
-    if (exifMode && item.exifStatus !== ExifStatus.SUCCESS) {
-      // no need to rename, keep old filename
+    if (strictMode && !isTemplateSatisfiable({ file: item, usedVars, useCreatedDate })) {
+      // When strict mode is enabled and metadata is missing, it should be skipped
+      item.shouldSkip = true
       item.newFilename = item.filename
-      item.shouldIgnore = true
-      // to avoid name conflicts, record newFilename
       newFilename = item.filename
     } else {
-      // generate new filename
       newFilename = generateFilename({
         filename: item.filename,
         format,
+        metadata: item.metadata || {},
         created: item.created,
-        exifData: item.exifData,
         useCreatedDate,
       })
       nameMap[item.filename] = newFilename
@@ -95,7 +107,7 @@ export function transformIpcFiles({
   // handle duplicates
   const nameSeqRecord: Record<string, number> = {}
   files.forEach(item => {
-    if (item.shouldIgnore) return
+    if (item.shouldSkip) return
 
     const newFilename = nameMap[item.filename]
     const lowerNewFilename = newFilename.toLowerCase()
@@ -113,7 +125,8 @@ export function transformIpcFiles({
       item.newFilename = newFilename
     }
 
-    item.shouldIgnore = item.newFilename === item.filename
+    // When the new filename is the same as the original filename, it should be skipped
+    item.shouldSkip = item.newFilename === item.filename
   })
 
   return files
@@ -140,19 +153,19 @@ function removeExtName(filename: string): string {
 function generateFilename({
   filename,
   format,
+  metadata,
   created,
-  exifData,
   useCreatedDate,
 }: {
   filename: string
   format: string
+  metadata: OptionalMetadata
   created: string
-  exifData: IpcFiles[number]['exifData']
   useCreatedDate: boolean
 }) {
   try {
     // dateTime example: 2024-03-04 08:33:38
-    const dateTime = (useCreatedDate ? created : exifData?.date) ?? ''
+    const dateTime = (useCreatedDate ? created : metadata?.date) ?? ''
     const timeList = dateTime.replace(/\s|:/g, '-').split('-')
     const formatValueMap: Record<FormatVar, string> = {
       '{YYYY}': timeList[0] || 'YYYY',
@@ -162,13 +175,13 @@ function generateFilename({
       '{mm}': timeList[4] || 'mm',
       '{ss}': timeList[5] || 'ss',
       '{Date}': dateTime.replace(/:/g, '.') || 'Date',
-      '{Make}': exifData?.make || 'Make',
-      '{Camera}': exifData?.camera || 'Camera',
-      '{Lens}': exifData?.lens || 'Lens',
-      '{FocalLength}': exifData?.focalLength || 'FocalLength',
-      '{Aperture}': exifData?.aperture || 'Aperture',
-      '{Shutter}': exifData?.shutter || 'Shutter',
-      '{ISO}': exifData?.iso || 'ISO',
+      '{Make}': metadata?.make || 'Make',
+      '{Camera}': metadata?.camera || 'Camera',
+      '{Lens}': metadata?.lens || 'Lens',
+      '{FocalLength}': metadata?.focalLength || 'FocalLength',
+      '{Aperture}': metadata?.aperture || 'Aperture',
+      '{Shutter}': metadata?.shutter || 'Shutter',
+      '{ISO}': metadata?.iso || 'ISO',
       '{Current}': getBaseName(filename) || 'Current',
       '{current}': getBaseName(filename) || 'Current',
     }
@@ -182,15 +195,92 @@ function generateFilename({
   }
 }
 
-/**
- * Whether the file is allowed to be previewed
- */
-function shouldPreview(filename: string, size: number) {
-  const maxSize = 50_000_000
-  if (size > maxSize) return false
+function isTemplateSatisfiable({
+  file,
+  usedVars,
+  useCreatedDate,
+}: {
+  file: UIFile
+  usedVars: FormatVar[]
+  useCreatedDate: boolean
+}) {
+  const metadata: OptionalMetadata = file.metadata || {}
+  for (const v of usedVars) {
+    switch (v) {
+      // date vars
+      case '{YYYY}':
+      case '{MM}':
+      case '{DD}':
+      case '{hh}':
+      case '{mm}':
+      case '{ss}':
+      case '{Date}':
+        if (!useCreatedDate && !metadata?.date) return false
+        break
 
-  const mimeType = mime.getType(filename)
-  if (!mimeType) return false
+      // common metadata vars
+      case '{Make}':
+        if (!metadata?.make) return false
+        break
+      case '{Camera}':
+        if (!metadata?.camera) return false
+        break
 
-  return mimeType.startsWith('image') || mimeType.startsWith('video')
+      // image-only vars
+      case '{Lens}':
+        if (!metadata?.lens) return false
+        break
+      case '{FocalLength}':
+        if (!metadata?.focalLength) return false
+        break
+      case '{Aperture}':
+        if (!metadata?.aperture) return false
+        break
+      case '{Shutter}':
+        if (!metadata?.shutter) return false
+        break
+      case '{ISO}':
+        if (!metadata?.iso) return false
+        break
+
+      // always available
+      case '{Current}':
+      case '{current}':
+        break
+
+      default:
+        // there’s nothing left in a union
+        const _exhaustiveCheck: never = v
+        throw new Error(`Unhandled format variable: ${_exhaustiveCheck}`)
+    }
+  }
+
+  return true
+}
+
+function getMetadataStatusAndTips({
+  metadata,
+  metaError,
+  t,
+}: {
+  metadata: AnyMetadata
+  metaError: string | null
+  t: any
+}): { metadataStatus: MetadataStatus; metadataTips: string } {
+  if (metaError) {
+    return {
+      metadataStatus: MetadataStatus.ERROR,
+      metadataTips: metaError === 'Unknown image format' ? t('errors.unknownImageFormat') : metaError,
+    }
+  }
+  if (!metadata || Object.values(metadata).some(val => val === null)) {
+    return {
+      metadataStatus: MetadataStatus.WARNING,
+      metadataTips: t('errors.missingMetadata'),
+    }
+  }
+  return {
+    metadataStatus: MetadataStatus.SUCCESS,
+    metadataTips: '',
+  }
 }

@@ -1,3 +1,5 @@
+// https://icon-sets.iconify.design/ri/
+
 import type { SVGProps } from 'react'
 
 export function RiFolderOpenLine(props: SVGProps<SVGSVGElement>) {
@@ -37,6 +39,17 @@ export function RiCloseLine(props: SVGProps<SVGSVGElement>) {
         fill="currentColor"
         d="m12 10.587l4.95-4.95l1.414 1.414l-4.95 4.95l4.95 4.95l-1.415 1.414l-4.95-4.95l-4.949 4.95l-1.414-1.415l4.95-4.95l-4.95-4.95L7.05 5.638z"
       />
+    </svg>
+  )
+}
+
+export function RiQuestionnaireLine(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
+      <path
+        fill="currentColor"
+        d="M5.763 17H20V5H4v13.385zm.692 2L2 22.5V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1zM11 14h2v2h-2zM8.567 8.813A3.501 3.501 0 1 1 12 13h-1v-2h1a1.5 1.5 0 1 0-1.471-1.794z"
+      ></path>
     </svg>
   )
 }

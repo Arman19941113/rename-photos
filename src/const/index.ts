@@ -4,10 +4,10 @@ export const enum TauriCommand {
   RENAME_FILES = 'rename_files',
 }
 
-export const enum ExifStatus {
-  SUCCESS = 1,
-  WARNING,
-  ERROR,
+export const enum MetadataStatus {
+  SUCCESS = 1, // contains full metadata
+  WARNING, // contains partial metadata
+  ERROR, // no metadata
 }
 
 export const enum Language {

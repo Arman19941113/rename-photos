@@ -1,7 +1,8 @@
 import { TauriCommand } from '@/const'
 import { useError } from '@/hooks'
 import { useConfigStore } from '@/store/useConfigStore.ts'
-import { transformIpcFiles } from '@/util'
+import type { IPCFile } from '@/types/file'
+import { transformIPCFiles } from '@/util'
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useMemo, useState } from 'react'
@@ -18,16 +19,16 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
   const { handleError } = useError()
 
   // Configuration
-  const exifMode = useConfigStore(state => state.mode.exif)
+  const strictMode = useConfigStore(state => state.strictMode)
   const useCreatedDate = useConfigStore(state => state.useCreatedDate)
 
   // Raw IPC file data from Tauri backend
-  const [ipcFiles, setIpcFiles] = useState<IpcFiles>([])
+  const [ipcFiles, setIPCFiles] = useState<IPCFile[]>([])
 
   // Transformed file list with computed new filenames
   const files = useMemo(
-    () => transformIpcFiles({ ipcFiles, exifMode, useCreatedDate, format, t }),
-    [ipcFiles, exifMode, useCreatedDate, format, t],
+    () => transformIPCFiles({ ipcFiles, strictMode, useCreatedDate, format, t }),
+    [ipcFiles, strictMode, useCreatedDate, format, t],
   )
 
   // Currently selected file for preview
@@ -45,8 +46,8 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
     })
       .then(dirPath => {
         if (!dirPath) return
-        invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_DIR, { dirPath })
-          .then(ipcFiles => setIpcFiles(ipcFiles))
+        invoke<IPCFile[]>(TauriCommand.GET_FILES_FROM_DIR, { dirPath })
+          .then(ipcFiles => setIPCFiles(ipcFiles))
           .catch(err => handleError({ err, title: t('errors.readFolder') }))
       })
       .catch(err => {
@@ -58,8 +59,8 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
    * Load files from drag-and-drop paths
    */
   const handleDropFiles = (paths: string[]) => {
-    invoke<IpcFiles>(TauriCommand.GET_FILES_FROM_PATHS, { paths })
-      .then(ipcFiles => setIpcFiles(ipcFiles))
+    invoke<IPCFile[]>(TauriCommand.GET_FILES_FROM_PATHS, { paths })
+      .then(ipcFiles => setIPCFiles(ipcFiles))
       .catch(err => handleError({ err, title: t('errors.readFiles') }))
   }
 
@@ -73,7 +74,7 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
     if (isRenaming) return
 
     // Collect files that actually need renaming and map their old/new paths
-    const renameTargets = files.filter(item => !item.shouldIgnore)
+    const renameTargets = files.filter(item => !item.shouldSkip)
     // Map: originalPath -> targetPath
     const renameMapping = new Map(renameTargets.map(item => [item.pathname, `${item.dirname}/${item.newFilename}`]))
 
@@ -96,7 +97,7 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
       .then(res => {
         // Reload files: combine unchanged files with newly renamed ones
         const pathnameList = files
-          .filter(item => item.shouldIgnore)
+          .filter(item => item.shouldSkip)
           .map(item => item.pathname)
           .concat(res)
         handleDropFiles(pathnameList)

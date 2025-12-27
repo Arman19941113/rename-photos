@@ -3,7 +3,7 @@ import { getLocalStorage, setLocalStorage } from '@/util'
 
 const StorageKey = {
   Language: 'LANGUAGE',
-  updateExifMode: 'EXIF_MODE',
+  StrictMode: 'STRICT_MODE',
   UseCreatedDate: 'USE_CREATED_DATE',
   FormatOptions: 'FORMAT_OPTIONS',
 }
@@ -23,13 +23,13 @@ export const storageService = {
   },
 
   /**
-   * EXIF mode configuration
+   * Strict mode configuration
    */
-  getExifMode(): boolean {
-    return !!getLocalStorage(StorageKey.updateExifMode)
+  getStrictMode(): boolean {
+    return !!getLocalStorage(StorageKey.StrictMode)
   },
-  setExifMode(enabled: boolean): void {
-    setLocalStorage(StorageKey.updateExifMode, enabled)
+  setStrictMode(enabled: boolean): void {
+    setLocalStorage(StorageKey.StrictMode, enabled)
   },
 
   /**

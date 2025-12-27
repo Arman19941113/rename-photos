@@ -14,7 +14,7 @@
     "readFiles": "Error Reading Files",
     "renameFiles": "Error Renaming Files",
     "unknownImageFormat": "Unknown image format",
-    "missingExifData": "No EXIF data found"
+    "missingMetadata": "Metadata missing"
   },
   "notifications": {
     "noRename": "Nothing to rename",
@@ -24,10 +24,11 @@
     "filename": "Name",
     "newFilename": "New Name",
     "fileSize": "File Size",
-    "dateCreated": "Date Created"
+    "dateCreated": "Date Created",
+    "metadata": "Metadata"
   },
-  "exif": {
-    "title": "EXIF Information",
+  "metadata": {
+    "title": "Metadata",
     "date": "Date",
     "make": "Make",
     "camera": "Camera",
@@ -40,9 +41,9 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
-    "exif": {
-      "title": "EXIF Mode",
-      "tooltip": "If enabled, only rename the files that have EXIF data."
+    "strict": {
+      "title": "Strict Mode",
+      "tooltip": "When enabled, only rename files whose metadata can satisfy the current rename template."
     },
     "creationDate": {
       "title": "Use Created Date",
