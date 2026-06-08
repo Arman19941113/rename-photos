@@ -185,7 +185,7 @@ export default function NamePhotos() {
             <div className="ml-5">
               <h2 className="mt-12 text-lg font-medium">macOS：提示“软件已损坏，无法打开”</h2>
               <p className="my-3">打开终端输入以下命令：</p>
-              <Snippet className="mb-24" color="secondary">
+              <Snippet className="pointer-events-auto mb-24" color="secondary">
                 sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app
               </Snippet>
             </div>

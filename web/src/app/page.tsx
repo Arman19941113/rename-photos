@@ -188,7 +188,7 @@ export default function NamePhotos() {
             <div className="ml-5">
               <h2 className="mt-12 text-lg font-medium">macOS: “App is damaged and can&apos;t be opened”</h2>
               <p className="my-3">Open Terminal and then enter the following command:</p>
-              <Snippet className="mb-24" color="secondary">
+              <Snippet className="pointer-events-auto mb-24" color="secondary">
                 sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app
               </Snippet>
             </div>
