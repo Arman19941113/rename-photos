@@ -1,4 +1,4 @@
-![](./docs/images/coverview-zh.jpg)
+![](./assets/readme/coverview-zh.jpg)
 
 # Rename Photos
 
