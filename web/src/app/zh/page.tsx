@@ -4,6 +4,7 @@ import duplicatesZh from '@/assets/images/duplicates-zh.png'
 import homeZh from '@/assets/images/home-zh.png'
 import lackExifZh from '@/assets/images/lack-exif-zh.png'
 import successZh from '@/assets/images/success-zh.png'
+import DownloadLinks, { type DownloadLabels } from '@/components/download-links'
 import { IconLanguage, RiFolderOpenLine, RiSettings4Line } from '@/components/icon'
 import MacShot from '@/components/mac-shot'
 import { useFullPage } from '@/hooks'
@@ -15,6 +16,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 const images = [homeZh, homeZh, successZh, duplicatesZh, lackExifZh]
+
+const downloadLabels = {
+  macApple: 'macOS (Apple Silicon)',
+  macIntel: 'macOS (Intel)',
+  windows: 'Windows',
+  linux: 'Linux',
+} satisfies DownloadLabels
 
 export default function NamePhotos() {
   const { page, setPage } = useFullPage({ maxPage: 5 })
@@ -142,40 +150,7 @@ export default function NamePhotos() {
       <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
         <div className="w-96">
           <h1 className="text-2xl font-bold">下载安装</h1>
-          <ul className="ml-4 list-disc pt-3 text-default-600">
-            <li className="py-1 underline">
-              <a
-                href="https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_aarch64.dmg"
-                download
-              >
-                macOS (Apple Silicon)
-              </a>
-            </li>
-            <li className="py-1 underline">
-              <a
-                href="https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_x64.dmg"
-                download
-              >
-                macOS (Intel)
-              </a>
-            </li>
-            <li className="py-1 underline">
-              <a
-                href="https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_x64_en-US.msi"
-                download
-              >
-                Windows
-              </a>
-            </li>
-            <li className="py-1 underline">
-              <a
-                href="https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_amd64.deb"
-                download
-              >
-                Linux
-              </a>
-            </li>
-          </ul>
+          <DownloadLinks labels={downloadLabels} />
         </div>
       </div>
 
@@ -183,10 +158,12 @@ export default function NamePhotos() {
         <MacShot>
           {page === 5 ? (
             <div className="ml-5">
-              <h2 className="mt-12 text-lg font-medium">macOS：提示“软件已损坏，无法打开”</h2>
-              <p className="my-3">打开终端输入以下命令：</p>
+              <h2 className="mt-12 text-lg font-medium">macOS：提示“Rename Photos 已损坏，无法打开”</h2>
+              <p className="my-3">
+                Rename Photos 目前没有经过 Apple 公证。如果你确认应用来自官方 GitHub Releases 页面，并且信任该来源，可以通过以下命令移除隔离标记：
+              </p>
               <Snippet className="pointer-events-auto mb-24" color="secondary">
-                sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app
+                sudo xattr -dr com.apple.quarantine &quot;/Applications/Rename Photos.app&quot;
               </Snippet>
             </div>
           ) : (

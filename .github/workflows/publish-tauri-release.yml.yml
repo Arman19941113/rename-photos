@@ -54,6 +54,10 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install
 
+      - name: Extract release notes
+        id: release-notes
+        run: node scripts/extract-release-notes.mjs --github-output-name body
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -61,7 +65,7 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: 'Rename Photos v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseBody: ${{ steps.release-notes.outputs.body }}
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true

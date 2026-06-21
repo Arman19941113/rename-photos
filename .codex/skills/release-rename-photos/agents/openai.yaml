@@ -1,0 +1,6 @@
+interface:
+  display_name: "Release Rename Photos"
+  short_description: "Prepare Rename Photos changelog, version bump, and commit"
+  default_prompt: "Use $release rename photos to prepare a new release commit from the latest tag."
+policy:
+  allow_implicit_invocation: false

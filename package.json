@@ -70,9 +70,15 @@
     "vite": "^5.2.11",
     "vitest": "^2.1.9"
   },
-  "packageManager": "pnpm@10.26.0",
-  "volta": {
-    "node": "24.12.0",
-    "pnpm": "10.26.0"
-  }
+  "engines": {
+    "node": "24.17.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.17.0",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@11.8.0"
 }

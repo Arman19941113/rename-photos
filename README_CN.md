@@ -6,17 +6,14 @@
 
 ## 下载
 
-软件安装包仅 4MB 左右：
+软件安装包仅 4MB 左右：[下载最新版本](https://github.com/Arman19941113/rename-photos/releases/latest)
 
-- [MacOs (Apple silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_aarch64.dmg)
-- [MacOs (Intel silicon)](https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_x64.dmg)
-- [Windows](https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_x64_en-US.msi)
-- [Linux](https://github.com/Arman19941113/rename-photos/releases/download/v1.0.0/Rename.Photos_1.0.0_amd64.deb)
+## macOS：提示“Rename Photos 已损坏，无法打开”
 
-## MacOS：软件已损坏，无法打开？
+Rename Photos 目前没有经过 Apple 公证，因此 macOS 可能会在下载后阻止打开。
 
-代码签名很贵，打开终端输入以下命令可以解决这个问题：
+如果你确认应用来自官方 GitHub Releases 页面，并且信任该来源，可以通过以下命令移除隔离标记：
 
 ```bash
-sudo xattr -d -r com.apple.quarantine /Applications/Rename\ Photos.app
+sudo xattr -dr com.apple.quarantine "/Applications/Rename Photos.app"
 ```
