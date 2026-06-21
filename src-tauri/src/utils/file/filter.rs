@@ -50,42 +50,15 @@ fn is_unix_symlink(metadata: &Metadata) -> bool {
 }
 
 #[cfg(target_os = "macos")]
-fn is_macos_finder_alias(path: &Path) -> bool {
-    use std::process::Command;
-
-    let output = Command::new("xattr")
-        .args(["-px", "com.apple.FinderInfo"])
-        .arg(path)
-        .output();
-
-    let Ok(out) = output else {
-        return false;
-    };
-    if !out.status.success() {
-        return false;
-    }
-
-    parse_hex_xattr_output(&out.stdout)
-        .map(|finder_info| has_macos_alias_finder_flag(&finder_info))
-        .unwrap_or(false)
-}
+const FINDER_INFO_XATTR: &str = "com.apple.FinderInfo";
 
 #[cfg(target_os = "macos")]
-fn parse_hex_xattr_output(output: &[u8]) -> Option<Vec<u8>> {
-    let text = String::from_utf8_lossy(output);
-    let hex: String = text.chars().filter(|ch| !ch.is_whitespace()).collect();
-
-    if hex.len() % 2 != 0 || !hex.chars().all(|ch| ch.is_ascii_hexdigit()) {
-        return None;
-    }
-
-    hex.as_bytes()
-        .chunks(2)
-        .map(|chunk| {
-            let pair = std::str::from_utf8(chunk).ok()?;
-            u8::from_str_radix(pair, 16).ok()
-        })
-        .collect()
+fn is_macos_finder_alias(path: &Path) -> bool {
+    xattr::get(path, std::ffi::OsStr::new(FINDER_INFO_XATTR))
+        .ok()
+        .flatten()
+        .map(|finder_info| has_macos_alias_finder_flag(&finder_info))
+        .unwrap_or(false)
 }
 
 #[cfg(target_os = "macos")]
@@ -130,7 +103,7 @@ fn is_system_file(_: &Metadata) -> bool {
 mod tests {
     use super::should_exclude_from_ui_file_list;
     #[cfg(target_os = "macos")]
-    use super::{has_macos_alias_finder_flag, parse_hex_xattr_output};
+    use super::{FINDER_INFO_XATTR, has_macos_alias_finder_flag, is_macos_finder_alias};
     use std::fs;
     use tempfile::tempdir;
 
@@ -194,23 +167,6 @@ mod tests {
 
     #[cfg(target_os = "macos")]
     #[test]
-    fn parses_xattr_hex_output_with_whitespace() {
-        let output = b"00 01 0a ff\n10";
-
-        assert_eq!(
-            parse_hex_xattr_output(output),
-            Some(vec![0, 1, 10, 255, 16])
-        );
-    }
-
-    #[cfg(target_os = "macos")]
-    #[test]
-    fn rejects_non_hex_xattr_output() {
-        assert_eq!(parse_hex_xattr_output(b"00 xx"), None);
-    }
-
-    #[cfg(target_os = "macos")]
-    #[test]
     fn detects_only_the_finder_alias_flag() {
         // Finder stores the alias bit in the big-endian flag bytes at offset 8.
         let mut regular_finder_info = [0; 32];
@@ -223,6 +179,20 @@ mod tests {
 
         assert!(!has_macos_alias_finder_flag(&regular_finder_info));
         assert!(has_macos_alias_finder_flag(&alias_finder_info));
+    }
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn detects_macos_finder_alias_from_extended_attribute() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("alias-file");
+        fs::write(&path, "content").unwrap();
+
+        let mut finder_info = [0; 32];
+        finder_info[8] = 0x80;
+        xattr::set(&path, std::ffi::OsStr::new(FINDER_INFO_XATTR), &finder_info).unwrap();
+
+        assert!(is_macos_finder_alias(&path));
     }
 
     #[cfg(target_os = "macos")]

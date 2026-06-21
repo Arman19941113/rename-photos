@@ -21,5 +21,8 @@ nom-exif = "2.5.4"
 chrono = "0.4.41"
 anyhow = "1"
 
+[target.'cfg(target_os = "macos")'.dependencies]
+xattr = "1.6.1"
+
 [dev-dependencies]
 tempfile = "3.19.1"
