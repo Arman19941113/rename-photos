@@ -38,7 +38,8 @@ The app supports two input modes:
 ### 2. Drag and drop
 
 - The frontend listens for Tauri drag events and forwards dropped paths to `get_files_from_paths`.
-- If the user drops exactly one folder path, the backend treats it the same as `get_files_from_dir`.
+- If the user drops exactly one non-symlink folder path, the backend treats it the same as `get_files_from_dir`.
+- A symlinked folder is handled by the normal UI exclusion filter and is skipped as a shortcut/symlink instead of being opened.
 - Otherwise, the backend treats the payload as an explicit file list and applies the normal UI exclusion filter to each supplied path, so directories and other excluded paths are ignored.
 - For explicit file lists, if filesystem metadata for any supplied path cannot be read, the whole load fails instead of returning a partial list. EXIF/media metadata extraction errors do not fail the load; they populate `metaError` on that file.
 
@@ -249,9 +250,14 @@ Then it performs a preflight conflict check before any rename happens.
 For each `new_path`:
 
 - If that path is also one of the batch `old_path` values, the backend allows it because the two-phase rename will free that path first.
-- Otherwise, if `new_path` already exists on disk, the backend returns an `AlreadyExists` error immediately.
+- Otherwise, if `new_path` is already occupied on disk, the backend returns an `AlreadyExists` error immediately.
 
-The preflight check only covers final `new_path` targets. It does not preflight every generated `tempPath`, so an existing temporary path can still make phase 1 fail.
+For each `temp_path`:
+
+- If that path is already occupied on disk, the backend returns an `AlreadyExists` error immediately.
+- This check is stricter than `new_path` because phase 1 writes to temporary paths before any batch `old_path` has been safely freed.
+
+The preflight check uses symlink-aware metadata reads, so occupied paths include regular files, directories, symlinks, and dangling symlinks.
 
 The backend also does not currently deduplicate final `new_path` values inside the payload; it relies on the frontend preview generation to avoid duplicate targets. Path equality is based on the derived `PathBuf` values and is not canonicalized.
 

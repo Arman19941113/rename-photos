@@ -8,7 +8,7 @@ pub(crate) fn should_exclude_from_ui_file_list(path: &Path, metadata: &Metadata)
     if metadata.is_dir() {
         return true;
     }
-    if is_shortcut(path) {
+    if is_shortcut(path, metadata) {
         return true;
     }
     if is_hidden(path, metadata) {
@@ -20,24 +20,20 @@ pub(crate) fn should_exclude_from_ui_file_list(path: &Path, metadata: &Metadata)
     false
 }
 
-pub fn is_shortcut(path: &Path) -> bool {
-    #[cfg(windows)]
-    {
-        is_windows_shortcut(path)
-    }
+#[cfg(windows)]
+fn is_shortcut(path: &Path, _: &Metadata) -> bool {
+    is_windows_shortcut(path)
+}
 
-    #[cfg(unix)]
-    {
-        let mut is_shortcut = is_unix_symlink(path);
+#[cfg(all(unix, not(target_os = "macos")))]
+fn is_shortcut(_: &Path, metadata: &Metadata) -> bool {
+    is_unix_symlink(metadata)
+}
 
-        // On macOS, Finder aliases are not symlinks; detect them separately.
-        #[cfg(target_os = "macos")]
-        {
-            is_shortcut = is_shortcut || is_macos_finder_alias(path);
-        }
-
-        is_shortcut
-    }
+#[cfg(target_os = "macos")]
+fn is_shortcut(path: &Path, metadata: &Metadata) -> bool {
+    // Finder aliases are not symlinks; detect them separately.
+    is_unix_symlink(metadata) || is_macos_finder_alias(path)
 }
 
 #[cfg(windows)]
@@ -49,10 +45,8 @@ fn is_windows_shortcut(path: &Path) -> bool {
 }
 
 #[cfg(unix)]
-fn is_unix_symlink(path: &Path) -> bool {
-    std::fs::symlink_metadata(path)
-        .map(|m| m.file_type().is_symlink())
-        .unwrap_or(false)
+fn is_unix_symlink(metadata: &Metadata) -> bool {
+    metadata.file_type().is_symlink()
 }
 
 #[cfg(target_os = "macos")]

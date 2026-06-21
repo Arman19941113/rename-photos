@@ -95,7 +95,7 @@ pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IPCFile>, String> {
 fn get_files_from_paths_inner(paths: Vec<&str>) -> std::io::Result<Vec<IPCFile>> {
     // If the user drops a single folder path, treat it like "open folder".
     if let [path_str] = paths.as_slice() {
-        let metadata = fs::metadata(path_str)?;
+        let metadata = fs::symlink_metadata(path_str)?;
         if metadata.is_dir() {
             return get_files_from_dir_inner(path_str);
         }
@@ -135,29 +135,9 @@ fn rename_files_inner(rename_path_data: Vec<RenamePathData>) -> io::Result<Vec<S
         .map(build_rename_plan)
         .collect::<io::Result<Vec<_>>>()?;
 
-    // Frontend input shape: `[{ oldPath, newFilename, tempFilename }, ...]`.
-    // The backend resolves filenames relative to each old path's parent directory.
-    //
-    // We use a two-phase rename to avoid collisions when multiple files swap names:
-    // 1) oldPath -> tempPath
-    // 2) tempPath -> newPath
-    //
-    // Before renaming, ensure we never overwrite an unrelated existing file.
-    for plan in &rename_plans {
-        // If `new_path` is also one of the `old_path`s in this batch, it will be freed up
-        // during phase 1, so it's safe to proceed.
-        if rename_plans
-            .iter()
-            .any(|other| other.old_path.as_path() == plan.new_path.as_path())
-        {
-            continue;
-        }
-        if plan.new_path.exists() {
-            let msg = format!("The file \"{}\" already exist", plan.new_path.display());
-            return Err(io::Error::new(io::ErrorKind::AlreadyExists, msg));
-        }
-    }
+    ensure_rename_targets_are_available(&rename_plans)?;
 
+    // Use a two-phase rename to avoid collisions when multiple files swap names.
     // Phase 1: move everything to a temporary path.
     for plan in &rename_plans {
         fs::rename(&plan.old_path, &plan.temp_path)?;
@@ -172,6 +152,44 @@ fn rename_files_inner(rename_path_data: Vec<RenamePathData>) -> io::Result<Vec<S
         .collect();
 
     Ok(new_paths)
+}
+
+fn ensure_rename_targets_are_available(rename_plans: &[RenamePlan]) -> io::Result<()> {
+    // The backend resolves filenames relative to each old path's parent directory.
+    // Before renaming, ensure we never overwrite an unrelated existing file.
+    for plan in rename_plans {
+        // If `new_path` is also one of the `old_path`s in this batch, it will be freed up
+        // during phase 1, so it's safe to proceed.
+        if !is_old_path_in_batch(rename_plans, &plan.new_path) && path_is_occupied(&plan.new_path)?
+        {
+            return Err(path_already_exists_error(&plan.new_path));
+        }
+
+        if path_is_occupied(&plan.temp_path)? {
+            return Err(path_already_exists_error(&plan.temp_path));
+        }
+    }
+
+    Ok(())
+}
+
+fn is_old_path_in_batch(rename_plans: &[RenamePlan], path: &Path) -> bool {
+    rename_plans
+        .iter()
+        .any(|plan| plan.old_path.as_path() == path)
+}
+
+fn path_is_occupied(path: &Path) -> io::Result<bool> {
+    match fs::symlink_metadata(path) {
+        Ok(_) => Ok(true),
+        Err(err) if err.kind() == io::ErrorKind::NotFound => Ok(false),
+        Err(err) => Err(err),
+    }
+}
+
+fn path_already_exists_error(path: &Path) -> io::Error {
+    let msg = format!("The file \"{}\" already exist", path.display());
+    io::Error::new(io::ErrorKind::AlreadyExists, msg)
 }
 
 fn build_rename_plan(rename_data: RenamePathData) -> io::Result<RenamePlan> {
@@ -313,6 +331,66 @@ mod tests {
     }
 
     #[test]
+    fn refuses_to_overwrite_unrelated_temporary_files() {
+        let dir = tempdir().unwrap();
+        let old_path = dir.path().join("a.txt");
+        let existing_temp_path = dir.path().join("tmp-a.txt");
+        write_file(&old_path, "a");
+        write_file(&existing_temp_path, "existing-temp");
+
+        let err =
+            rename_files_inner(vec![rename_data(&old_path, "b.txt", "tmp-a.txt")]).unwrap_err();
+
+        assert_eq!(err.kind(), ErrorKind::AlreadyExists);
+        assert_eq!(fs::read_to_string(old_path).unwrap(), "a");
+        assert_eq!(
+            fs::read_to_string(existing_temp_path).unwrap(),
+            "existing-temp"
+        );
+        assert!(!dir.path().join("b.txt").exists());
+    }
+
+    #[test]
+    fn refuses_to_use_batch_old_paths_as_temporary_paths() {
+        let dir = tempdir().unwrap();
+        let a_path = dir.path().join("a.txt");
+        let b_path = dir.path().join("b.txt");
+        write_file(&a_path, "from-a");
+        write_file(&b_path, "from-b");
+
+        let err = rename_files_inner(vec![
+            rename_data(&a_path, "c.txt", "b.txt"),
+            rename_data(&b_path, "d.txt", "tmp-b.txt"),
+        ])
+        .unwrap_err();
+
+        assert_eq!(err.kind(), ErrorKind::AlreadyExists);
+        assert_eq!(fs::read_to_string(a_path).unwrap(), "from-a");
+        assert_eq!(fs::read_to_string(b_path).unwrap(), "from-b");
+        assert!(!dir.path().join("c.txt").exists());
+        assert!(!dir.path().join("d.txt").exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn refuses_to_overwrite_dangling_symlinks() {
+        use std::os::unix::fs::symlink;
+
+        let dir = tempdir().unwrap();
+        let old_path = dir.path().join("a.txt");
+        let dangling_link_path = dir.path().join("b.txt");
+        write_file(&old_path, "a");
+        symlink(dir.path().join("missing-target.txt"), &dangling_link_path).unwrap();
+
+        let err =
+            rename_files_inner(vec![rename_data(&old_path, "b.txt", "tmp-a.txt")]).unwrap_err();
+
+        assert_eq!(err.kind(), ErrorKind::AlreadyExists);
+        assert_eq!(fs::read_to_string(old_path).unwrap(), "a");
+        assert!(fs::symlink_metadata(dangling_link_path).is_ok());
+    }
+
+    #[test]
     fn swaps_names_with_two_phase_rename() {
         // Direct renames would collide here; the temporary phase is the behavior under test.
         let dir = tempdir().unwrap();
@@ -362,6 +440,23 @@ mod tests {
         let from_paths = sorted_filenames(get_files_from_paths_inner(vec![path]).unwrap());
 
         assert_eq!(from_paths, from_dir);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn skips_single_symlinked_directory_instead_of_opening_it() {
+        use std::os::unix::fs::symlink;
+
+        let dir = tempdir().unwrap();
+        let target_dir = dir.path().join("target");
+        let link_path = dir.path().join("link");
+        fs::create_dir(&target_dir).unwrap();
+        write_file(&target_dir.join("inside.txt"), "inside");
+        symlink(&target_dir, &link_path).unwrap();
+
+        let files = get_files_from_paths_inner(vec![link_path.to_str().unwrap()]).unwrap();
+
+        assert_eq!(sorted_filenames(files), Vec::<String>::new());
     }
 
     #[test]
