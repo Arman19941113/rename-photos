@@ -3,8 +3,10 @@ import { Button } from '@nextui-org/button'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
 import { Input } from '@nextui-org/input'
 import { clsx } from 'clsx'
-import { KeyboardEvent, useRef } from 'react'
+import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
+const RENAMING_LOADING_DELAY_MS = 200
 
 function OperationBar({
   inputValue,
@@ -13,6 +15,7 @@ function OperationBar({
   formatOptions,
   onFormatChange,
   hasFiles,
+  isRenaming,
   onClickOpen,
   onClickRename,
 }: {
@@ -22,6 +25,7 @@ function OperationBar({
   onFormatChange: (format: string) => void
   formatOptions: string[]
   hasFiles: boolean
+  isRenaming: boolean
   onClickOpen: () => void
   onClickRename: () => void
 }) {
@@ -29,7 +33,21 @@ function OperationBar({
 
   const inputRef = useRef<HTMLInputElement>(null)
   const compositionRef = useRef(false)
+  const [showRenamingLoading, setShowRenamingLoading] = useState(false)
   const items = formatOptions.map(option => ({ key: option, value: option }))
+
+  useEffect(() => {
+    if (!isRenaming) {
+      setShowRenamingLoading(false)
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowRenamingLoading(true)
+    }, RENAMING_LOADING_DELAY_MS)
+
+    return () => window.clearTimeout(timer)
+  }, [isRenaming])
 
   const handleCompositionStart = () => {
     compositionRef.current = true
@@ -105,7 +123,14 @@ function OperationBar({
             {item => <DropdownItem key={item.key}>{item.value}</DropdownItem>}
           </DropdownMenu>
         </Dropdown>
-        <Button radius="sm" size="sm" className="btn--grad-pink ml-4 shrink-0" onClick={onClickRename}>
+        <Button
+          radius="sm"
+          size="sm"
+          className="btn--grad-pink ml-4 shrink-0"
+          isDisabled={isRenaming}
+          isLoading={showRenamingLoading}
+          onClick={onClickRename}
+        >
           {t('buttons.rename')}
           <span>🚀</span>
         </Button>

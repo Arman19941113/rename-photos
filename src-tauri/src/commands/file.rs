@@ -3,6 +3,7 @@
 //! get_files_from_paths: get files from a list of paths
 //! rename_files: rename a list of files
 
+use std::collections::HashSet;
 use std::fs;
 use std::fs::Metadata;
 use std::io;
@@ -17,8 +18,9 @@ use crate::utils::file::{
 };
 
 #[tauri::command]
-pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<IPCFile>, String> {
-    get_files_from_dir_inner(Path::new(dir_path)).map_err(|err| err.to_string())
+pub async fn get_files_from_dir(dir_path: String) -> Result<Vec<IPCFile>, String> {
+    let dir_path = PathBuf::from(dir_path);
+    run_blocking(move || get_files_from_dir_inner(&dir_path)).await
 }
 
 fn build_ipc_file(path: &Path, path_str: &str, metadata: &Metadata) -> IPCFile {
@@ -82,12 +84,13 @@ fn get_files_from_dir_inner(dir_path: &Path) -> std::io::Result<Vec<IPCFile>> {
 }
 
 #[tauri::command]
-pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IPCFile>, String> {
-    let paths = paths
-        .iter()
-        .map(|path_str| Path::new(*path_str))
-        .collect::<Vec<_>>();
-    get_files_from_paths_inner(&paths).map_err(|err| err.to_string())
+pub async fn get_files_from_paths(paths: Vec<String>) -> Result<Vec<IPCFile>, String> {
+    let paths = paths.into_iter().map(PathBuf::from).collect::<Vec<_>>();
+    run_blocking(move || {
+        let path_refs = paths.iter().map(|path| path.as_path()).collect::<Vec<_>>();
+        get_files_from_paths_inner(&path_refs)
+    })
+    .await
 }
 
 fn get_files_from_paths_inner(paths: &[&Path]) -> std::io::Result<Vec<IPCFile>> {
@@ -126,8 +129,18 @@ fn path_to_str(path: &Path) -> io::Result<&str> {
 }
 
 #[tauri::command]
-pub fn rename_files(rename_path_data: Vec<RenamePathData>) -> Result<Vec<String>, String> {
-    rename_files_inner(rename_path_data).map_err(|err| err.to_string())
+pub async fn rename_files(rename_path_data: Vec<RenamePathData>) -> Result<Vec<String>, String> {
+    run_blocking(move || rename_files_inner(rename_path_data)).await
+}
+
+async fn run_blocking<T>(task: impl FnOnce() -> io::Result<T> + Send + 'static) -> Result<T, String>
+where
+    T: Send + 'static,
+{
+    tauri::async_runtime::spawn_blocking(task)
+        .await
+        .map_err(|err| err.to_string())?
+        .map_err(|err| err.to_string())
 }
 
 struct RenamePlan {
@@ -164,11 +177,15 @@ fn rename_files_inner(rename_path_data: Vec<RenamePathData>) -> io::Result<Vec<S
 fn ensure_rename_targets_are_available(rename_plans: &[RenamePlan]) -> io::Result<()> {
     // The backend resolves filenames relative to each old path's parent directory.
     // Before renaming, ensure we never overwrite an unrelated existing file.
+    let old_paths = rename_plans
+        .iter()
+        .map(|plan| plan.old_path.as_path())
+        .collect::<HashSet<_>>();
+
     for plan in rename_plans {
         // If `new_path` is also one of the `old_path`s in this batch, it will be freed up
         // during phase 1, so it's safe to proceed.
-        if !is_old_path_in_batch(rename_plans, &plan.new_path) && path_is_occupied(&plan.new_path)?
-        {
+        if !old_paths.contains(plan.new_path.as_path()) && path_is_occupied(&plan.new_path)? {
             return Err(path_already_exists_error(&plan.new_path));
         }
 
@@ -178,12 +195,6 @@ fn ensure_rename_targets_are_available(rename_plans: &[RenamePlan]) -> io::Resul
     }
 
     Ok(())
-}
-
-fn is_old_path_in_batch(rename_plans: &[RenamePlan], path: &Path) -> bool {
-    rename_plans
-        .iter()
-        .any(|plan| plan.old_path.as_path() == path)
 }
 
 fn path_is_occupied(path: &Path) -> io::Result<bool> {

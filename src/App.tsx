@@ -18,6 +18,7 @@ function App() {
     handleOpenFolder,
     handleDropFiles,
     handleClickRename,
+    isRenaming,
     // selected file operations
     selectedKey,
     selectedFile,
@@ -42,6 +43,7 @@ function App() {
           onFormatChange={setFormat}
           onClickOpen={handleOpenFolder}
           onClickRename={handleClickRename}
+          isRenaming={isRenaming}
         />
 
         {hasFiles ? (

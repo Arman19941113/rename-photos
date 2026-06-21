@@ -10,6 +10,7 @@
   - `get_files_from_dir`
   - `get_files_from_paths`
   - `rename_files`
+- 这些命令以 async Tauri command 暴露，并把阻塞式文件系统工作交给 Tauri 的 blocking task runtime 执行，因此目录读取、元数据提取和批量重命名不会直接运行在命令调用线程上。
 
 主要入口：
 

@@ -121,6 +121,7 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
 
   return {
     files,
+    isRenaming,
     handleOpenFolder,
     handleDropFiles,
     handleClickRename,

@@ -10,6 +10,7 @@ This document summarizes the main runtime logic of Rename Photos as it exists to
   - `get_files_from_dir`
   - `get_files_from_paths`
   - `rename_files`
+- These commands are exposed as async Tauri commands and dispatch blocking filesystem work through Tauri's blocking task runtime, so directory reads, metadata extraction, and batch renames do not run directly on the command caller thread.
 
 Primary entry points:
 
