@@ -9,6 +9,12 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
+type RenamePathData = {
+  oldPath: string
+  newFilename: string
+  tempFilename: string
+}
+
 /**
  * Hook for managing file operations including opening folders,
  * handling drag-and-drop files, and batch renaming.
@@ -75,16 +81,14 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
 
     // Collect files that actually need renaming and map their old/new paths
     const renameTargets = files.filter(item => !item.shouldSkip)
-    // Map: originalPath -> targetPath
-    const renameMapping = new Map(renameTargets.map(item => [item.pathname, `${item.dirname}/${item.newFilename}`]))
 
-    // Build rename data: [originalPath, targetPath, tempPath]
+    // Build rename data and let the backend resolve filenames inside each source directory.
     const time = Date.now()
-    const renamePathData = renameTargets.map(item => [
-      `${item.dirname}/${item.filename}`,
-      `${item.dirname}/${item.newFilename}`,
-      `${item.dirname}/${time}_${item.filename}`,
-    ])
+    const renamePathData: RenamePathData[] = renameTargets.map(item => ({
+      oldPath: item.pathname,
+      newFilename: item.newFilename,
+      tempFilename: `${time}_${item.filename}`,
+    }))
 
     // Skip if no files need renaming
     if (!renamePathData.length) {
@@ -103,9 +107,9 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
         handleDropFiles(pathnameList)
         // Preserve selection: move it to the renamed path if applicable
         if (selectedKey) {
-          const nextKey = renameMapping.get(selectedKey)
-          if (nextKey) {
-            setSelectedKey(nextKey)
+          const selectedTargetIndex = renameTargets.findIndex(item => item.pathname === selectedKey)
+          if (selectedTargetIndex >= 0) {
+            setSelectedKey(res[selectedTargetIndex])
           }
         }
         toast.success(t('notifications.renameSuccess'))

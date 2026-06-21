@@ -16,11 +16,15 @@
   },
   "type": "module",
   "scripts": {
-    "lint": "eslint src",
     "dev": "vite",
+    "lint": "eslint src",
+    "typecheck": "tsc",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
   },
   "dependencies": {
     "@nextui-org/button": "^2.0.34",

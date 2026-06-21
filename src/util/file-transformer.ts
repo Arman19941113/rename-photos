@@ -70,18 +70,26 @@ export function transformIPCFiles({
           }
           return uiFile
         }
+        default: {
+          const _exhaustiveCheck: never = item
+          throw new Error(`Unhandled file type: ${JSON.stringify(_exhaustiveCheck)}`)
+        }
       }
     })
 
   // === transform newFilename and shouldSkip
   // nameMap: filename -> newFilename
   const nameMap: Record<string, string> = {}
-  // the counts of lowerNewFilename
+  // lowerNewFilename -> total count in the loaded set
   const newNameCounter: Record<string, number> = {}
   // compute newFilename
   files.forEach(item => {
     let newFilename = ''
-    if (strictMode && !isTemplateSatisfiable({ file: item, usedVars, useCreatedDate })) {
+    if (!format) {
+      item.shouldSkip = true
+      item.newFilename = item.filename
+      newFilename = item.filename
+    } else if (strictMode && !isTemplateSatisfiable({ file: item, usedVars, useCreatedDate })) {
       // When strict mode is enabled and metadata is missing, it should be skipped
       item.shouldSkip = true
       item.newFilename = item.filename
@@ -101,7 +109,7 @@ export function transformIPCFiles({
     if (newNameCounter.hasOwnProperty(lowerNewFilename)) {
       newNameCounter[lowerNewFilename] += 1
     } else {
-      newNameCounter[lowerNewFilename] = 0
+      newNameCounter[lowerNewFilename] = 1
     }
   })
   // handle duplicates
@@ -111,15 +119,16 @@ export function transformIPCFiles({
 
     const newFilename = nameMap[item.filename]
     const lowerNewFilename = newFilename.toLowerCase()
-    const duplicateCount = newNameCounter[lowerNewFilename]
-    if (duplicateCount) {
-      const countLength = duplicateCount.toString().length
+    const totalCount = newNameCounter[lowerNewFilename]
+    if (totalCount > 1) {
+      const countLength = totalCount.toString().length
       const sequence = nameSeqRecord.hasOwnProperty(lowerNewFilename)
         ? ++nameSeqRecord[lowerNewFilename]
         : (nameSeqRecord[lowerNewFilename] = 1)
       const seqString = '_' + sequence.toString().padStart(countLength, '0')
+      const { basename, extname } = splitFilename(newFilename)
       // new filename with sequence
-      item.newFilename = removeExtName(newFilename) + seqString + getExtName(item.filename)
+      item.newFilename = basename + seqString + extname
     } else {
       // expected new filename
       item.newFilename = newFilename
@@ -144,7 +153,14 @@ function getExtName(filename: string): string {
 
 function removeExtName(filename: string): string {
   const parts = filename.split('.')
-  return parts.slice(0, parts.length - 1).join('.')
+  return parts.length > 1 ? parts.slice(0, parts.length - 1).join('.') : filename
+}
+
+function splitFilename(filename: string): { basename: string; extname: string } {
+  return {
+    basename: removeExtName(filename),
+    extname: getExtName(filename),
+  }
 }
 
 /**
@@ -185,7 +201,7 @@ function generateFilename({
       '{Current}': getBaseName(filename) || 'Current',
       '{current}': getBaseName(filename) || 'Current',
     }
-    let basename = format
+    let basename = getValidPath(format)
     Object.entries(formatValueMap).forEach(([key, value]) => {
       basename = basename.replace(new RegExp(key, 'g'), getValidPath(value))
     })

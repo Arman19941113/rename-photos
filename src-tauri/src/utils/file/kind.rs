@@ -17,10 +17,9 @@ pub(crate) fn detect_file_kind(path_str: &str) -> FileKind {
 
     match ext.as_str() {
         // Images (common + a few RAW formats)
-        "jpg" | "jpeg" | "tif" | "tiff" | "heic" | "heif" | "heics" | "avif" | "dng" | "arw"
-        | "cr2" | "cr3" | "nef" | "raf" | "rw2" | "orf" | "sr2" | "srf" | "pef" | "x3f" => {
-            FileKind::Image
-        }
+        "jpg" | "jpeg" | "png" | "webp" | "tif" | "tiff" | "heic" | "heif" | "heics"
+        | "avif" | "dng" | "arw" | "cr2" | "cr3" | "nef" | "raf" | "rw2" | "orf"
+        | "sr2" | "srf" | "pef" | "x3f" => FileKind::Image,
 
         // Videos
         "mp4" | "mov" | "m4v" | "3gp" | "avi" | "mkv" | "webm" | "mka" => FileKind::Video,

@@ -42,14 +42,12 @@ export function formatFileSize(bytes: number, decimalPlaces = 1): string {
 }
 
 export function getDirFromFilePath(filePath: string) {
-  const isWindows = window.navigator.userAgent.toLowerCase().includes('windows')
-  const separator = isWindows ? '\\' : '/'
-  const pathParts = filePath.split(separator)
-  return pathParts.slice(0, -1).join(separator)
+  const lastSeparatorIndex = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'))
+  return lastSeparatorIndex >= 0 ? filePath.slice(0, lastSeparatorIndex) : ''
 }
 
 // filter the symbols are not allowed in the filename
 export function getValidPath(path: string): string {
   if (!path) return ''
-  return path.replace(/[\\/:*?<>|]/g, ' ')
+  return path.replace(/[\\/:*?"<>|]/g, '')
 }

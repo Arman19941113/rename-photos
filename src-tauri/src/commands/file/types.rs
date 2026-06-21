@@ -49,3 +49,15 @@ pub enum IPCFile {
         size: u64,
     },
 }
+
+/// Rename request sent by the frontend for a single file.
+///
+/// `new_filename` and `temp_filename` must be plain filenames. The backend
+/// resolves them against the parent directory of `old_path`.
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RenamePathData {
+    pub old_path: String,
+    pub new_filename: String,
+    pub temp_filename: String,
+}

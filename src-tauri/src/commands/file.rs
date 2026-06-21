@@ -5,11 +5,12 @@
 
 use std::fs;
 use std::fs::Metadata;
-use std::path::Path;
+use std::io;
+use std::path::{Component, Path, PathBuf};
 
 mod types;
 
-use self::types::IPCFile;
+use self::types::{IPCFile, RenamePathData};
 use crate::utils::file::{
     FileKind, analyze_image_metadata, analyze_video_metadata, detect_file_kind,
     get_created_timestamp, get_filename, should_exclude_from_ui_file_list,
@@ -118,45 +119,102 @@ fn get_files_from_paths_inner(paths: Vec<&str>) -> std::io::Result<Vec<IPCFile>>
 }
 
 #[tauri::command]
-pub fn rename_files(rename_path_data: Vec<(&str, &str, &str)>) -> Result<Vec<String>, String> {
+pub fn rename_files(rename_path_data: Vec<RenamePathData>) -> Result<Vec<String>, String> {
     rename_files_inner(rename_path_data).map_err(|err| err.to_string())
 }
 
-fn rename_files_inner(rename_path_data: Vec<(&str, &str, &str)>) -> std::io::Result<Vec<String>> {
-    // Frontend input shape: `[[oldPath, newPath, tempPath], ...]`.
+struct RenamePlan {
+    old_path: PathBuf,
+    new_path: PathBuf,
+    temp_path: PathBuf,
+}
+
+fn rename_files_inner(rename_path_data: Vec<RenamePathData>) -> io::Result<Vec<String>> {
+    let rename_plans = rename_path_data
+        .into_iter()
+        .map(build_rename_plan)
+        .collect::<io::Result<Vec<_>>>()?;
+
+    // Frontend input shape: `[{ oldPath, newFilename, tempFilename }, ...]`.
+    // The backend resolves filenames relative to each old path's parent directory.
     //
     // We use a two-phase rename to avoid collisions when multiple files swap names:
     // 1) oldPath -> tempPath
     // 2) tempPath -> newPath
     //
     // Before renaming, ensure we never overwrite an unrelated existing file.
-    for &(_, new_path, _) in &rename_path_data {
+    for plan in &rename_plans {
         // If `new_path` is also one of the `old_path`s in this batch, it will be freed up
         // during phase 1, so it's safe to proceed.
-        if rename_path_data
+        if rename_plans
             .iter()
-            .any(|&(old_path, _, _)| old_path == new_path)
+            .any(|other| other.old_path.as_path() == plan.new_path.as_path())
         {
             continue;
         }
-        if Path::new(new_path).exists() {
-            let msg = format!("The file \"{}\" already exist", new_path);
-            return Err(std::io::Error::new(std::io::ErrorKind::AlreadyExists, msg));
+        if plan.new_path.exists() {
+            let msg = format!("The file \"{}\" already exist", plan.new_path.display());
+            return Err(io::Error::new(io::ErrorKind::AlreadyExists, msg));
         }
     }
 
     // Phase 1: move everything to a temporary path.
-    for &(old_path, _, temp_path) in &rename_path_data {
-        fs::rename(old_path, temp_path)?;
+    for plan in &rename_plans {
+        fs::rename(&plan.old_path, &plan.temp_path)?;
     }
     // Phase 2: move temporary paths into their final targets.
-    for &(_, new_path, temp_path) in &rename_path_data {
-        fs::rename(temp_path, new_path)?;
+    for plan in &rename_plans {
+        fs::rename(&plan.temp_path, &plan.new_path)?;
     }
-    let new_paths: Vec<String> = rename_path_data
+    let new_paths: Vec<String> = rename_plans
         .into_iter()
-        .map(|(_, new_path, _)| new_path.to_owned())
+        .map(|plan| plan.new_path.to_string_lossy().to_string())
         .collect();
 
     Ok(new_paths)
+}
+
+fn build_rename_plan(rename_data: RenamePathData) -> io::Result<RenamePlan> {
+    validate_plain_filename(&rename_data.new_filename, "newFilename")?;
+    validate_plain_filename(&rename_data.temp_filename, "tempFilename")?;
+
+    let old_path = PathBuf::from(rename_data.old_path);
+    let parent_dir = old_path
+        .parent()
+        .filter(|path| !path.as_os_str().is_empty())
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!(
+                    "Cannot determine parent directory for \"{}\"",
+                    old_path.display()
+                ),
+            )
+        })?;
+
+    let new_path = parent_dir.join(rename_data.new_filename);
+    let temp_path = parent_dir.join(rename_data.temp_filename);
+
+    Ok(RenamePlan {
+        old_path,
+        new_path,
+        temp_path,
+    })
+}
+
+fn validate_plain_filename(filename: &str, label: &str) -> io::Result<()> {
+    let mut components = Path::new(filename).components();
+    let is_plain_filename = matches!(components.next(), Some(Component::Normal(_)))
+        && components.next().is_none()
+        && !filename.contains('/')
+        && !filename.contains('\\');
+
+    if !is_plain_filename {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!("{label} must be a plain filename: \"{filename}\""),
+        ));
+    }
+
+    Ok(())
 }

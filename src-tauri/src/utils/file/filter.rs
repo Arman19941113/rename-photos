@@ -59,14 +59,52 @@ fn is_unix_symlink(path: &Path) -> bool {
 fn is_macos_finder_alias(path: &Path) -> bool {
     use std::process::Command;
 
-    let output = Command::new("xattr").arg(path).output();
-    match output {
-        Ok(out) => {
-            let stdout = String::from_utf8_lossy(&out.stdout);
-            stdout.contains("com.apple.FinderInfo")
-        }
-        Err(_) => false,
+    let output = Command::new("xattr")
+        .args(["-px", "com.apple.FinderInfo"])
+        .arg(path)
+        .output();
+
+    let Ok(out) = output else {
+        return false;
+    };
+    if !out.status.success() {
+        return false;
     }
+
+    parse_hex_xattr_output(&out.stdout)
+        .map(|finder_info| has_macos_alias_finder_flag(&finder_info))
+        .unwrap_or(false)
+}
+
+#[cfg(target_os = "macos")]
+fn parse_hex_xattr_output(output: &[u8]) -> Option<Vec<u8>> {
+    let text = String::from_utf8_lossy(output);
+    let hex: String = text.chars().filter(|ch| !ch.is_whitespace()).collect();
+
+    if hex.len() % 2 != 0 || !hex.chars().all(|ch| ch.is_ascii_hexdigit()) {
+        return None;
+    }
+
+    hex.as_bytes()
+        .chunks(2)
+        .map(|chunk| {
+            let pair = std::str::from_utf8(chunk).ok()?;
+            u8::from_str_radix(pair, 16).ok()
+        })
+        .collect()
+}
+
+#[cfg(target_os = "macos")]
+fn has_macos_alias_finder_flag(finder_info: &[u8]) -> bool {
+    const FINDER_FLAGS_OFFSET: usize = 8;
+    const FINDER_FLAG_IS_ALIAS: u16 = 0x8000;
+
+    let Some(flags) = finder_info.get(FINDER_FLAGS_OFFSET..FINDER_FLAGS_OFFSET + 2) else {
+        return false;
+    };
+    let finder_flags = u16::from_be_bytes([flags[0], flags[1]]);
+
+    finder_flags & FINDER_FLAG_IS_ALIAS != 0
 }
 
 #[cfg(windows)]
@@ -92,4 +130,43 @@ fn is_system_file(metadata: &Metadata) -> bool {
 #[cfg(unix)]
 fn is_system_file(_: &Metadata) -> bool {
     false
+}
+
+#[cfg(all(test, target_os = "macos"))]
+mod tests {
+    use super::{has_macos_alias_finder_flag, parse_hex_xattr_output};
+
+    #[test]
+    fn parses_xattr_hex_output_with_whitespace() {
+        let output = b"00 01 0a ff\n10";
+
+        assert_eq!(
+            parse_hex_xattr_output(output),
+            Some(vec![0, 1, 10, 255, 16])
+        );
+    }
+
+    #[test]
+    fn rejects_non_hex_xattr_output() {
+        assert_eq!(parse_hex_xattr_output(b"00 xx"), None);
+    }
+
+    #[test]
+    fn detects_only_the_finder_alias_flag() {
+        let mut regular_finder_info = [0; 32];
+        regular_finder_info[8] = 0x00;
+        regular_finder_info[9] = 0x10;
+
+        let mut alias_finder_info = [0; 32];
+        alias_finder_info[8] = 0x80;
+        alias_finder_info[9] = 0x00;
+
+        assert!(!has_macos_alias_finder_flag(&regular_finder_info));
+        assert!(has_macos_alias_finder_flag(&alias_finder_info));
+    }
+
+    #[test]
+    fn missing_finder_flags_are_not_aliases() {
+        assert!(!has_macos_alias_finder_flag(&[0; 8]));
+    }
 }
