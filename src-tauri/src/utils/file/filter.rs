@@ -132,10 +132,73 @@ fn is_system_file(_: &Metadata) -> bool {
     false
 }
 
-#[cfg(all(test, target_os = "macos"))]
+#[cfg(test)]
 mod tests {
+    use super::should_exclude_from_ui_file_list;
+    #[cfg(target_os = "macos")]
     use super::{has_macos_alias_finder_flag, parse_hex_xattr_output};
+    use std::fs;
+    use tempfile::tempdir;
 
+    // These tests create minimal filesystem fixtures instead of relying on media samples.
+    #[test]
+    fn keeps_regular_files() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("regular.txt");
+        fs::write(&path, "content").unwrap();
+        let metadata = fs::symlink_metadata(&path).unwrap();
+
+        assert!(!should_exclude_from_ui_file_list(&path, &metadata));
+    }
+
+    #[test]
+    fn excludes_directories() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("nested");
+        fs::create_dir(&path).unwrap();
+        let metadata = fs::symlink_metadata(&path).unwrap();
+
+        assert!(should_exclude_from_ui_file_list(&path, &metadata));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn excludes_dot_prefixed_hidden_files() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join(".hidden.jpg");
+        fs::write(&path, "content").unwrap();
+        let metadata = fs::symlink_metadata(&path).unwrap();
+
+        assert!(should_exclude_from_ui_file_list(&path, &metadata));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn excludes_unix_symlinks() {
+        use std::os::unix::fs::symlink;
+
+        let dir = tempdir().unwrap();
+        let target = dir.path().join("target.jpg");
+        let link = dir.path().join("link.jpg");
+        fs::write(&target, "content").unwrap();
+        symlink(&target, &link).unwrap();
+        let metadata = fs::symlink_metadata(&link).unwrap();
+
+        assert!(should_exclude_from_ui_file_list(&link, &metadata));
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn excludes_windows_shortcuts() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("shortcut.LNK");
+        fs::write(&path, "content").unwrap();
+        let metadata = fs::symlink_metadata(&path).unwrap();
+
+        assert!(should_exclude_from_ui_file_list(&path, &metadata));
+    }
+
+    #[cfg(target_os = "macos")]
     #[test]
     fn parses_xattr_hex_output_with_whitespace() {
         let output = b"00 01 0a ff\n10";
@@ -146,13 +209,16 @@ mod tests {
         );
     }
 
+    #[cfg(target_os = "macos")]
     #[test]
     fn rejects_non_hex_xattr_output() {
         assert_eq!(parse_hex_xattr_output(b"00 xx"), None);
     }
 
+    #[cfg(target_os = "macos")]
     #[test]
     fn detects_only_the_finder_alias_flag() {
+        // Finder stores the alias bit in the big-endian flag bytes at offset 8.
         let mut regular_finder_info = [0; 32];
         regular_finder_info[8] = 0x00;
         regular_finder_info[9] = 0x10;
@@ -165,6 +231,7 @@ mod tests {
         assert!(has_macos_alias_finder_flag(&alias_finder_info));
     }
 
+    #[cfg(target_os = "macos")]
     #[test]
     fn missing_finder_flags_are_not_aliases() {
         assert!(!has_macos_alias_finder_flag(&[0; 8]));

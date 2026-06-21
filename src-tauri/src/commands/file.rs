@@ -218,3 +218,185 @@ fn validate_plain_filename(filename: &str, label: &str) -> io::Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        build_rename_plan, get_files_from_dir_inner, get_files_from_paths_inner,
+        rename_files_inner, validate_plain_filename,
+    };
+    use crate::commands::file::types::{IPCFile, RenamePathData};
+    use std::fs;
+    use std::io::ErrorKind;
+    use std::path::Path;
+    use tempfile::tempdir;
+
+    // Keep filesystem tests isolated from repository fixtures and user files.
+    fn write_file(path: &Path, content: &str) {
+        fs::write(path, content).unwrap();
+    }
+
+    // The frontend sends filenames only; the backend resolves them beside old_path.
+    fn rename_data(old_path: &Path, new_filename: &str, temp_filename: &str) -> RenamePathData {
+        RenamePathData {
+            old_path: old_path.to_string_lossy().to_string(),
+            new_filename: new_filename.to_string(),
+            temp_filename: temp_filename.to_string(),
+        }
+    }
+
+    fn filename_of(file: IPCFile) -> String {
+        match file {
+            IPCFile::Image { filename, .. }
+            | IPCFile::Video { filename, .. }
+            | IPCFile::Other { filename, .. } => filename,
+        }
+    }
+
+    fn sorted_filenames(files: Vec<IPCFile>) -> Vec<String> {
+        let mut filenames = files.into_iter().map(filename_of).collect::<Vec<_>>();
+        filenames.sort();
+        filenames
+    }
+
+    #[test]
+    fn validates_plain_filenames() {
+        assert!(validate_plain_filename("a.jpg", "newFilename").is_ok());
+
+        for filename in ["", "../a.jpg", "dir/a.jpg", "dir\\a.jpg"] {
+            let err = validate_plain_filename(filename, "newFilename").unwrap_err();
+            assert_eq!(err.kind(), ErrorKind::InvalidInput);
+        }
+    }
+
+    #[test]
+    fn build_rename_plan_resolves_targets_inside_old_parent() {
+        let dir = tempdir().unwrap();
+        let old_path = dir.path().join("a.txt");
+        let plan = build_rename_plan(rename_data(&old_path, "b.txt", "tmp-a.txt")).unwrap();
+
+        assert_eq!(plan.old_path, old_path);
+        assert_eq!(plan.new_path, dir.path().join("b.txt"));
+        assert_eq!(plan.temp_path, dir.path().join("tmp-a.txt"));
+    }
+
+    #[test]
+    fn renames_a_single_file() {
+        let dir = tempdir().unwrap();
+        let old_path = dir.path().join("a.txt");
+        let new_path = dir.path().join("b.txt");
+        write_file(&old_path, "a");
+
+        let result =
+            rename_files_inner(vec![rename_data(&old_path, "b.txt", "tmp-a.txt")]).unwrap();
+
+        assert_eq!(result, vec![new_path.to_string_lossy().to_string()]);
+        assert!(!old_path.exists());
+        assert_eq!(fs::read_to_string(new_path).unwrap(), "a");
+    }
+
+    #[test]
+    fn refuses_to_overwrite_unrelated_existing_files() {
+        let dir = tempdir().unwrap();
+        let old_path = dir.path().join("a.txt");
+        let existing_path = dir.path().join("b.txt");
+        write_file(&old_path, "a");
+        write_file(&existing_path, "existing");
+
+        let err =
+            rename_files_inner(vec![rename_data(&old_path, "b.txt", "tmp-a.txt")]).unwrap_err();
+
+        assert_eq!(err.kind(), ErrorKind::AlreadyExists);
+        assert_eq!(fs::read_to_string(old_path).unwrap(), "a");
+        assert_eq!(fs::read_to_string(existing_path).unwrap(), "existing");
+        assert!(!dir.path().join("tmp-a.txt").exists());
+    }
+
+    #[test]
+    fn swaps_names_with_two_phase_rename() {
+        // Direct renames would collide here; the temporary phase is the behavior under test.
+        let dir = tempdir().unwrap();
+        let a_path = dir.path().join("a.txt");
+        let b_path = dir.path().join("b.txt");
+        write_file(&a_path, "from-a");
+        write_file(&b_path, "from-b");
+
+        let result = rename_files_inner(vec![
+            rename_data(&a_path, "b.txt", "tmp-a.txt"),
+            rename_data(&b_path, "a.txt", "tmp-b.txt"),
+        ])
+        .unwrap();
+
+        assert_eq!(
+            result,
+            vec![
+                b_path.to_string_lossy().to_string(),
+                a_path.to_string_lossy().to_string()
+            ]
+        );
+        assert_eq!(fs::read_to_string(a_path).unwrap(), "from-b");
+        assert_eq!(fs::read_to_string(b_path).unwrap(), "from-a");
+    }
+
+    #[test]
+    fn reads_direct_files_from_a_directory_without_recursing() {
+        // Folder loading is intentionally shallow so nested media is not pulled in implicitly.
+        let dir = tempdir().unwrap();
+        write_file(&dir.path().join("a.txt"), "a");
+        fs::create_dir(dir.path().join("nested")).unwrap();
+        write_file(&dir.path().join("nested").join("inside.txt"), "inside");
+
+        let files = get_files_from_dir_inner(dir.path().to_str().unwrap()).unwrap();
+
+        assert_eq!(sorted_filenames(files), vec!["a.txt"]);
+    }
+
+    #[test]
+    fn treats_a_single_path_directory_like_open_folder() {
+        let dir = tempdir().unwrap();
+        write_file(&dir.path().join("a.txt"), "a");
+        write_file(&dir.path().join("b.txt"), "b");
+        let path = dir.path().to_str().unwrap();
+
+        let from_dir = sorted_filenames(get_files_from_dir_inner(path).unwrap());
+        let from_paths = sorted_filenames(get_files_from_paths_inner(vec![path]).unwrap());
+
+        assert_eq!(from_paths, from_dir);
+    }
+
+    #[test]
+    fn ignores_directories_in_explicit_path_lists() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("a.txt");
+        let nested_path = dir.path().join("nested");
+        write_file(&file_path, "a");
+        fs::create_dir(&nested_path).unwrap();
+
+        let files = get_files_from_paths_inner(vec![
+            file_path.to_str().unwrap(),
+            nested_path.to_str().unwrap(),
+        ])
+        .unwrap();
+
+        assert_eq!(sorted_filenames(files), vec!["a.txt"]);
+    }
+
+    #[test]
+    fn fails_explicit_path_lists_when_any_path_is_missing() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("a.txt");
+        let missing_path = dir.path().join("missing.txt");
+        write_file(&file_path, "a");
+
+        let result = get_files_from_paths_inner(vec![
+            file_path.to_str().unwrap(),
+            missing_path.to_str().unwrap(),
+        ]);
+        let err = match result {
+            Ok(_) => panic!("expected missing path to fail"),
+            Err(err) => err,
+        };
+
+        assert_eq!(err.kind(), ErrorKind::NotFound);
+    }
+}
