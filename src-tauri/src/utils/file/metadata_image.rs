@@ -1,5 +1,6 @@
 use exif::{In, Tag};
 use std::fs;
+use std::path::Path;
 
 #[derive(serde::Serialize, Default, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -14,20 +15,20 @@ pub(crate) struct ImageMetadata {
     iso: Option<String>,
 }
 
-pub(crate) fn analyze_image_metadata(path_str: &str) -> (Option<ImageMetadata>, Option<String>) {
-    match read_image_metadata(path_str) {
+pub(crate) fn analyze_image_metadata(path: &Path) -> (Option<ImageMetadata>, Option<String>) {
+    match read_image_metadata(path) {
         Ok(metadata) => (metadata, None),
         Err(err) => (None, Some(err)),
     }
 }
 
-fn read_image_metadata(path_str: &str) -> Result<Option<ImageMetadata>, String> {
-    read_image_metadata_inner(path_str).map_err(|err| err.to_string())
+fn read_image_metadata(path: &Path) -> Result<Option<ImageMetadata>, String> {
+    read_image_metadata_inner(path).map_err(|err| err.to_string())
 }
 
-fn read_image_metadata_inner(path_str: &str) -> anyhow::Result<Option<ImageMetadata>> {
+fn read_image_metadata_inner(path: &Path) -> anyhow::Result<Option<ImageMetadata>> {
     let mut metadata = ImageMetadata::default();
-    fill_image_metadata(path_str, &mut metadata)?;
+    fill_image_metadata(path, &mut metadata)?;
     Ok(normalize_image_metadata(metadata))
 }
 
@@ -43,8 +44,8 @@ fn normalize_image_metadata(metadata: ImageMetadata) -> Option<ImageMetadata> {
     if has_any { Some(metadata) } else { None }
 }
 
-fn fill_image_metadata(path_str: &str, metadata: &mut ImageMetadata) -> anyhow::Result<()> {
-    let file = fs::File::open(path_str)?;
+fn fill_image_metadata(path: &Path, metadata: &mut ImageMetadata) -> anyhow::Result<()> {
+    let file = fs::File::open(path)?;
     let mut buf_reader = std::io::BufReader::new(&file);
     let exif = exif::Reader::new()
         .read_from_container(&mut buf_reader)

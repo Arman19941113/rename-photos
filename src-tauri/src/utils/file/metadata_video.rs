@@ -1,5 +1,6 @@
 use chrono::prelude::{DateTime, Local};
 use nom_exif::{MediaParser, MediaSource, TrackInfo, TrackInfoTag};
+use std::path::Path;
 
 #[derive(serde::Serialize, Default, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -9,20 +10,20 @@ pub(crate) struct VideoMetadata {
     camera: Option<String>,
 }
 
-pub(crate) fn analyze_video_metadata(path_str: &str) -> (Option<VideoMetadata>, Option<String>) {
-    match read_video_metadata(path_str) {
+pub(crate) fn analyze_video_metadata(path: &Path) -> (Option<VideoMetadata>, Option<String>) {
+    match read_video_metadata(path) {
         Ok(metadata) => (metadata, None),
         Err(err) => (None, Some(err)),
     }
 }
 
-fn read_video_metadata(path_str: &str) -> Result<Option<VideoMetadata>, String> {
-    read_video_metadata_inner(path_str).map_err(|err| err.to_string())
+fn read_video_metadata(path: &Path) -> Result<Option<VideoMetadata>, String> {
+    read_video_metadata_inner(path).map_err(|err| err.to_string())
 }
 
-fn read_video_metadata_inner(path_str: &str) -> anyhow::Result<Option<VideoMetadata>> {
+fn read_video_metadata_inner(path: &Path) -> anyhow::Result<Option<VideoMetadata>> {
     let mut parser = MediaParser::new();
-    let ms = MediaSource::file_path(path_str).map_err(|err| anyhow::anyhow!(err.to_string()))?;
+    let ms = MediaSource::file_path(path).map_err(|err| anyhow::anyhow!(err.to_string()))?;
     if !ms.has_track() {
         return Ok(None);
     }

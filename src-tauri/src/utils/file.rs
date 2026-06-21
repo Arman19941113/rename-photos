@@ -21,9 +21,8 @@ pub(crate) fn get_created_timestamp(metadata: &Metadata) -> u128 {
         .unwrap_or(0)
 }
 
-pub(crate) fn get_filename(path_str: &str) -> String {
-    Path::new(path_str)
-        .file_name()
+pub(crate) fn get_filename(path: &Path) -> String {
+    path.file_name()
         .and_then(|name| name.to_str())
         .unwrap_or_default()
         .to_string()

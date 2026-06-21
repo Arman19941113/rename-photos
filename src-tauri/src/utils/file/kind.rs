@@ -8,8 +8,8 @@ pub(crate) enum FileKind {
     Other,
 }
 
-pub(crate) fn detect_file_kind(path_str: &str) -> FileKind {
-    let ext = Path::new(path_str)
+pub(crate) fn detect_file_kind(path: &Path) -> FileKind {
+    let ext = path
         .extension()
         .and_then(|s| s.to_str())
         .unwrap_or_default()
@@ -31,29 +31,30 @@ pub(crate) fn detect_file_kind(path_str: &str) -> FileKind {
 #[cfg(test)]
 mod tests {
     use super::{FileKind, detect_file_kind};
+    use std::path::Path;
 
     // Classification only depends on the path extension, so no real files are needed.
     #[test]
     fn detects_images_case_insensitively() {
-        assert_eq!(detect_file_kind("a.JPG"), FileKind::Image);
-        assert_eq!(detect_file_kind("a.jPeG"), FileKind::Image);
+        assert_eq!(detect_file_kind(Path::new("a.JPG")), FileKind::Image);
+        assert_eq!(detect_file_kind(Path::new("a.jPeG")), FileKind::Image);
     }
 
     #[test]
     fn detects_raw_images() {
-        assert_eq!(detect_file_kind("a.ARW"), FileKind::Image);
-        assert_eq!(detect_file_kind("a.dng"), FileKind::Image);
+        assert_eq!(detect_file_kind(Path::new("a.ARW")), FileKind::Image);
+        assert_eq!(detect_file_kind(Path::new("a.dng")), FileKind::Image);
     }
 
     #[test]
     fn detects_videos_case_insensitively() {
-        assert_eq!(detect_file_kind("a.MOV"), FileKind::Video);
-        assert_eq!(detect_file_kind("a.mp4"), FileKind::Video);
+        assert_eq!(detect_file_kind(Path::new("a.MOV")), FileKind::Video);
+        assert_eq!(detect_file_kind(Path::new("a.mp4")), FileKind::Video);
     }
 
     #[test]
     fn treats_unknown_or_missing_extensions_as_other() {
-        assert_eq!(detect_file_kind("a.txt"), FileKind::Other);
-        assert_eq!(detect_file_kind("a"), FileKind::Other);
+        assert_eq!(detect_file_kind(Path::new("a.txt")), FileKind::Other);
+        assert_eq!(detect_file_kind(Path::new("a")), FileKind::Other);
     }
 }

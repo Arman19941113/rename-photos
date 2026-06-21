@@ -18,18 +18,18 @@ use crate::utils::file::{
 
 #[tauri::command]
 pub fn get_files_from_dir(dir_path: &str) -> Result<Vec<IPCFile>, String> {
-    get_files_from_dir_inner(dir_path).map_err(|err| err.to_string())
+    get_files_from_dir_inner(Path::new(dir_path)).map_err(|err| err.to_string())
 }
 
-fn build_ipc_file(path_str: &str, metadata: &Metadata) -> IPCFile {
+fn build_ipc_file(path: &Path, path_str: &str, metadata: &Metadata) -> IPCFile {
     let pathname = path_str.to_string();
-    let filename = get_filename(path_str);
+    let filename = get_filename(path);
     let created = get_created_timestamp(metadata);
     let size = metadata.len();
 
-    match detect_file_kind(path_str) {
+    match detect_file_kind(path) {
         FileKind::Image => {
-            let (metadata, meta_error) = analyze_image_metadata(path_str);
+            let (metadata, meta_error) = analyze_image_metadata(path);
             IPCFile::Image {
                 pathname,
                 filename,
@@ -40,7 +40,7 @@ fn build_ipc_file(path_str: &str, metadata: &Metadata) -> IPCFile {
             }
         }
         FileKind::Video => {
-            let (metadata, meta_error) = analyze_video_metadata(path_str);
+            let (metadata, meta_error) = analyze_video_metadata(path);
             IPCFile::Video {
                 pathname,
                 filename,
@@ -59,7 +59,7 @@ fn build_ipc_file(path_str: &str, metadata: &Metadata) -> IPCFile {
     }
 }
 
-fn get_files_from_dir_inner(dir_path: &str) -> std::io::Result<Vec<IPCFile>> {
+fn get_files_from_dir_inner(dir_path: &Path) -> std::io::Result<Vec<IPCFile>> {
     let dir_entries = fs::read_dir(dir_path)?;
     let mut files = Vec::new();
 
@@ -68,20 +68,14 @@ fn get_files_from_dir_inner(dir_path: &str) -> std::io::Result<Vec<IPCFile>> {
         let path_buf = entry.path();
         // Use `symlink_metadata` so `file_type().is_symlink()` works as expected.
         let metadata = fs::symlink_metadata(&path_buf)?;
-        // Get the path as a string.
-        let Some(path_str) = path_buf.to_str() else {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidData,
-                format!("Non-UTF-8 path encountered: {}", path_buf.display()),
-            ));
-        };
+        let path_str = path_to_str(&path_buf)?;
 
         // Skip folders, symlinks, hidden files, and (on Windows) system files.
         if should_exclude_from_ui_file_list(&path_buf, &metadata) {
             continue;
         }
 
-        files.push(build_ipc_file(path_str, &metadata))
+        files.push(build_ipc_file(&path_buf, path_str, &metadata))
     }
 
     Ok(files)
@@ -89,33 +83,46 @@ fn get_files_from_dir_inner(dir_path: &str) -> std::io::Result<Vec<IPCFile>> {
 
 #[tauri::command]
 pub fn get_files_from_paths(paths: Vec<&str>) -> Result<Vec<IPCFile>, String> {
-    get_files_from_paths_inner(paths).map_err(|err| err.to_string())
+    let paths = paths
+        .iter()
+        .map(|path_str| Path::new(*path_str))
+        .collect::<Vec<_>>();
+    get_files_from_paths_inner(&paths).map_err(|err| err.to_string())
 }
 
-fn get_files_from_paths_inner(paths: Vec<&str>) -> std::io::Result<Vec<IPCFile>> {
+fn get_files_from_paths_inner(paths: &[&Path]) -> std::io::Result<Vec<IPCFile>> {
     // If the user drops a single folder path, treat it like "open folder".
-    if let [path_str] = paths.as_slice() {
-        let metadata = fs::symlink_metadata(path_str)?;
+    if let [path] = paths {
+        let path = *path;
+        let metadata = fs::symlink_metadata(path)?;
         if metadata.is_dir() {
-            return get_files_from_dir_inner(path_str);
+            return get_files_from_dir_inner(path);
         }
     }
 
     // Otherwise treat every input as a file path and ignore directories.
     let mut files = Vec::new();
 
-    for path_str in paths {
-        let path = Path::new(path_str);
+    for &path in paths {
         let metadata = fs::symlink_metadata(path)?;
 
         if should_exclude_from_ui_file_list(path, &metadata) {
             continue;
         }
 
-        files.push(build_ipc_file(path_str, &metadata))
+        files.push(build_ipc_file(path, path_to_str(path)?, &metadata))
     }
 
     Ok(files)
+}
+
+fn path_to_str(path: &Path) -> io::Result<&str> {
+    path.to_str().ok_or_else(|| {
+        io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("Non-UTF-8 path encountered: {}", path.display()),
+        )
+    })
 }
 
 #[tauri::command]
@@ -424,7 +431,7 @@ mod tests {
         fs::create_dir(dir.path().join("nested")).unwrap();
         write_file(&dir.path().join("nested").join("inside.txt"), "inside");
 
-        let files = get_files_from_dir_inner(dir.path().to_str().unwrap()).unwrap();
+        let files = get_files_from_dir_inner(dir.path()).unwrap();
 
         assert_eq!(sorted_filenames(files), vec!["a.txt"]);
     }
@@ -434,10 +441,10 @@ mod tests {
         let dir = tempdir().unwrap();
         write_file(&dir.path().join("a.txt"), "a");
         write_file(&dir.path().join("b.txt"), "b");
-        let path = dir.path().to_str().unwrap();
+        let path = dir.path();
 
         let from_dir = sorted_filenames(get_files_from_dir_inner(path).unwrap());
-        let from_paths = sorted_filenames(get_files_from_paths_inner(vec![path]).unwrap());
+        let from_paths = sorted_filenames(get_files_from_paths_inner(&[path]).unwrap());
 
         assert_eq!(from_paths, from_dir);
     }
@@ -454,7 +461,7 @@ mod tests {
         write_file(&target_dir.join("inside.txt"), "inside");
         symlink(&target_dir, &link_path).unwrap();
 
-        let files = get_files_from_paths_inner(vec![link_path.to_str().unwrap()]).unwrap();
+        let files = get_files_from_paths_inner(&[link_path.as_path()]).unwrap();
 
         assert_eq!(sorted_filenames(files), Vec::<String>::new());
     }
@@ -467,11 +474,8 @@ mod tests {
         write_file(&file_path, "a");
         fs::create_dir(&nested_path).unwrap();
 
-        let files = get_files_from_paths_inner(vec![
-            file_path.to_str().unwrap(),
-            nested_path.to_str().unwrap(),
-        ])
-        .unwrap();
+        let files =
+            get_files_from_paths_inner(&[file_path.as_path(), nested_path.as_path()]).unwrap();
 
         assert_eq!(sorted_filenames(files), vec!["a.txt"]);
     }
@@ -483,10 +487,7 @@ mod tests {
         let missing_path = dir.path().join("missing.txt");
         write_file(&file_path, "a");
 
-        let result = get_files_from_paths_inner(vec![
-            file_path.to_str().unwrap(),
-            missing_path.to_str().unwrap(),
-        ]);
+        let result = get_files_from_paths_inner(&[file_path.as_path(), missing_path.as_path()]);
         let err = match result {
             Ok(_) => panic!("expected missing path to fail"),
             Err(err) => err,
