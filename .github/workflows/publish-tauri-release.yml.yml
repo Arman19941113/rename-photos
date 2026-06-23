@@ -9,7 +9,27 @@ on:
 # This workflow will trigger on each push to the `release` branch to create or update a GitHub release, build your app, and upload the artifacts to the release.
 
 jobs:
+  check-release-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check release tag does not exist
+        run: |
+          VERSION="$(node -p "require('./src-tauri/tauri.conf.json').version")"
+          TAG="v${VERSION}"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "::error title=Release tag already exists::${TAG} already exists. Bump src-tauri/tauri.conf.json version before publishing."
+            exit 1
+          fi
+
+          echo "Release tag ${TAG} is available."
+
   publish-tauri:
+    needs: check-release-tag
     environment: 'production'
     permissions:
       contents: write
