@@ -1,6 +1,6 @@
 {
   "productName": "Rename Photos",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "identifier": "fun.armantang",
   "build": {
     "beforeDevCommand": "pnpm dev",

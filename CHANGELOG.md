@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.0.1] - 2026-06-23
+
+### Changed
+
+- Hardened file loading and rename preflight checks to better reject unsupported, hidden, shortcut, and conflicting paths before rename operations run.
+- Improved macOS Finder alias detection by reading the alias extended attribute directly during file filtering.
+- Refactored internal file APIs to use path-based inputs consistently across metadata reading and file classification.
+- Moved heavier file commands onto blocking async tasks so metadata loading and rename operations avoid blocking the Tauri async runtime.
+
+### Tests
+
+- Added unit test coverage for rename template generation, date formatting, file filtering, file classification, and rename preflight behavior.
+
 ## [v1.0.0] - 2026-06-21
 
 ### Added
@@ -133,6 +146,7 @@
 - Fixed Windows path handling, EXIF `DateTimeOriginal` reading, and template input trimming.
 - Kept all files visible after renaming.
 
+[v1.0.1]: https://github.com/Arman19941113/rename-photos/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/Arman19941113/rename-photos/compare/v0.1.2...v1.0.0
 [v0.1.2]: https://github.com/Arman19941113/rename-photos/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/Arman19941113/rename-photos/compare/v0.1.0...v0.1.1
