@@ -86,7 +86,9 @@ Everything else that passes filtering is classified as `other`.
 
 Metadata extraction is best-effort:
 
-- Images use the Rust `exif` crate.
+- Images use the Rust `exif` crate through `src-tauri/src/utils/file/image_exif`.
+- Standard image containers are read first; if that fails, the backend tries supported RAW compatibility fallbacks.
+- Panasonic RW2 files try embedded JPEG EXIF first, then fall back to normalizing the RW2 TIFF header in memory before handing the full file data to `exif`.
 - Videos use `nom_exif`.
 - If extraction fails, the file is still returned, but `metaError` is populated.
 - If extraction succeeds but fields are missing, the metadata object may be partial.

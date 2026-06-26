@@ -3,6 +3,7 @@ use std::path::Path;
 use std::time::UNIX_EPOCH;
 
 mod filter;
+mod image_exif;
 mod kind;
 mod metadata_image;
 mod metadata_video;

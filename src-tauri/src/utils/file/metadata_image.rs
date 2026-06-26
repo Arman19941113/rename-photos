@@ -1,5 +1,5 @@
+use super::image_exif::read_exif;
 use exif::{In, Tag};
-use std::fs;
 use std::path::Path;
 
 #[derive(serde::Serialize, Default, Clone)]
@@ -45,23 +45,23 @@ fn normalize_image_metadata(metadata: ImageMetadata) -> Option<ImageMetadata> {
 }
 
 fn fill_image_metadata(path: &Path, metadata: &mut ImageMetadata) -> anyhow::Result<()> {
-    let file = fs::File::open(path)?;
-    let mut buf_reader = std::io::BufReader::new(&file);
-    let exif = exif::Reader::new()
-        .read_from_container(&mut buf_reader)
-        .map_err(|err| anyhow::anyhow!(err.to_string()))?;
+    let exif = read_exif(path)?;
 
-    // Values are stored as strings because the UI uses them for template substitution.
-    metadata.date = exif_field_string(&exif, Tag::DateTimeOriginal);
-    metadata.make = exif_field_string(&exif, Tag::Make);
-    metadata.camera = exif_field_string(&exif, Tag::Model);
-    metadata.lens = exif_field_string(&exif, Tag::LensModel);
-    metadata.focal_length = exif_field_string(&exif, Tag::FocalLengthIn35mmFilm);
-    metadata.aperture = exif_field_string(&exif, Tag::FNumber);
-    metadata.shutter = exif_field_string(&exif, Tag::ExposureTime);
-    metadata.iso = exif_field_string(&exif, Tag::PhotographicSensitivity);
+    fill_metadata_from_exif(metadata, &exif);
 
     Ok(())
+}
+
+fn fill_metadata_from_exif(metadata: &mut ImageMetadata, exif: &exif::Exif) {
+    // Values are stored as strings because the UI uses them for template substitution.
+    metadata.date = exif_field_string(exif, Tag::DateTimeOriginal);
+    metadata.make = exif_field_string(exif, Tag::Make);
+    metadata.camera = exif_field_string(exif, Tag::Model);
+    metadata.lens = exif_field_string(exif, Tag::LensModel);
+    metadata.focal_length = exif_field_string(exif, Tag::FocalLengthIn35mmFilm);
+    metadata.aperture = exif_field_string(exif, Tag::FNumber);
+    metadata.shutter = exif_field_string(exif, Tag::ExposureTime);
+    metadata.iso = exif_field_string(exif, Tag::PhotographicSensitivity);
 }
 
 // Reads a single EXIF tag value and returns its display representation.

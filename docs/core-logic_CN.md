@@ -86,7 +86,9 @@
 
 元数据提取采用 best-effort 模式：
 
-- 图片使用 Rust `exif` crate。
+- 图片通过 `src-tauri/src/utils/file/image_exif` 使用 Rust `exif` crate。
+- 标准图片容器会优先读取；如果失败，后端会继续尝试已支持的 RAW 兼容 fallback。
+- Panasonic RW2 文件会先尝试读取内嵌 JPEG EXIF；如果失败，再在内存里把 RW2 的 TIFF header 规范化，并把完整文件数据交给 `exif` 解析。
 - 视频使用 `nom_exif`。
 - 如果提取失败，文件仍然会返回，只是 `metaError` 会被填上。
 - 如果提取成功但字段不完整，返回的 metadata 可能是部分字段。
