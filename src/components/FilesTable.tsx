@@ -38,7 +38,10 @@ function FilesTable({
         color="primary"
         selectionMode="single"
         selectionBehavior="replace"
-        classNames={{ tr: '!outline-none', td: '!outline-none' }}
+        classNames={{
+          tr: '!outline-none odd:bg-background even:bg-default-50 odd:data-[hover=true]:bg-background even:data-[hover=true]:bg-default-50',
+          td: '!outline-none bg-transparent group-aria-[selected=false]:group-data-[hover=true]:before:!opacity-0',
+        }}
         selectedKeys={selectedKeys}
         onSelectionChange={handleSelectionChange}
       >
