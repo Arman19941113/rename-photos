@@ -319,15 +319,18 @@ If a file is marked `shouldSkip`, the preview filename column is left blank.
 
 The side panel displays:
 
-- a preview image when possible
-- for videos smaller than `50_000_000` bytes, an asset URL is attempted through the same image element; there is no video player or thumbnail extraction step
+- a media preview when possible
 - basic file info
 - extracted metadata fields
 
 Current preview rule:
 
-- images are previewable
-- videos are attempted only when size is below `50_000_000` bytes, and fall back to the generic file icon if the image load fails
+- preview support is decided in the frontend by extension whitelist, not by backend file classification alone
+- images use an `img` element for `jpg`, `jpeg`, `png`, `webp`, `gif`, `heic`, `heif`, and `heics`
+- videos use a `video` element for `mp4`, `mov`, `m4v`, and `webm`
+- video preview tries muted inline autoplay briefly to trigger first-frame rendering, then pauses and shows a custom play button; when playback starts, native video controls are enabled
+- the frontend does not generate video thumbnail files
+- unsupported or failed previews fall back to the generic file icon
 - other files fall back to a generic file icon
 
 Drag-and-drop events are ignored while the settings panel is open.

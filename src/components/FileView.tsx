@@ -3,22 +3,47 @@ import type { UIFile } from '@/types/file'
 import { convertFileSrc } from '@tauri-apps/api/core'
 
 import { clsx } from 'clsx'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // reset state by key
 function FileView({ fileInfo }: { fileInfo: UIFile }) {
   const { t } = useTranslation()
 
-  /* image source */
-  const canPreview =
-    fileInfo.fileType === 'image' ? true : fileInfo.fileType === 'video' ? fileInfo.size < 50_000_000 : false
-  const imageSrc = canPreview ? convertFileSrc(fileInfo.pathname) : ''
-  const [isImgLoad, setIsImgLoad] = useState(false)
-  const [isImgError, setIsImgError] = useState(false)
-  const onImgLoad = () => setIsImgLoad(true)
-  const onImgError = () => setIsImgError(true)
-  const showFileIcon = !imageSrc || isImgError
+  /* media source */
+  const canPreview = canPreviewFile(fileInfo)
+  const mediaSrc = canPreview ? convertFileSrc(fileInfo.pathname) : ''
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const isPrimingVideoRef = useRef(true)
+  const [isMediaLoaded, setIsMediaLoaded] = useState(false)
+  const [isMediaError, setIsMediaError] = useState(false)
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false)
+  const onMediaLoad = () => setIsMediaLoaded(true)
+  const onMediaError = () => setIsMediaError(true)
+  const onVideoPlaying = (event: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = event.currentTarget
+    setIsMediaLoaded(true)
+
+    if (isPrimingVideoRef.current) {
+      window.setTimeout(() => {
+        video.pause()
+        isPrimingVideoRef.current = false
+        setIsVideoPlaying(false)
+      }, 120)
+      return
+    }
+
+    setIsVideoPlaying(true)
+  }
+  const onClickVideoPreview = () => {
+    const video = videoRef.current
+
+    if (!video) return
+
+    isPrimingVideoRef.current = false
+    video.play().catch(() => {})
+  }
+  const showFileIcon = !mediaSrc || isMediaError
 
   /* metadata */
   const metadata: Array<[string, string]> | null = (() => {
@@ -52,8 +77,49 @@ function FileView({ fileInfo }: { fileInfo: UIFile }) {
         {showFileIcon ? (
           <StreamlineUltimateColorDataFileSearch className="text-6xl text-default-500" />
         ) : (
-          <div className={clsx('p-1 pt-0', isImgLoad && 'shadow-md')}>
-            <img src={imageSrc} alt="" className="h-[135px] object-contain" onLoad={onImgLoad} onError={onImgError} />
+          <div className={clsx('p-1 pt-0', isMediaLoaded && 'shadow-md')}>
+            {fileInfo.fileType === 'video' ? (
+              <div className="relative">
+                <video
+                  ref={videoRef}
+                  src={mediaSrc}
+                  className="h-[135px] max-w-[232px] object-contain"
+                  autoPlay
+                  muted
+                  playsInline
+                  controls={isVideoPlaying}
+                  preload="auto"
+                  onLoadedData={onMediaLoad}
+                  onError={onMediaError}
+                  onPlaying={onVideoPlaying}
+                  onPause={() => {
+                    if (!isPrimingVideoRef.current) {
+                      setIsVideoPlaying(false)
+                    }
+                  }}
+                />
+                {isMediaLoaded && !isVideoPlaying ? (
+                  <button
+                    type="button"
+                    aria-label="Play video preview"
+                    className="absolute inset-0 flex items-center justify-center bg-transparent"
+                    onClick={onClickVideoPreview}
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50">
+                      <span className="ml-0.5 h-0 w-0 border-y-[7px] border-l-[11px] border-y-transparent border-l-white" />
+                    </span>
+                  </button>
+                ) : null}
+              </div>
+            ) : (
+              <img
+                src={mediaSrc}
+                alt=""
+                className="h-[135px] object-contain"
+                onLoad={onMediaLoad}
+                onError={onMediaError}
+              />
+            )}
           </div>
         )}
       </div>
@@ -85,6 +151,53 @@ function FileView({ fileInfo }: { fileInfo: UIFile }) {
       ) : null}
     </div>
   )
+}
+
+function canPreviewFile(fileInfo: UIFile): boolean {
+  const ext = getLowerExt(fileInfo.filename)
+
+  if (fileInfo.fileType === 'image') {
+    return canPreviewImageExt(ext)
+  }
+
+  if (fileInfo.fileType === 'video') {
+    return canPreviewVideoExt(ext)
+  }
+
+  return false
+}
+
+function getLowerExt(filename: string): string {
+  const ext = filename.split('.').pop()
+  return ext && ext !== filename ? ext.toLowerCase() : ''
+}
+
+function canPreviewImageExt(ext: string): boolean {
+  switch (ext) {
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+    case 'webp':
+    case 'gif':
+    case 'heic':
+    case 'heif':
+    case 'heics':
+      return true
+    default:
+      return false
+  }
+}
+
+function canPreviewVideoExt(ext: string): boolean {
+  switch (ext) {
+    case 'mp4':
+    case 'mov':
+    case 'm4v':
+    case 'webm':
+      return true
+    default:
+      return false
+  }
 }
 
 export default FileView
