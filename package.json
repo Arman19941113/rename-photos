@@ -71,14 +71,7 @@
     "vitest": "^2.1.9"
   },
   "engines": {
-    "node": "24.17.0"
-  },
-  "devEngines": {
-    "runtime": {
-      "name": "node",
-      "version": "24.17.0",
-      "onFail": "download"
-    }
+    "node": "24.x"
   },
   "packageManager": "pnpm@11.8.0"
 }
