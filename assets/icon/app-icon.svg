@@ -1,0 +1,48 @@
+<!-- Complete vector app icon for Rename Photos. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bodyGradient" x1="0" y1="106" x2="0" y2="914" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="0.25" stop-color="#ffffff" />
+      <stop offset="1" stop-color="#eeeeee" />
+    </linearGradient>
+    <radialGradient id="bottomShade" cx="512" cy="938" r="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d8d8d8" stop-opacity="0.28" />
+      <stop offset="0.55" stop-color="#e7e7e7" stop-opacity="0.12" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="symbolInk" x1="340" y1="250" x2="688" y2="775" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b3c3a" />
+      <stop offset="0.54" stop-color="#30312f" />
+      <stop offset="1" stop-color="#292a28" />
+    </linearGradient>
+    <filter id="outerShadow" x="64" y="58" width="896" height="912" filterUnits="userSpaceOnUse"
+      color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000000" flood-opacity="0.13" />
+    </filter>
+    <filter id="symbolShadow" x="214" y="220" width="622" height="596" filterUnits="userSpaceOnUse"
+      color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#000000" flood-opacity="0.22" />
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#ffffff" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <rect x="116" y="106" width="792" height="808" rx="160" fill="url(#bodyGradient)" filter="url(#outerShadow)" />
+  <rect x="116" y="106" width="792" height="808" rx="160" fill="url(#bottomShade)" />
+  <rect x="119.5" y="109.5" width="785" height="801" rx="156.5" fill="none" stroke="#ffffff" stroke-width="7" />
+
+  <g fill="none" stroke="url(#symbolInk)" stroke-opacity="1" stroke-linecap="round" stroke-linejoin="round"
+    filter="url(#symbolShadow)" transform="translate(512 512) scale(0.92) translate(-512 -512)">
+    <path d="M512 756H320C287 756 260 729 260 696V322C260 289 287 262 320 262H704C737 262 764 289 764 322V502"
+      stroke-width="44" />
+    <path
+      d="M263 670L391 542C399 534 412 534 420 542L457 579C467 589 483 589 493 579L586 486C596 476 613 476 623 486L683 546"
+      stroke-width="44" />
+    <circle cx="404" cy="396" r="47" stroke-width="44" />
+
+    <path d="M604 750L624 678L720 582C737 565 765 565 782 582C799 599 799 627 782 644L686 740L604 750Z"
+      stroke-width="32" />
+    <path d="M624 678L686 740" stroke-width="28" />
+    <path d="M714 589L776 651" stroke-width="28" />
+  </g>
+</svg>
