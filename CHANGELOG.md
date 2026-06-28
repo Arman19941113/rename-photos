@@ -1,5 +1,20 @@
 # Changelog
 
+## [v1.0.2] - 2026-06-28
+
+### Added
+
+- Added Panasonic RW2 RAW metadata fallback so RW2 photos can expose capture metadata for rename templates.
+
+### Fixed
+
+- Improved media preview rendering in the file detail view.
+
+### Changed
+
+- Added zebra striping to the file table for easier scanning.
+- Refreshed app icon assets across desktop and mobile bundle outputs.
+
 ## [v1.0.1] - 2026-06-23
 
 ### Changed
