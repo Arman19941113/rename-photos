@@ -1,0 +1,190 @@
+name: Publish desktop release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-release:
+    if: ${{ github.event.created }}
+    runs-on: ubuntu-22.04
+    outputs:
+      release-notes: ${{ steps.release-notes.outputs.body }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.17.0
+          cache: 'pnpm'
+
+      - name: Check release tag matches app version
+        run: |
+          VERSION="$(node -p "require('./src-tauri/tauri.conf.json').version")"
+          TAG="${GITHUB_REF_NAME}"
+
+          if [ "${TAG}" != "v${VERSION}" ]; then
+            echo "::error title=Release version mismatch::Tag ${TAG} does not match app version v${VERSION}."
+            exit 1
+          fi
+
+          echo "Publishing existing release tag ${TAG}."
+
+      - name: Validate and extract release notes
+        id: release-notes
+        run: node scripts/extract-release-notes.mjs --version "$GITHUB_REF_NAME" --github-output-name body
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run frontend and release tests
+        run: pnpm test
+
+      - name: Typecheck frontend
+        run: pnpm typecheck
+
+      - name: Run Rust tests
+        run: cargo test --locked --manifest-path src-tauri/Cargo.toml
+
+  prepare-draft-release:
+    needs: validate-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      release-id: ${{ steps.release.outputs.release-id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Create or reuse draft release
+        id: release
+        uses: actions/github-script@v8
+        env:
+          RELEASE_NOTES: ${{ needs.validate-release.outputs.release-notes }}
+        with:
+          script: |
+            const { prepareDraftRelease } = await import(`${process.env.GITHUB_WORKSPACE}/scripts/github-release.mjs`)
+            const release = await prepareDraftRelease({
+              github,
+              repo: context.repo,
+              tag: context.ref.slice('refs/tags/'.length),
+              commit: context.sha,
+              body: process.env.RELEASE_NOTES,
+            })
+            core.setOutput('release-id', release.id)
+
+  build-release-assets:
+    needs: prepare-draft-release
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest' # for Intel based macs.
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04'
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.17.0
+          cache: 'pnpm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Cache Rust dependencies
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and upload release assets
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ needs.prepare-draft-release.outputs.release-id }}
+          tagName: ${{ github.ref_name }}
+          releaseDraft: true
+          includeUpdaterJson: false
+          args: ${{ matrix.args }}
+
+  publish-release:
+    needs: [prepare-draft-release, build-release-assets]
+    runs-on: ubuntu-latest
+    environment: 'production'
+    concurrency:
+      group: desktop-release-publish
+      cancel-in-progress: false
+      queue: max
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Publish completed release
+        uses: actions/github-script@v8
+        env:
+          RELEASE_ID: ${{ needs.prepare-draft-release.outputs.release-id }}
+        with:
+          script: |
+            const { publishRelease } = await import(`${process.env.GITHUB_WORKSPACE}/scripts/github-release.mjs`)
+            await publishRelease({
+              github,
+              repo: context.repo,
+              tag: context.ref.slice('refs/tags/'.length),
+              releaseId: process.env.RELEASE_ID,
+            })

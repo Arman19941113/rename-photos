@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-// Prepare a release commit after the AI-authored changelog has been updated.
+// Prepare a release commit and tag after the AI-authored changelog has been updated.
 
 import { spawnSync } from 'node:child_process'
 import { createInterface } from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
 import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import { extractReleaseNotes } from './extract-release-notes.mjs'
 
 const validBumpTypes = new Set(['major', 'minor', 'patch'])
 
@@ -27,19 +28,22 @@ async function main() {
   }
 
   const targetVersion = resolveNextVersion(config.version, options.target)
+  const tagName = `v${targetVersion}`
+  ensureTagDoesNotExist(repo, tagName)
+  ensureOnlyAllowedPreexistingChanges(repo, [changelogRelativePath])
+  ensureFileHasChanges(repo, changelogRelativePath)
+  extractReleaseNotes(await readFile(path.join(repo, changelogRelativePath), 'utf8'), targetVersion)
 
   printReleasePlan({
     repo,
     currentVersion: config.version,
     targetVersion,
+    tagName,
     latestTag,
     changedFiles: [changelogRelativePath, tauriConfigRelativePath],
   })
 
   if (options.dryRun) return
-
-  ensureOnlyAllowedPreexistingChanges(repo, [changelogRelativePath])
-  ensureFileHasChanges(repo, changelogRelativePath)
 
   if (!options.yes) {
     await confirm(`Proceed with release ${targetVersion}? [y/N] `)
@@ -52,6 +56,9 @@ async function main() {
 
   const commitHash = runGit(repo, ['rev-parse', '--short', 'HEAD'], { capture: true }).trim()
   console.log(`Created release commit ${commitHash} for ${targetVersion}`)
+
+  runGit(repo, ['tag', '-a', tagName, '-m', `release: ${targetVersion}`])
+  console.log(`Created release tag ${tagName} at ${commitHash}. Push this tag to trigger the release workflow.`)
 }
 
 function parseArgs(args) {
@@ -98,6 +105,13 @@ function ensureGitRepo(repo) {
   runGit(repo, ['rev-parse', '--is-inside-work-tree'], { capture: true })
 }
 
+function ensureTagDoesNotExist(repo, tagName) {
+  const existingTag = runGit(repo, ['tag', '--list', tagName], { capture: true }).trim()
+  if (existingTag) {
+    fail(`Release tag ${tagName} already exists. Choose a new version before releasing.`)
+  }
+}
+
 function ensureOnlyAllowedPreexistingChanges(repo, allowedPaths) {
   const allowed = new Set(allowedPaths)
   const entries = getStatusEntries(repo)
@@ -138,12 +152,12 @@ function getLatestTag(repo) {
 
 function resolveNextVersion(currentVersion, releaseTarget) {
   const current = parseVersion(currentVersion)
-
-  if (validBumpTypes.has(releaseTarget)) {
-    return formatVersion(bumpVersion(current, releaseTarget))
+  const next = validBumpTypes.has(releaseTarget) ? bumpVersion(current, releaseTarget) : parseVersion(releaseTarget)
+  const difference = next.major - current.major || next.minor - current.minor || next.patch - current.patch
+  if (difference <= 0) {
+    fail(`Release version ${formatVersion(next)} must be greater than current version ${formatVersion(current)}`)
   }
-
-  return formatVersion(parseVersion(releaseTarget))
+  return formatVersion(next)
 }
 
 function bumpVersion(version, bumpType) {
@@ -200,11 +214,12 @@ function printVersionSuggestions({ repo, currentVersion, latestTag }) {
   console.log('Choose one version before running the release commit.')
 }
 
-function printReleasePlan({ repo, currentVersion, targetVersion, latestTag, changedFiles }) {
+function printReleasePlan({ repo, currentVersion, targetVersion, tagName, latestTag, changedFiles }) {
   console.log(`Repository: ${repo}`)
   console.log(`Current version: ${currentVersion}`)
   console.log(`Next version: ${targetVersion}`)
   console.log(`Previous tag: ${latestTag}`)
+  console.log(`Tag to create: ${tagName}`)
   console.log('Files to stage and commit:')
   for (const file of changedFiles) {
     console.log(`- ${file}`)

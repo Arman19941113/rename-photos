@@ -21,6 +21,7 @@
     "lint": "eslint src",
     "typecheck": "tsc",
     "build": "tsc && vite build",
+    "release": "node scripts/release.mjs",
     "preview": "vite preview",
     "tauri": "tauri",
     "icons:generate": "tauri icon assets/icon/app-icon.svg"

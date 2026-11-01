@@ -13,7 +13,7 @@ const tauriConfigPath = path.join(rootDir, 'src-tauri/tauri.conf.json')
 async function main() {
   const options = parseArgs(process.argv.slice(2))
   const version = normalizeVersion(options.version || (await readTauriVersion()))
-  const notes = await extractReleaseNotes(version)
+  const notes = extractReleaseNotes(await readFile(changelogPath, 'utf8'), version)
 
   if (options.output) {
     await writeFile(path.resolve(rootDir, options.output), notes + '\n')
@@ -73,19 +73,31 @@ function normalizeVersion(version) {
   return version.startsWith('v') ? version : `v${version}`
 }
 
-async function extractReleaseNotes(version) {
-  const changelog = await readFile(changelogPath, 'utf8')
+export function extractReleaseNotes(changelog, version) {
+  version = normalizeVersion(version)
   const lines = changelog.split(/\r?\n/)
-  const startIndex = lines.findIndex(line => line.startsWith(`## [${version}]`))
+  const heading = `## [${version}]`
+  const matches = lines.flatMap((line, index) => (line === heading || line.startsWith(`${heading} `) ? [index] : []))
 
-  if (startIndex === -1) {
+  if (matches.length === 0) {
     fail(`No CHANGELOG.md entry found for ${version}`)
   }
+  if (matches.length > 1) {
+    fail(`Multiple CHANGELOG.md entries found for ${version}`)
+  }
 
+  const startIndex = matches[0]
   const endIndex = lines.findIndex(
-    (line, index) => index > startIndex && (line.startsWith('## [') || /^\[[^\]]+\]:/.test(line)),
+    (line, index) => index > startIndex && (/^##(?:\s|$)/.test(line) || /^\[[^\]]+\]:/.test(line)),
   )
-  return lines.slice(startIndex + 1, endIndex === -1 ? lines.length : endIndex).join('\n').trim()
+  const notes = lines
+    .slice(startIndex + 1, endIndex === -1 ? lines.length : endIndex)
+    .join('\n')
+    .trim()
+  if (!notes) {
+    fail(`CHANGELOG.md entry for ${version} must contain release notes`)
+  }
+  return notes
 }
 
 async function writeGithubOutput(name, value) {
@@ -102,7 +114,9 @@ function fail(message) {
   throw new Error(message)
 }
 
-main().catch(error => {
-  console.error(error instanceof Error ? error.message : error)
-  process.exit(1)
-})
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch(error => {
+    console.error(error instanceof Error ? error.message : error)
+    process.exit(1)
+  })
+}

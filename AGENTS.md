@@ -27,5 +27,6 @@
 - Vite dev server: `pnpm dev`
 - Lint frontend: `pnpm lint`
 - Typecheck: `pnpm typecheck`
+- Prepare local release: `pnpm release`
 - Tauri dev/build: `pnpm tauri dev`, `pnpm tauri build`
 - Rust tests: `cd src-tauri && cargo test`
