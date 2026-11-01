@@ -1,5 +1,6 @@
 # Deploys the exported Next.js website in web/out to GitHub Pages.
 name: deploy web pages
+run-name: Deploy web pages · ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
