@@ -4,6 +4,7 @@ import type { UIFile } from '@/types/file'
 import { ScrollShadow } from '@nextui-org/scroll-shadow'
 import { Selection, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table'
 import { Tooltip } from '@nextui-org/tooltip'
+import type { KeyboardEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 function FilesTable({
@@ -28,8 +29,19 @@ function FilesTable({
     }
   }
 
+  const handleKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'ArrowUp' || !(event.target instanceof HTMLElement)) return
+
+    const row = event.target.closest('tbody > tr')
+    if (row && row === row.parentElement?.firstElementChild) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+
+  // NextUI clears Table's onKeyDownCapture, so intercept header navigation on its parent.
   return (
-    <ScrollShadow className="h-full" visibility="bottom" hideScrollBar>
+    <ScrollShadow className="h-full" visibility="bottom" hideScrollBar onKeyDownCapture={handleKeyDownCapture}>
       <Table
         isCompact
         isHeaderSticky
