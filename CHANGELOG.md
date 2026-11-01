@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.3] - 2026-11-01
+
+### Changed
+
+- Refreshed app icons across desktop and mobile bundle outputs.
+
 ## [v1.0.2] - 2026-06-28
 
 ### Added
