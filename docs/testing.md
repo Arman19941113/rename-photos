@@ -1,4 +1,6 @@
-# Tests and media fixtures
+# Testing and media fixtures
+
+This document owns check commands, test coverage, and media fixture workflows. See the [development guide](README.md) for setup, [core logic](core-logic.md) for runtime behavior, and [metadata extraction](metadata.md) for parser contracts.
 
 ## Checks
 
@@ -11,19 +13,20 @@ pnpm lint
 cargo test --locked --manifest-path src-tauri/Cargo.toml
 ```
 
-`.github/workflows/test.yml` runs on PRs, pushes to `main`, and manual dispatch.
+The [test workflow](../.github/workflows/test.yml) runs on PRs, pushes to `main`, and manual dispatch.
 Vitest, type checking, and lint run on Linux; Rust tests run on Linux, macOS, and
-Windows. Release tags also run the existing publication checks.
+Windows. Release-tag checks are defined in the [desktop release workflow](../.github/workflows/publish-desktop-release.yml).
 
 ## Test boundaries
 
-| Location                                          | Responsibility                                                                                                                                                          |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/util/*.test.ts`                              | Formatting, template rules, and normal/strict previews from shared media metadata.                                                                                      |
-| `src/hooks/useFiles.test.ts`                      | Real hook in jsdom; mocked Tauri, settings, translation, and notifications. Covers loading, rename payloads, selection/refresh, failures/retry, and duplicate requests. |
-| `src-tauri/src/commands/file.rs`                  | Loading rules, filename validation, two-phase rename, and conflict protection using temporary files.                                                                    |
-| `src-tauri/src/commands/file/real_media_tests.rs` | Media parsing and IPC fields, batch rename/reload with byte preservation, damaged-file isolation, and a 256 KiB fixture budget.                                         |
-| `scripts/*.test.ts`                               | Release notes and release operations using mocked GitHub APIs or disposable Git repositories.                                                                           |
+| Location                                                                                  | Responsibility                                                                                                                                       |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`src/util/*.test.ts`](../src/util)                                                       | Formatting, template rules, and normal/strict previews from shared metadata                                                                          |
+| [`useFiles.test.ts`](../src/hooks/useFiles.test.ts)                                       | Hook flow with mocked Tauri/settings/notifications: loading, rename payloads, refresh, failures/retry, and duplicate requests                        |
+| [`commands/file.rs`](../src-tauri/src/commands/file.rs)                                   | Loading rules, filename validation, two-phase rename, and conflict protection                                                                        |
+| [`commands/file/real_media_tests.rs`](../src-tauri/src/commands/file/real_media_tests.rs) | Media IPC fields, mixed-batch isolation, distant TIFF/RAW metadata, rename/reload byte preservation, damaged-file isolation, and fixture size budget |
+| [`utils/file/`](../src-tauri/src/utils/file)                                              | Filtering, classification, date/numeric formatting, EXIF field selection, TIFF/RW2 bounds, and metadata read budgets                                 |
+| [`scripts/*.test.ts`](../scripts)                                                         | Release notes and release operations with mocked GitHub APIs or disposable Git repositories                                                          |
 
 `pnpm typecheck` runs one `tsc -p tsconfig.typecheck.json` for application and test
 code. Builds use `tsconfig.json`. Imported JavaScript scripts have inferred types
@@ -36,8 +39,8 @@ or create GitHub releases.
 
 ## Fixture conventions
 
-`tests/fixtures/media/` holds about 9 KiB of files derived from real HEIC, JPEG,
-ARW, RW2, MP4/MOV, and text samples. `tests/fixtures/real-media.json` is shared by
+[tests/fixtures/media/](../tests/fixtures/media) holds compact files derived from real HEIC, JPEG,
+ARW, RW2, MP4/MOV, and text samples. [real-media.json](../tests/fixtures/real-media.json) is shared by
 frontend and Rust tests. It records original metadata and reviewed preview names:
 
 - `size` is the bundled size; `sourceSize` is the original size.
@@ -47,9 +50,18 @@ frontend and Rust tests. It records original metadata and reviewed preview names
   time; frontend previews use the fixed strings, so expected names describe UTC.
   Image EXIF dates are unchanged.
 
+The bundled corpus has a total size budget of 256 KiB, enforced by the Rust tests.
+
 The two iPhone JPEGs share a date and exercise duplicate numbering. The screenshot
 has no tracked EXIF fields; RW2 lacks a lens; both MP4s lack make/model but retain
 a date. Damaged JPEG/MP4 cases are generated in temporary directories.
+
+TIFF/RAW compatibility tests generate temporary files with distant metadata,
+both TIFF byte orders, invalid ranges, and cyclic IFDs. Counted readers enforce
+a small I/O budget while files contain large gaps or trailing sensor data.
+RW2 tests cover bounded JPEG reads and TIFF fallback. Image extraction is also
+compared with eager `nom_exif::Exif` lookup for namespace priority, primary-image
+selection, and partial entry errors. These cases do not add bundled media files.
 
 ## Regenerate samples
 
@@ -62,7 +74,7 @@ cargo test --locked --manifest-path src-tauri/Cargo.toml real_media_tests
 pnpm test
 ```
 
-The generator resizes JPEG/HEIC to fit 16 × 16 pixels, keeps one 16 × 16 video
+The [fixture generator](../scripts/prepare-media-fixtures.py) resizes JPEG/HEIC to fit 16 × 16 pixels, keeps one 16 × 16 video
 frame, and repacks RAW metadata. RW2 retains an embedded JPEG with its original
 tracked EXIF; MOV retains the source's `moov/meta` layout. RAW samples have no
 sensor pixels and cannot test RAW decoding. Ordinary images/videos remain decodable.

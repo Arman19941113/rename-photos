@@ -1,0 +1,70 @@
+# Development guide
+
+Start here for local setup. Read the topic relevant to the change rather than loading every implementation detail.
+
+## Read by task
+
+| Task                                                                                   | Document                           |
+| -------------------------------------------------------------------------------------- | ---------------------------------- |
+| Change file loading, naming previews, settings, or rename execution                    | [Core logic](core-logic.md)        |
+| Change classification, metadata fields, date/value formatting, or TIFF/RAW/RW2 parsing | [Metadata extraction](metadata.md) |
+| Run checks, change tests or CI, or work with media fixtures                            | [Testing and fixtures](testing.md) |
+| Change app or website icons and regenerate resources                                   | [Icons](icons.md)                  |
+
+Each topic owns its detailed behavior. Other documents link to that topic. Agent work rules and the source entry-point map are in [AGENTS.md](../AGENTS.md).
+
+## Project layout
+
+| Location                     | Responsibility                                                               |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| [`src/`](../src)             | Desktop frontend: React, Vite, TypeScript, Tailwind, and NextUI              |
+| [`src-tauri/`](../src-tauri) | Desktop backend and packaging: Rust and Tauri                                |
+| [`web/`](../web)             | Independent Next.js landing page, with its own package manifest and lockfile |
+| [`tests/`](../tests)         | Shared media fixtures and frontend test support                              |
+| [`scripts/`](../scripts)     | Release preparation and fixture-generation tools                             |
+| [`assets/`](../assets)       | Editable assets and README images                                            |
+
+The frontend/backend runtime boundary and IPC contracts are described in [core logic](core-logic.md#runtime-structure).
+
+## Local setup
+
+- Use the Node.js and pnpm versions specified by `engines` and `packageManager` in [package.json](../package.json).
+- Desktop development also needs Rust and the platform's native Tauri build dependencies. [CI setup](../.github/workflows/test.yml) uses stable Rust and lists the Linux system packages.
+- Rust dependencies are declared in [Cargo.toml](../src-tauri/Cargo.toml) and resolved in [Cargo.lock](../src-tauri/Cargo.lock).
+
+Install desktop frontend dependencies from the repository root:
+
+```sh
+pnpm install --frozen-lockfile
+```
+
+## Run and build the desktop app
+
+Run commands from the repository root:
+
+| Purpose                                            | Command            |
+| -------------------------------------------------- | ------------------ |
+| Start the desktop app with its frontend dev server | `pnpm tauri dev`   |
+| Build the desktop app and platform bundles         | `pnpm tauri build` |
+| Start the Vite frontend alone                      | `pnpm dev`         |
+| Build frontend assets alone                        | `pnpm build`       |
+
+[Tauri configuration](../src-tauri/tauri.conf.json) starts or builds the frontend through its `beforeDevCommand` and `beforeBuildCommand`. The standalone Vite server does not provide the desktop app's native commands.
+
+Check commands and their coverage are maintained in [testing](testing.md#checks).
+
+## Work on the landing page
+
+The website is installed and run separately:
+
+```sh
+cd web
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+Its scripts are defined in [web/package.json](../web/package.json). The [website workflow](../.github/workflows/deploy-web-pages.yml) builds its static export for GitHub Pages.
+
+## Prepare a desktop release
+
+`pnpm release` displays version suggestions. Preparing a selected version requires release notes in [CHANGELOG.md](../CHANGELOG.md) and creates a release commit and tag. Pushing the release tag triggers the [desktop release workflow](../.github/workflows/publish-desktop-release.yml). See [the release script](../scripts/release.mjs) for arguments and working-tree requirements.

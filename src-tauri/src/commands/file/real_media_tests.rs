@@ -119,6 +119,95 @@ fn damaged_media_reports_per_file_errors_without_failing_the_load() {
 }
 
 #[test]
+fn mixed_media_batch_keeps_metadata_isolated_after_failures_and_repeated_files() {
+    let root = media_root();
+    let fixtures = fixtures();
+    let dir = tempdir().unwrap();
+    let sequence = [
+        "image-iPhone-1.HEIC",
+        "truncated.jpg",
+        "video-metadata.MOV",
+        "test.RW2",
+        "video-large.mp4",
+        "image-screenshot.jpg",
+        "invalid.mp4",
+        "image-sony-1.ARW",
+        "truncated.mp4",
+        "image-iPhone-2.jpeG",
+        "test.RW2",
+        "video-metadata-missing.mp4",
+        "untitled.txt",
+        "image-iPhone-1.HEIC",
+    ];
+
+    for fixture in &fixtures {
+        if sequence.contains(&fixture.filename()) {
+            copy_fixture(&root, dir.path(), fixture.filename());
+        }
+    }
+    let bundled = bundled_media_root();
+    let jpeg = fs::read(bundled.join("image-sony-2.JPG")).unwrap();
+    let mp4 = fs::read(bundled.join("video-large.mp4")).unwrap();
+    fs::write(dir.path().join("truncated.jpg"), &jpeg[..32]).unwrap();
+    fs::write(dir.path().join("truncated.mp4"), &mp4[..32]).unwrap();
+    fs::write(dir.path().join("invalid.mp4"), b"not a media container").unwrap();
+
+    let paths = sequence.map(|filename| dir.path().join(filename));
+    let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
+    let files = get_files_from_paths_inner(&refs).unwrap();
+    assert_eq!(files.len(), sequence.len());
+
+    for (filename, file) in sequence.into_iter().zip(files) {
+        let file = serde_json::to_value(file).unwrap();
+        assert_eq!(file["filename"], filename);
+        if let Some(fixture) = fixtures
+            .iter()
+            .find(|fixture| fixture.filename() == filename)
+        {
+            assert_metadata_matches(file, fixture, &dir.path().join(filename));
+        } else {
+            assert!(file["metadata"].is_null());
+            assert!(!file["metaError"].as_str().unwrap().is_empty());
+        }
+    }
+}
+
+#[test]
+fn late_tiff_and_raw_metadata_preserves_the_full_ipc_payload_and_file_bytes() {
+    let root = bundled_media_root();
+    let mut corpus = fixtures();
+    let fixture = corpus
+        .iter_mut()
+        .find(|fixture| fixture.filename() == "image-sony-1.ARW")
+        .unwrap();
+    let mut bytes = fs::read(root.join(fixture.filename())).unwrap();
+    let make = bytes[140..145].to_vec();
+    let offset = 16 * 1024_u32;
+    bytes.resize(offset as usize, 0);
+    bytes.extend_from_slice(&make);
+    bytes[18..22].copy_from_slice(&offset.to_le_bytes());
+    fixture.input["size"] = (bytes.len() as u64).into();
+    let dir = tempdir().unwrap();
+    let paths = ["late.tiff", "late.ARW"].map(|name| dir.path().join(name));
+    for path in &paths {
+        fs::write(path, &bytes).unwrap();
+    }
+    let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
+    for files in [
+        get_files_from_dir_inner(dir.path()).unwrap(),
+        get_files_from_paths_inner(&refs).unwrap(),
+    ] {
+        assert_eq!(files.len(), paths.len());
+        for file in files {
+            let file = serde_json::to_value(file).unwrap();
+            let path = Path::new(file["pathname"].as_str().unwrap()).to_path_buf();
+            assert_metadata_matches(file, fixture, &path);
+            assert_eq!(fs::read(path).unwrap(), bytes);
+        }
+    }
+}
+
+#[test]
 fn checked_in_media_stays_within_size_budget() {
     let root = bundled_media_root();
     let mut total = 0;

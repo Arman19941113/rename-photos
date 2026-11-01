@@ -9,6 +9,8 @@ use std::fs::Metadata;
 use std::io;
 use std::path::{Component, Path, PathBuf};
 
+use nom_exif::MediaParser;
+
 mod types;
 
 #[cfg(test)]
@@ -26,7 +28,12 @@ pub async fn get_files_from_dir(dir_path: String) -> Result<Vec<IPCFile>, String
     run_blocking(move || get_files_from_dir_inner(&dir_path)).await
 }
 
-fn build_ipc_file(path: &Path, path_str: &str, metadata: &Metadata) -> IPCFile {
+fn build_ipc_file(
+    path: &Path,
+    path_str: &str,
+    metadata: &Metadata,
+    parser: &mut MediaParser,
+) -> IPCFile {
     let pathname = path_str.to_string();
     let filename = get_filename(path);
     let created = get_created_timestamp(metadata);
@@ -34,7 +41,7 @@ fn build_ipc_file(path: &Path, path_str: &str, metadata: &Metadata) -> IPCFile {
 
     match detect_file_kind(path) {
         FileKind::Image => {
-            let (metadata, meta_error) = analyze_image_metadata(path);
+            let (metadata, meta_error) = analyze_image_metadata(path, parser);
             IPCFile::Image {
                 pathname,
                 filename,
@@ -45,7 +52,7 @@ fn build_ipc_file(path: &Path, path_str: &str, metadata: &Metadata) -> IPCFile {
             }
         }
         FileKind::Video => {
-            let (metadata, meta_error) = analyze_video_metadata(path);
+            let (metadata, meta_error) = analyze_video_metadata(path, parser);
             IPCFile::Video {
                 pathname,
                 filename,
@@ -67,6 +74,7 @@ fn build_ipc_file(path: &Path, path_str: &str, metadata: &Metadata) -> IPCFile {
 fn get_files_from_dir_inner(dir_path: &Path) -> std::io::Result<Vec<IPCFile>> {
     let dir_entries = fs::read_dir(dir_path)?;
     let mut files = Vec::new();
+    let mut parser = MediaParser::new();
 
     for entry_result in dir_entries {
         let entry = entry_result?;
@@ -80,7 +88,7 @@ fn get_files_from_dir_inner(dir_path: &Path) -> std::io::Result<Vec<IPCFile>> {
             continue;
         }
 
-        files.push(build_ipc_file(&path_buf, path_str, &metadata))
+        files.push(build_ipc_file(&path_buf, path_str, &metadata, &mut parser))
     }
 
     Ok(files)
@@ -108,6 +116,7 @@ fn get_files_from_paths_inner(paths: &[&Path]) -> std::io::Result<Vec<IPCFile>> 
 
     // Otherwise treat every input as a file path and ignore directories.
     let mut files = Vec::new();
+    let mut parser = MediaParser::new();
 
     for &path in paths {
         let metadata = fs::symlink_metadata(path)?;
@@ -116,7 +125,12 @@ fn get_files_from_paths_inner(paths: &[&Path]) -> std::io::Result<Vec<IPCFile>> 
             continue;
         }
 
-        files.push(build_ipc_file(path, path_to_str(path)?, &metadata))
+        files.push(build_ipc_file(
+            path,
+            path_to_str(path)?,
+            &metadata,
+            &mut parser,
+        ))
     }
 
     Ok(files)

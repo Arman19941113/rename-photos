@@ -1,29 +1,21 @@
-# Core Logic
+# Core logic
 
-This document summarizes the main runtime logic of Rename Photos as it exists today. It is intended for maintainers who need to understand how files are loaded, transformed, previewed, and finally renamed.
+This document owns file-loading, naming-preview, settings, and rename behavior. See the [development guide](README.md) for setup and task navigation, and [metadata extraction](metadata.md) for media formats and parser details.
 
 ## Runtime Structure
 
-- The React frontend owns the interactive workflow and user state.
-- The Tauri Rust backend owns file-system access, file filtering, metadata extraction, and the final rename operation.
-- The frontend communicates with the backend through three Tauri commands:
-  - `get_files_from_dir`
-  - `get_files_from_paths`
-  - `rename_files`
-- These commands are exposed as async Tauri commands and dispatch blocking filesystem work through Tauri's blocking task runtime, so directory reads, metadata extraction, and batch renames do not run directly on the command caller thread.
+- The React frontend owns the interactive workflow, filename previews, and user state.
+- The Tauri Rust backend owns filesystem access, filtering, metadata extraction, and final renames.
+- Commands are registered in [main.rs](../src-tauri/src/main.rs), implemented in [file.rs](../src-tauri/src/commands/file.rs), and called using names in [TauriCommand](../src/const/index.ts).
+- Async Tauri commands dispatch blocking filesystem work through Tauri's blocking task runtime.
 
-Primary entry points:
+| Command                | Frontend arguments                     | Successful result       |
+| ---------------------- | -------------------------------------- | ----------------------- |
+| `get_files_from_dir`   | `{ dirPath: string }`                  | `IPCFile[]`             |
+| `get_files_from_paths` | `{ paths: string[] }`                  | `IPCFile[]`             |
+| `rename_files`         | `{ renamePathData: RenamePathData[] }` | `string[]` of new paths |
 
-- Frontend app shell: `src/App.tsx`
-- File operations hook: `src/hooks/useFiles.ts`
-- Drag-and-drop hook: `src/hooks/useDragging.ts`
-- Format input UI events: `src/components/OperationBar.tsx`
-- Format input/history hook: `src/hooks/useInputFormat.ts`
-- Persistent settings service: `src/services/storage.ts`
-- Filename transformation logic: `src/util/file-transformer.ts`
-- Shared date/path helpers: `src/util/common.ts`
-- Backend file commands: `src-tauri/src/commands/file.rs`
-- Backend file helpers: `src-tauri/src/utils/file/*.rs`
+The complete payloads are defined by the [Rust IPC types](../src-tauri/src/commands/file/types.rs) and [TypeScript types](../src/types/file.d.ts). File records carry a full source path, basename, size in bytes, creation timestamp in milliseconds since the Unix epoch, and a file kind. The image/video metadata contract is maintained in [metadata extraction](metadata.md#extracted-fields-and-result-contract).
 
 ## File Input Flow
 
@@ -40,7 +32,7 @@ The app supports two input modes:
 
 - The frontend listens for Tauri drag events and forwards dropped paths to `get_files_from_paths`.
 - If the user drops exactly one non-symlink folder path, the backend treats it the same as `get_files_from_dir`.
-- A symlinked folder is handled by the normal UI exclusion filter and is skipped as a shortcut/symlink instead of being opened.
+- On Unix/macOS, a symlinked folder is excluded by the symlink filter instead of being opened.
 - Otherwise, the backend treats the payload as an explicit file list and applies the normal UI exclusion filter to each supplied path, so directories and other excluded paths are ignored.
 - For explicit file lists, if filesystem metadata for any supplied path cannot be read, the whole load fails instead of returning a partial list. EXIF/media metadata extraction errors do not fail the load; they populate `metaError` on that file.
 
@@ -63,58 +55,21 @@ When the backend builds a file list, it excludes items that should not appear in
 
 This filtering happens before metadata extraction and before the frontend receives any file entries.
 
-## File Classification and Metadata
+## Metadata in the Loading Flow
 
-Each accepted path is classified into one of three kinds:
+Accepted files are classified as `image`, `video`, or `other`. The backend attempts metadata extraction for images and videos; the frontend uses the returned values during preview generation. See [metadata extraction](metadata.md) for extension lists, fields, result semantics, and compatibility readers.
 
-- `image`
-- `video`
-- `other`
-
-Classification is based on file extension in `src-tauri/src/utils/file/kind.rs`.
-
-Image extensions:
-
-- `jpg`, `jpeg`, `png`, `webp`, `tif`, `tiff`, `heic`, `heif`, `heics`, `avif`
-- RAW-like formats: `dng`, `arw`, `cr2`, `cr3`, `nef`, `raf`, `rw2`, `orf`, `sr2`, `srf`, `pef`, `x3f`
-
-Video extensions:
-
-- `mp4`, `mov`, `m4v`, `3gp`, `avi`, `mkv`, `webm`, `mka`
-
-Everything else that passes filtering is classified as `other`.
-
-Metadata extraction is best-effort:
-
-- Images use the Rust `exif` crate through `src-tauri/src/utils/file/image_exif`.
-- Standard image containers are read first; if that fails, the backend tries supported RAW compatibility fallbacks.
-- Panasonic RW2 files try embedded JPEG EXIF first, then fall back to normalizing the RW2 TIFF header in memory before handing the full file data to `exif`.
-- Videos use `nom_exif`.
-- If extraction fails, the file is still returned, but `metaError` is populated.
-- If extraction succeeds but fields are missing, the metadata object may be partial.
-- `other` files are listed without metadata.
-
-Runtime metadata fields:
-
-- Images expose `date`, `make`, `camera`, `lens`, `focalLength`, `aperture`, `shutter`, and `iso`.
-- Videos expose `date`, `make`, and `camera`.
-- Image fields are read from EXIF tags `DateTimeOriginal`, `Make`, `Model`, `LensModel`, `FocalLengthIn35mmFilm`, `FNumber`, `ExposureTime`, and `PhotographicSensitivity`.
-- Video fields are read from `nom_exif` track tags `CreateDate`, `Make`, and `Model`.
-- Image date strings are whatever `exif` returns for `DateTimeOriginal`, commonly `YYYY:MM:DD HH:mm:ss`.
-- Video date strings are normalized to local `YYYY-MM-DD HH:mm:ss` when `nom_exif` returns a parseable local/RFC3339 value; otherwise the raw value is kept.
-- If parsing succeeds but none of the tracked fields are present, the backend returns `metadata: null` with no `metaError`.
-
-The frontend converts backend payloads into `UIFile` items and assigns a metadata status:
+The frontend converts backend payloads into `UIFile` items and assigns a metadata status to images and videos:
 
 - `SUCCESS`: metadata exists and all tracked fields are present
 - `WARNING`: metadata is missing partially or entirely
 - `ERROR`: backend parsing returned an explicit error
 
-These statuses drive the table icons and tooltips.
+These statuses drive the table icons and tooltips. Files classified as `other` have no metadata status and use a generic status icon.
 
 ## Rename Rule Input and Persistent Settings
 
-The rename format is a plain string template. Supported variables are declared in `src/const/index.ts`:
+The rename format is a plain string template. Supported variables are declared in [the frontend constants](../src/const/index.ts):
 
 - date parts: `{YYYY}`, `{MM}`, `{DD}`, `{hh}`, `{mm}`, `{ss}`
 - common metadata/date: `{Date}`, `{Make}`, `{Camera}`
@@ -183,7 +138,7 @@ If strict mode is disabled, missing variables do not cause a skip. Missing value
 
 If `useCreatedDate` is enabled, date variables come from the file creation timestamp instead of metadata date. Date variables include both the split date parts and `{Date}`.
 
-The backend sends the file creation timestamp in milliseconds. If the platform cannot provide a creation timestamp, the backend falls back to the Unix epoch before the frontend formats it in local time.
+If the platform cannot provide a creation timestamp, the backend falls back to the Unix epoch before the frontend formats it in local time.
 
 ### Sanitization
 
@@ -216,13 +171,14 @@ Behavior:
 - Every non-skipped file in a duplicate group receives a suffix, including the first item in that group.
 - The suffix is inserted before the extension-like segment of the generated preview filename. In normal use this is the original file extension, because `generateFilename` appends it to the generated basename.
 - Files whose final preview filename equals the original filename are marked as `shouldSkip`.
-- Strict-mode skipped files still contribute their original filenames to duplicate counting, so renamed files avoid colliding with files that will stay unchanged.
+- Strict-mode skipped files still contribute their original filenames to duplicate counting.
 
 Important limitation:
 
 - This duplicate handling does not consider files that exist on disk but are not currently loaded in the UI.
 - If the user dropped only 5 files out of a 10-file directory, preview deduplication sees only those 5 files.
 - Duplicate detection is not grouped by directory. If loaded files from different folders resolve to the same filename, the frontend still treats them as duplicates and appends suffixes.
+- Suffixes are added once, without checking the resulting names against other preview names. A generated name such as `photo_1.jpg` can still collide with another loaded file.
 - The current implementation keeps an internal `nameMap` keyed by original filename rather than full path. If two loaded files from different directories have the same original filename, their preview mapping can overwrite each other. Treat this as an implementation limitation, not a behavior to rely on.
 
 ## Rename Execution Flow
@@ -325,26 +281,11 @@ The side panel displays:
 
 Current preview rule:
 
-- preview support is decided in the frontend by extension whitelist, not by backend file classification alone
-- images use an `img` element for `jpg`, `jpeg`, `png`, `webp`, `gif`, `heic`, `heif`, and `heics`
+- preview support requires both the backend media classification and the frontend extension allowlist in [FileView.tsx](../src/components/FileView.tsx)
+- images use an `img` element for `jpg`, `jpeg`, `png`, `webp`, `heic`, `heif`, and `heics`; although the frontend allowlist also contains `gif`, the backend classifies GIF files as `other`, so they use the generic file icon
 - videos use a `video` element for `mp4`, `mov`, `m4v`, and `webm`
 - video preview tries muted inline autoplay briefly to trigger first-frame rendering, then pauses and shows a custom play button; when playback starts, native video controls are enabled
 - the frontend does not generate video thumbnail files
-- unsupported or failed previews fall back to the generic file icon
-- other files fall back to a generic file icon
+- unsupported, failed, or `other` previews fall back to the generic file icon
 
 Drag-and-drop events are ignored while the settings panel is open.
-
-## Practical Summary
-
-The core design is split deliberately:
-
-- the frontend computes a user-facing rename preview from the currently loaded files
-- the backend blocks overwriting unrelated files at execution time
-
-As a result, duplicate handling and conflict handling are related but not identical:
-
-- frontend duplicate handling resolves collisions inside the loaded preview set
-- backend conflict handling blocks overwriting unrelated files already present on disk
-
-That difference is why a batch can look valid in the UI preview but still fail during rename when only part of a directory was loaded.
