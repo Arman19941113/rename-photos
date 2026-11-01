@@ -11,7 +11,8 @@
 - Shared TypeScript types belong in `src/types`; Tauri command payloads belong in Rust `types.rs`.
 - If a change touches both frontend and backend, keep IPC payloads and TypeScript callers in sync.
 - For loading, metadata extraction, preview naming, duplicates, or rename conflicts, read `docs/core-logic.md` first.
-- When core behavior changes, update both `docs/core-logic.md` and `docs/core-logic_CN.md`.
+- When core behavior changes, update `docs/core-logic.md`.
+- When changing test infrastructure, hook flow tests, CI checks, or media fixtures, read `docs/testing.md`.
 
 ## Task Map
 - Frontend loading/rename flow: `src/hooks/useFiles.ts`
@@ -27,6 +28,7 @@
 - Vite dev server: `pnpm dev`
 - Lint frontend: `pnpm lint`
 - Typecheck: `pnpm typecheck`
+- Frontend tests: `pnpm test`
 - Prepare local release: `pnpm release`
 - Tauri dev/build: `pnpm tauri dev`, `pnpm tauri build`
-- Rust tests: `cd src-tauri && cargo test`
+- Rust tests: `cargo test --locked --manifest-path src-tauri/Cargo.toml`

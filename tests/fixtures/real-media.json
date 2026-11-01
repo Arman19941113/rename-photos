@@ -1,0 +1,271 @@
+{
+  "format": "{YYYY}{MM}{DD} {hh}.{mm}.{ss}",
+  "files": [
+    {
+      "input": {
+        "pathname": "/fixtures/image-iPhone-1.HEIC",
+        "filename": "image-iPhone-1.HEIC",
+        "created": 0,
+        "size": 845,
+        "fileType": "image",
+        "metadata": {
+          "date": "2024-05-09 11:17:13",
+          "make": "Apple",
+          "camera": "iPhone 14 Plus",
+          "lens": "iPhone 14 Plus back dual wide camera 5.7mm f/1.5",
+          "focalLength": "26",
+          "aperture": "1.5",
+          "shutter": "1/11364",
+          "iso": "50"
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20240509 11.17.13.HEIC",
+        "strictSkip": false,
+        "metadataStatus": "success"
+      },
+      "sourceSize": 2190180
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/image-iPhone-2.jpeG",
+        "filename": "image-iPhone-2.jpeG",
+        "created": 0,
+        "size": 715,
+        "fileType": "image",
+        "metadata": {
+          "date": "2024-04-22 23:17:54",
+          "make": "Apple",
+          "camera": "iPhone 14 Plus",
+          "lens": "iPhone 14 Plus back dual wide camera 5.7mm f/1.5",
+          "focalLength": "26",
+          "aperture": "1.5",
+          "shutter": "1/50",
+          "iso": "320"
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20240422 23.17.54_1.jpeG",
+        "strictSkip": false,
+        "metadataStatus": "success"
+      },
+      "sourceSize": 2257454
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/image-iPhone-3.jpeg",
+        "filename": "image-iPhone-3.jpeg",
+        "created": 0,
+        "size": 715,
+        "fileType": "image",
+        "metadata": {
+          "date": "2024-04-22 23:17:54",
+          "make": "Apple",
+          "camera": "iPhone 14 Plus",
+          "lens": "iPhone 14 Plus back dual wide camera 5.7mm f/1.5",
+          "focalLength": "26",
+          "aperture": "1.5",
+          "shutter": "1/50",
+          "iso": "320"
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20240422 23.17.54_2.jpeg",
+        "strictSkip": false,
+        "metadataStatus": "success"
+      },
+      "sourceSize": 2257454
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/image-screenshot.jpg",
+        "filename": "image-screenshot.jpg",
+        "created": 0,
+        "size": 372,
+        "fileType": "image",
+        "metadata": null,
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "YYYYMMDD hh.mm.ss.jpg",
+        "strictSkip": true,
+        "metadataStatus": "warning"
+      },
+      "sourceSize": 80958
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/image-sony-1.ARW",
+        "filename": "image-sony-1.ARW",
+        "created": 0,
+        "size": 205,
+        "fileType": "image",
+        "metadata": {
+          "date": "2025-12-13 15:21:34",
+          "make": "SONY",
+          "camera": "ILCE-7M4",
+          "lens": "FE 35mm F1.8",
+          "focalLength": "35",
+          "aperture": "1.8",
+          "shutter": "1/30",
+          "iso": "100"
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20251213 15.21.34.ARW",
+        "strictSkip": false,
+        "metadataStatus": "success"
+      },
+      "sourceSize": 37761024
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/image-sony-2.JPG",
+        "filename": "image-sony-2.JPG",
+        "created": 0,
+        "size": 811,
+        "fileType": "image",
+        "metadata": {
+          "date": "2023-09-29 15:54:26",
+          "make": "SONY",
+          "camera": "ILCE-7M4",
+          "lens": "FE 35mm F1.8",
+          "focalLength": "35",
+          "aperture": "1.8",
+          "shutter": "1/8000",
+          "iso": "100"
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20230929 15.54.26.JPG",
+        "strictSkip": false,
+        "metadataStatus": "success"
+      },
+      "sourceSize": 11962151
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/test.RW2",
+        "filename": "test.RW2",
+        "created": 0,
+        "size": 540,
+        "fileType": "image",
+        "metadata": {
+          "date": "2024-12-16 20:55:20",
+          "make": "Panasonic",
+          "camera": "DMC-G85",
+          "lens": null,
+          "focalLength": "120",
+          "aperture": "13",
+          "shutter": "1/500",
+          "iso": "400"
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20241216 20.55.20.RW2",
+        "strictSkip": false,
+        "metadataStatus": "warning"
+      },
+      "sourceSize": 19196416
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/untitled copy.txt",
+        "filename": "untitled copy.txt",
+        "created": 0,
+        "size": 5,
+        "fileType": "other"
+      },
+      "expected": {
+        "newFilename": "YYYYMMDD hh.mm.ss_1.txt",
+        "strictSkip": true,
+        "metadataStatus": null
+      },
+      "sourceSize": 5
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/untitled.txt",
+        "filename": "untitled.txt",
+        "created": 0,
+        "size": 5,
+        "fileType": "other"
+      },
+      "expected": {
+        "newFilename": "YYYYMMDD hh.mm.ss_2.txt",
+        "strictSkip": true,
+        "metadataStatus": null
+      },
+      "sourceSize": 5
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/video-large.mp4",
+        "filename": "video-large.mp4",
+        "created": 0,
+        "size": 1625,
+        "fileType": "video",
+        "metadata": {
+          "date": "2020-07-09 04:00:00",
+          "make": null,
+          "camera": null
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20200709 04.00.00.mp4",
+        "strictSkip": false,
+        "metadataStatus": "warning"
+      },
+      "sourceSize": 77066009
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/video-metadata-missing.mp4",
+        "filename": "video-metadata-missing.mp4",
+        "created": 0,
+        "size": 1631,
+        "fileType": "video",
+        "metadata": {
+          "date": "2023-07-30 04:00:00",
+          "make": null,
+          "camera": null
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20230730 04.00.00.mp4",
+        "strictSkip": false,
+        "metadataStatus": "warning"
+      },
+      "sourceSize": 2598292
+    },
+    {
+      "input": {
+        "pathname": "/fixtures/video-metadata.MOV",
+        "filename": "video-metadata.MOV",
+        "created": 0,
+        "size": 1751,
+        "fileType": "video",
+        "metadata": {
+          "date": "2024-05-16 10:07:26",
+          "make": "Apple",
+          "camera": "iPhone 14 Plus"
+        },
+        "metaError": null
+      },
+      "expected": {
+        "newFilename": "20240516 10.07.26.MOV",
+        "strictSkip": false,
+        "metadataStatus": "success"
+      },
+      "sourceSize": 9498835
+    }
+  ]
+}

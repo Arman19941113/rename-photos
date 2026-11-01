@@ -11,6 +11,9 @@ use std::path::{Component, Path, PathBuf};
 
 mod types;
 
+#[cfg(test)]
+mod real_media_tests;
+
 use self::types::{IPCFile, RenamePathData};
 use crate::utils::file::{
     FileKind, analyze_image_metadata, analyze_video_metadata, detect_file_kind,

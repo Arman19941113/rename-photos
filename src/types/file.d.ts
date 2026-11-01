@@ -28,6 +28,12 @@ export type IPCFile = {
 )
 export type FileType = IPCFile['fileType']
 
+export type RenamePathData = {
+  oldPath: string
+  newFilename: string
+  tempFilename: string
+}
+
 export type UIFile = {
   pathname: string
   dirname: string // the directory name of the file

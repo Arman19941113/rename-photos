@@ -238,7 +238,7 @@ When the user clicks Rename:
 
 The frontend does not construct full target paths. The backend validates that `newFilename` and `tempFilename` are plain filenames, then resolves both against the parent directory of `oldPath` with Rust `Path::join`.
 
-If a rename is already running, additional clicks are ignored. If no file needs renaming, the frontend shows a "nothing to rename" toast and does not call the backend.
+If a rename is already running, additional clicks are ignored. A synchronous ref guard also blocks repeated calls before React commits the loading state. If no file needs renaming, the frontend shows a "nothing to rename" toast and does not call the backend.
 
 ## Existing-File Conflict Handling
 
