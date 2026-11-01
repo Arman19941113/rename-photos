@@ -119,6 +119,72 @@ fn damaged_media_reports_per_file_errors_without_failing_the_load() {
 }
 
 #[test]
+fn unsupported_media_extensions_load_as_other_without_metadata() {
+    let dir = tempdir().unwrap();
+    let paths = [
+        "clip-lower.avi",
+        "clip-upper.AVI",
+        "photo-lower.orf",
+        "photo-upper.ORF",
+        "photo-lower.x3f",
+        "photo-upper.X3F",
+    ]
+    .map(|filename| dir.path().join(filename));
+    for path in &paths {
+        fs::write(path, b"not a supported media container").unwrap();
+    }
+    let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
+    for files in [
+        get_files_from_dir_inner(dir.path()).unwrap(),
+        get_files_from_paths_inner(&refs).unwrap(),
+    ] {
+        assert_eq!(files.len(), paths.len());
+        for file in files {
+            let file = serde_json::to_value(file).unwrap();
+            assert_eq!(file["fileType"], "other");
+            assert!(file.get("metadata").is_none());
+            assert!(file.get("metaError").is_none());
+        }
+    }
+}
+
+#[test]
+fn three_g2_brands_load_track_metadata_case_insensitively() {
+    let root = bundled_media_root();
+    let mut fixture = fixtures()
+        .into_iter()
+        .find(|fixture| fixture.filename() == "video-large.mp4")
+        .unwrap();
+    let mut bytes = fs::read(root.join(fixture.filename())).unwrap();
+    fixture.input["size"] = (bytes.len() as u64).into();
+    assert_eq!(&bytes[4..8], b"ftyp");
+    let dir = tempdir().unwrap();
+    let mut paths = Vec::new();
+    for (filename, brand) in [
+        ("clip-a.3g2", b"3g2a"),
+        ("clip-b.3G2", b"3g2b"),
+        ("clip-c.3g2", b"3g2c"),
+    ] {
+        bytes[8..12].copy_from_slice(brand);
+        let path = dir.path().join(filename);
+        fs::write(&path, &bytes).unwrap();
+        paths.push(path);
+    }
+    let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
+    for files in [
+        get_files_from_dir_inner(dir.path()).unwrap(),
+        get_files_from_paths_inner(&refs).unwrap(),
+    ] {
+        assert_eq!(files.len(), paths.len());
+        for file in files {
+            let file = serde_json::to_value(file).unwrap();
+            let path = Path::new(file["pathname"].as_str().unwrap()).to_path_buf();
+            assert_metadata_matches(file, &fixture, &path);
+        }
+    }
+}
+
+#[test]
 fn mixed_media_batch_keeps_metadata_isolated_after_failures_and_repeated_files() {
     let root = media_root();
     let fixtures = fixtures();
@@ -188,7 +254,8 @@ fn late_tiff_and_raw_metadata_preserves_the_full_ipc_payload_and_file_bytes() {
     bytes[18..22].copy_from_slice(&offset.to_le_bytes());
     fixture.input["size"] = (bytes.len() as u64).into();
     let dir = tempdir().unwrap();
-    let paths = ["late.tiff", "late.ARW"].map(|name| dir.path().join(name));
+    let paths = ["late.tiff", "late.ARW", "late-lower.iiq", "late-upper.IIQ"]
+        .map(|name| dir.path().join(name));
     for path in &paths {
         fs::write(path, &bytes).unwrap();
     }

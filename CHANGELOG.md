@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Aligned media extension classification with nom-exif: added IIQ and 3G2, and classified unsupported AVI, ORF, and X3F files as other files. Preserved TIFF/RAW and Panasonic RW2 metadata compatibility readers.
+
 ## [v1.0.3] - 2026-11-01
 
 ### Changed

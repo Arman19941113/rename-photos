@@ -9,11 +9,15 @@ The backend classifies accepted files by case-insensitive extension in [kind.rs]
 | Kind            | Extensions                                                                         |
 | --------------- | ---------------------------------------------------------------------------------- |
 | Image           | `jpg`, `jpeg`, `png`, `webp`, `tif`, `tiff`, `heic`, `heif`, `heics`, `avif`       |
-| Image, RAW-like | `dng`, `arw`, `cr2`, `cr3`, `nef`, `raf`, `rw2`, `orf`, `sr2`, `srf`, `pef`, `x3f` |
-| Video           | `mp4`, `mov`, `m4v`, `3gp`, `avi`, `mkv`, `webm`, `mka`                            |
+| Image, RAW-like | `dng`, `arw`, `cr2`, `cr3`, `nef`, `raf`, `rw2`, `sr2`, `srf`, `pef`, `iiq`        |
+| Video           | `mp4`, `mov`, `m4v`, `3gp`, `3g2`, `mkv`, `webm`, `mka`                            |
 | Other           | All other extensions                                                               |
 
 Classification selects a parsing path; extraction also depends on the actual container and its metadata. UI preview support uses a separate extension allowlist described in [core logic](core-logic.md#ui-presentation-rules).
+
+The extension list follows the containers recognized by `nom-exif`, including Phase One IIQ and ISOBMFF 3G2, plus the [TIFF/RAW](#tiff-and-raw-compatibility) and [Panasonic RW2](#panasonic-rw2) compatibility readers. TIFF-based RAW extensions share the TIFF path; this does not guarantee support for every camera variant. `mka` is an audio container and uses the same track-metadata path and `video` IPC shape as videos.
+
+AVI, Olympus ORF, and Sigma X3F containers have no supported parsing path. Their extensions are classified as `other`; eligible files still appear in the file list, without metadata or metadata errors.
 
 ## Extracted fields and result contract
 

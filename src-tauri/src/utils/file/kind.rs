@@ -16,13 +16,14 @@ pub(crate) fn detect_file_kind(path: &Path) -> FileKind {
         .to_ascii_lowercase();
 
     match ext.as_str() {
-        // Images (common + a few RAW formats)
+        // Images supported by nom-exif or the TIFF/RAW compatibility readers.
         "jpg" | "jpeg" | "png" | "webp" | "tif" | "tiff" | "heic" | "heif" | "heics" | "avif"
-        | "dng" | "arw" | "cr2" | "cr3" | "nef" | "raf" | "rw2" | "orf" | "sr2" | "srf" | "pef"
-        | "x3f" => FileKind::Image,
+        | "dng" | "arw" | "cr2" | "cr3" | "nef" | "raf" | "rw2" | "sr2" | "srf" | "pef" | "iiq" => {
+            FileKind::Image
+        }
 
         // Videos
-        "mp4" | "mov" | "m4v" | "3gp" | "avi" | "mkv" | "webm" | "mka" => FileKind::Video,
+        "mp4" | "mov" | "m4v" | "3gp" | "3g2" | "mkv" | "webm" | "mka" => FileKind::Video,
 
         _ => FileKind::Other,
     }
@@ -36,25 +37,56 @@ mod tests {
     // Classification only depends on the path extension, so no real files are needed.
     #[test]
     fn detects_images_case_insensitively() {
-        assert_eq!(detect_file_kind(Path::new("a.JPG")), FileKind::Image);
+        assert_extensions_kind(
+            &[
+                "jpg", "jpeg", "png", "webp", "tif", "tiff", "heic", "heif", "heics", "avif",
+            ],
+            FileKind::Image,
+        );
         assert_eq!(detect_file_kind(Path::new("a.jPeG")), FileKind::Image);
     }
 
     #[test]
-    fn detects_raw_images() {
-        assert_eq!(detect_file_kind(Path::new("a.ARW")), FileKind::Image);
-        assert_eq!(detect_file_kind(Path::new("a.dng")), FileKind::Image);
+    fn detects_raw_images_case_insensitively() {
+        assert_extensions_kind(
+            &[
+                "dng", "arw", "cr2", "cr3", "nef", "raf", "rw2", "sr2", "srf", "pef", "iiq",
+            ],
+            FileKind::Image,
+        );
     }
 
     #[test]
     fn detects_videos_case_insensitively() {
-        assert_eq!(detect_file_kind(Path::new("a.MOV")), FileKind::Video);
-        assert_eq!(detect_file_kind(Path::new("a.mp4")), FileKind::Video);
+        assert_extensions_kind(
+            &["mp4", "mov", "m4v", "3gp", "3g2", "mkv", "webm", "mka"],
+            FileKind::Video,
+        );
+    }
+
+    #[test]
+    fn treats_unsupported_media_extensions_as_other() {
+        assert_extensions_kind(&["avi", "orf", "x3f"], FileKind::Other);
     }
 
     #[test]
     fn treats_unknown_or_missing_extensions_as_other() {
         assert_eq!(detect_file_kind(Path::new("a.txt")), FileKind::Other);
         assert_eq!(detect_file_kind(Path::new("a")), FileKind::Other);
+    }
+
+    fn assert_extensions_kind(extensions: &[&str], expected: FileKind) {
+        for extension in extensions {
+            for filename in [
+                format!("a.{extension}"),
+                format!("a.{}", extension.to_ascii_uppercase()),
+            ] {
+                assert_eq!(
+                    detect_file_kind(Path::new(&filename)),
+                    expected,
+                    "{filename}"
+                );
+            }
+        }
     }
 }

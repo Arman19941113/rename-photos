@@ -24,8 +24,8 @@ Windows. Release-tag checks are defined in the [desktop release workflow](../.gi
 | [`src/util/*.test.ts`](../src/util)                                                       | Formatting, template rules, and normal/strict previews from shared metadata                                                                          |
 | [`useFiles.test.ts`](../src/hooks/useFiles.test.ts)                                       | Hook flow with mocked Tauri/settings/notifications: loading, rename payloads, refresh, failures/retry, and duplicate requests                        |
 | [`commands/file.rs`](../src-tauri/src/commands/file.rs)                                   | Loading rules, filename validation, two-phase rename, and conflict protection                                                                        |
-| [`commands/file/real_media_tests.rs`](../src-tauri/src/commands/file/real_media_tests.rs) | Media IPC fields, mixed-batch isolation, distant TIFF/RAW metadata, rename/reload byte preservation, damaged-file isolation, and fixture size budget |
-| [`utils/file/`](../src-tauri/src/utils/file)                                              | Filtering, classification, date/numeric formatting, EXIF field selection, TIFF/RW2 bounds, and metadata read budgets                                 |
+| [`commands/file/real_media_tests.rs`](../src-tauri/src/commands/file/real_media_tests.rs) | Media IPC fields, supported/unsupported extension routing, mixed-batch isolation, distant TIFF/RAW metadata, rename/reload byte preservation, damaged-file isolation, and fixture size budget |
+| [`utils/file/`](../src-tauri/src/utils/file)                                              | Filtering, case-insensitive supported/unsupported extension classification, date/numeric formatting, EXIF field selection, TIFF/RW2 bounds, and metadata read budgets |
 | [`scripts/*.test.ts`](../scripts)                                                         | Release notes and release operations with mocked GitHub APIs or disposable Git repositories                                                          |
 
 `pnpm typecheck` runs one `tsc -p tsconfig.typecheck.json` for application and test
@@ -62,6 +62,8 @@ a small I/O budget while files contain large gaps or trailing sensor data.
 RW2 tests cover bounded JPEG reads and TIFF fallback. Image extraction is also
 compared with eager `nom_exif::Exif` lookup for namespace priority, primary-image
 selection, and partial entry errors. These cases do not add bundled media files.
+
+Extension-routing tests exercise both directory and explicit-path loading. Temporary copies of the bundled MP4 use `3g2a`, `3g2b`, and `3g2c` brands with `.3g2`/`.3G2` filenames and retain the expected track metadata. The distant-TIFF test also uses `.iiq`/`.IIQ` filenames to verify TIFF compatibility routing; it does not represent a separate real Phase One sample or test RAW decoding. AVI, ORF, and X3F paths remain visible as `other` files without metadata fields or parser errors. No additional bundled media is required.
 
 ## Regenerate samples
 
