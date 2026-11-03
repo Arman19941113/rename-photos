@@ -1,3 +1,7 @@
+use crate::files::{FileEntry, FileMedia};
+use crate::metadata::{ImageMetadata, VideoMetadata};
+use crate::rename::RenameOperation;
+
 /// Data returned to frontend via IPC for a single file.
 ///
 /// ```json
@@ -22,14 +26,14 @@
 /// ```
 #[derive(serde::Serialize)]
 #[serde(tag = "fileType", rename_all = "lowercase")]
-pub enum IPCFile {
+pub enum IpcFile {
     #[serde(rename_all = "camelCase")]
     Image {
         pathname: String,
         filename: String,
         created: u128,
         size: u64,
-        metadata: Option<crate::utils::file::ImageMetadata>,
+        metadata: Option<ImageMetadata>,
         meta_error: Option<String>,
     },
     #[serde(rename_all = "camelCase")]
@@ -38,7 +42,7 @@ pub enum IPCFile {
         filename: String,
         created: u128,
         size: u64,
-        metadata: Option<crate::utils::file::VideoMetadata>,
+        metadata: Option<VideoMetadata>,
         meta_error: Option<String>,
     },
     #[serde(rename_all = "camelCase")]
@@ -56,8 +60,55 @@ pub enum IPCFile {
 /// resolves them against the parent directory of `old_path`.
 #[derive(serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RenamePathData {
+pub struct RenameRequest {
     pub old_path: String,
     pub new_filename: String,
     pub temp_filename: String,
+}
+
+impl From<FileEntry> for IpcFile {
+    fn from(file: FileEntry) -> Self {
+        let FileEntry {
+            pathname,
+            filename,
+            created,
+            size,
+            media,
+        } = file;
+
+        match media {
+            FileMedia::Image { metadata, error } => Self::Image {
+                pathname,
+                filename,
+                created,
+                size,
+                metadata,
+                meta_error: error,
+            },
+            FileMedia::Video { metadata, error } => Self::Video {
+                pathname,
+                filename,
+                created,
+                size,
+                metadata,
+                meta_error: error,
+            },
+            FileMedia::Other => Self::Other {
+                pathname,
+                filename,
+                created,
+                size,
+            },
+        }
+    }
+}
+
+impl From<RenameRequest> for RenameOperation {
+    fn from(request: RenameRequest) -> Self {
+        Self {
+            old_path: request.old_path.into(),
+            new_filename: request.new_filename,
+            temp_filename: request.temp_filename,
+        }
+    }
 }

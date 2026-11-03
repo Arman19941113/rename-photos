@@ -2,13 +2,13 @@ use std::path::Path;
 
 /// A coarse file classification used by the backend to decide how to extract metadata.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum FileKind {
+pub(super) enum FileKind {
     Image,
     Video,
     Other,
 }
 
-pub(crate) fn detect_file_kind(path: &Path) -> FileKind {
+pub(super) fn detect_file_kind(path: &Path) -> FileKind {
     let ext = path
         .extension()
         .and_then(|s| s.to_str())

@@ -4,7 +4,7 @@ This document owns media classification, extracted fields, value formatting, and
 
 ## File classification
 
-The backend classifies accepted files by case-insensitive extension in [kind.rs](../src-tauri/src/utils/file/kind.rs):
+The backend classifies accepted files by case-insensitive extension in [kind.rs](../src-tauri/src/files/kind.rs):
 
 | Kind            | Extensions                                                                         |
 | --------------- | ---------------------------------------------------------------------------------- |
@@ -23,7 +23,7 @@ AVI, Olympus ORF, and Sigma X3F containers have no supported parsing path. Their
 
 Images and videos use `nom-exif`. Dependency versions are maintained in [Cargo.toml](../src-tauri/Cargo.toml) and [Cargo.lock](../src-tauri/Cargo.lock).
 
-The [image](../src-tauri/src/utils/file/metadata_image.rs) and [video](../src-tauri/src/utils/file/metadata_video.rs) extractors expose optional string values for filename-template substitution:
+The [image](../src-tauri/src/metadata/image.rs) and [video](../src-tauri/src/metadata/video.rs) extractors expose optional string values for filename-template substitution:
 
 | Field         | Image EXIF tag          | Video track tag |
 | ------------- | ----------------------- | --------------- |
@@ -60,7 +60,7 @@ Using the filesystem creation timestamp for naming is a frontend setting describ
 
 Each directory or explicit-path load creates one `MediaParser` in the backend blocking task and reuses it sequentially across accepted files. Values are converted to owned strings and intermediate iterators are released before the next file.
 
-Images are opened once by the [image reader](../src-tauri/src/utils/file/image_exif/mod.rs). It first uses `MediaSource::seekable` and `MediaParser::parse_exif`. The resulting `ExifIter` is traversed once, retaining only the eight naming fields without building a complete EXIF map or explicitly decoding GPS.
+Images are opened once by the [image reader](../src-tauri/src/metadata/exif/mod.rs). It first uses `MediaSource::seekable` and `MediaParser::parse_exif`. The resulting `ExifIter` is traversed once, retaining only the eight naming fields without building a complete EXIF map or explicitly decoding GPS.
 
 Image fields come from the main image. Successful values are selected in TIFF, EXIF, GPS, then Interop namespace order, independently of traversal order. Thumbnail fields do not fill missing main-image fields, and individual entry errors leave that value unavailable.
 
@@ -68,7 +68,7 @@ Videos use `MediaSource::open` and `MediaParser::parse_track`. A recognized imag
 
 ## TIFF and RAW compatibility
 
-When standard parsing fails, compatibility readers reuse the same open file. A matching TIFF-based container is handled by the [TIFF reader](../src-tauri/src/utils/file/image_exif/tiff.rs):
+When standard parsing fails, compatibility readers reuse the same open file. A matching TIFF-based container is handled by the [TIFF reader](../src-tauri/src/metadata/exif/tiff.rs):
 
 1. Read the main IFD and its EXIF/GPS/Interop sub-IFDs using their file offsets.
 2. Retain naming and timezone entries, read their referenced values, and rewrite offsets into a compact TIFF buffer.
@@ -78,7 +78,7 @@ Both TIFF byte orders and distant metadata offsets are supported. Compatibility 
 
 ## Panasonic RW2
 
-The [RW2 reader](../src-tauri/src/utils/file/image_exif/raw_fallback.rs) recognizes the Panasonic TIFF-variant header and prefers embedded JPEG EXIF:
+The [EXIF reader](../src-tauri/src/metadata/exif/mod.rs) recognizes the Panasonic TIFF-variant header and dispatches to the [RW2 reader](../src-tauri/src/metadata/exif/rw2.rs), which prefers embedded JPEG EXIF:
 
 1. Inspect blob entries in the main IFD, validating each candidate's offset and length against the file size.
 2. Parse the first JPEG candidate through a seekable view bounded by that blob's range. The reader does not allocate a buffer for the declared blob length. JPEGs of at most 128 bytes are parsed from memory.

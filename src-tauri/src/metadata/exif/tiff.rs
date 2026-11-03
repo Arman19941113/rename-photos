@@ -132,7 +132,7 @@ fn check_range(offset: u64, length: u64, file_len: u64) -> anyhow::Result<()> {
 }
 
 fn align(data: &mut Vec<u8>) {
-    if data.len() % 2 != 0 {
+    if !data.len().is_multiple_of(2) {
         data.push(0);
     }
 }

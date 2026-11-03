@@ -1,4 +1,4 @@
-use super::image_exif::{METADATA_TAGS, read_exif};
+use super::exif::{METADATA_TAGS, read_exif};
 use nom_exif::{EntryValue, ExifIter, ExifTag, IfdIndex, IfdKind, MediaParser};
 use std::path::Path;
 
@@ -127,7 +127,7 @@ fn format_exif_value(tag: ExifTag, value: &EntryValue) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::super::image_exif::{METADATA_TAGS, read_exif};
+    use super::super::exif::{METADATA_TAGS, read_exif};
     use super::{extract_image_metadata, format_exif_value};
     use chrono::DateTime;
     use nom_exif::{EntryValue, Exif, ExifTag, MediaParser, MediaSource, URational};

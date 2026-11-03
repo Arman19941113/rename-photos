@@ -1,5 +1,4 @@
-use super::types::RenamePathData;
-use super::{get_files_from_dir_inner, get_files_from_paths_inner, rename_files_inner};
+use super::types::{IpcFile, RenameRequest};
 use chrono::{Local, NaiveDateTime};
 use serde::Deserialize;
 use serde_json::Value;
@@ -19,7 +18,7 @@ fn real_media_batch_preserves_metadata_and_bytes_after_rename() {
         copy_fixture(&root, dir.path(), fixture.filename());
     }
 
-    let loaded = get_files_from_dir_inner(dir.path()).unwrap();
+    let loaded = load_directory(dir.path()).unwrap();
     assert_eq!(loaded.len(), fixtures.len());
     for file in loaded {
         let file = serde_json::to_value(file).unwrap();
@@ -34,7 +33,7 @@ fn real_media_batch_preserves_metadata_and_bytes_after_rename() {
         .iter()
         .enumerate()
         .map(|(index, fixture)| {
-            serde_json::from_value::<RenamePathData>(serde_json::json!({
+            serde_json::from_value::<RenameRequest>(serde_json::json!({
                 "oldPath": dir.path().join(fixture.filename()).to_str().unwrap(),
                 "newFilename": fixture.expected.new_filename,
                 "tempFilename": format!("rename-test-{index}.tmp"),
@@ -42,7 +41,7 @@ fn real_media_batch_preserves_metadata_and_bytes_after_rename() {
             .unwrap()
         })
         .collect();
-    let renamed = rename_files_inner(payload).unwrap();
+    let renamed = rename_batch(payload).unwrap();
     let expected_paths = fixtures
         .iter()
         .map(|fixture| {
@@ -56,7 +55,7 @@ fn real_media_batch_preserves_metadata_and_bytes_after_rename() {
     assert_eq!(renamed, expected_paths);
 
     let paths = renamed.iter().map(Path::new).collect::<Vec<_>>();
-    let reloaded = get_files_from_paths_inner(&paths).unwrap();
+    let reloaded = load_paths(&paths).unwrap();
     assert_eq!(reloaded.len(), fixtures.len());
     for (fixture, file) in fixtures.iter().zip(reloaded) {
         let renamed_path = dir.path().join(&fixture.expected.new_filename);
@@ -88,8 +87,8 @@ fn damaged_media_reports_per_file_errors_without_failing_the_load() {
     paths.push(copy_fixture(&root, dir.path(), "image-iPhone-1.HEIC"));
     let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
     for files in [
-        get_files_from_dir_inner(dir.path()).unwrap(),
-        get_files_from_paths_inner(&refs).unwrap(),
+        load_directory(dir.path()).unwrap(),
+        load_paths(&refs).unwrap(),
     ] {
         assert_eq!(files.len(), paths.len());
         let files = files
@@ -135,8 +134,8 @@ fn unsupported_media_extensions_load_as_other_without_metadata() {
     }
     let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
     for files in [
-        get_files_from_dir_inner(dir.path()).unwrap(),
-        get_files_from_paths_inner(&refs).unwrap(),
+        load_directory(dir.path()).unwrap(),
+        load_paths(&refs).unwrap(),
     ] {
         assert_eq!(files.len(), paths.len());
         for file in files {
@@ -172,8 +171,8 @@ fn three_g2_brands_load_track_metadata_case_insensitively() {
     }
     let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
     for files in [
-        get_files_from_dir_inner(dir.path()).unwrap(),
-        get_files_from_paths_inner(&refs).unwrap(),
+        load_directory(dir.path()).unwrap(),
+        load_paths(&refs).unwrap(),
     ] {
         assert_eq!(files.len(), paths.len());
         for file in files {
@@ -220,7 +219,7 @@ fn mixed_media_batch_keeps_metadata_isolated_after_failures_and_repeated_files()
 
     let paths = sequence.map(|filename| dir.path().join(filename));
     let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
-    let files = get_files_from_paths_inner(&refs).unwrap();
+    let files = load_paths(&refs).unwrap();
     assert_eq!(files.len(), sequence.len());
 
     for (filename, file) in sequence.into_iter().zip(files) {
@@ -261,8 +260,8 @@ fn late_tiff_and_raw_metadata_preserves_the_full_ipc_payload_and_file_bytes() {
     }
     let refs = paths.iter().map(PathBuf::as_path).collect::<Vec<_>>();
     for files in [
-        get_files_from_dir_inner(dir.path()).unwrap(),
-        get_files_from_paths_inner(&refs).unwrap(),
+        load_directory(dir.path()).unwrap(),
+        load_paths(&refs).unwrap(),
     ] {
         assert_eq!(files.len(), paths.len());
         for file in files {
@@ -290,6 +289,24 @@ fn checked_in_media_stays_within_size_budget() {
         total > 0 && total <= 256 * 1024,
         "Media corpus is {total} bytes; budget is 256 KiB"
     );
+}
+
+fn load_directory(path: &Path) -> Result<Vec<IpcFile>, String> {
+    tauri::async_runtime::block_on(super::get_files_from_dir(
+        path.to_str().unwrap().to_string(),
+    ))
+}
+
+fn load_paths(paths: &[&Path]) -> Result<Vec<IpcFile>, String> {
+    let paths = paths
+        .iter()
+        .map(|path| path.to_str().unwrap().to_string())
+        .collect();
+    tauri::async_runtime::block_on(super::get_files_from_paths(paths))
+}
+
+fn rename_batch(requests: Vec<RenameRequest>) -> Result<Vec<String>, String> {
+    tauri::async_runtime::block_on(super::rename_files(requests))
 }
 
 fn media_root() -> PathBuf {
@@ -349,17 +366,17 @@ fn assert_metadata_matches(actual: Value, fixture: &MediaFixture, path: &Path) {
         .unwrap_or(0);
     expected["created"] = serde_json::to_value(created).unwrap();
     // Video snapshots use UTC; the backend intentionally returns local wall-clock time.
-    if expected["fileType"] == "video" {
-        if let Some(date) = expected["metadata"]["date"].as_str() {
-            let utc = NaiveDateTime::parse_from_str(date, "%Y-%m-%d %H:%M:%S")
-                .unwrap()
-                .and_utc();
-            expected["metadata"]["date"] = utc
-                .with_timezone(&Local)
-                .format("%Y-%m-%d %H:%M:%S")
-                .to_string()
-                .into();
-        }
+    if expected["fileType"] == "video"
+        && let Some(date) = expected["metadata"]["date"].as_str()
+    {
+        let utc = NaiveDateTime::parse_from_str(date, "%Y-%m-%d %H:%M:%S")
+            .unwrap()
+            .and_utc();
+        expected["metadata"]["date"] = utc
+            .with_timezone(&Local)
+            .format("%Y-%m-%d %H:%M:%S")
+            .to_string()
+            .into();
     }
     assert_eq!(actual, expected, "IPC mismatch for {}", path.display());
 }

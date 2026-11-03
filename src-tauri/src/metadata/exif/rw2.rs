@@ -1,54 +1,23 @@
-//! Compatibility readers for TIFF-based RAW containers.
+//! Panasonic RW2 metadata via bounded embedded JPEG reads and TIFF fallback.
 
 use nom_exif::{ExifIter, MediaParser, MediaSource};
 use std::io::{self, Read, Seek, SeekFrom};
 
 use super::tiff;
 
-const PANASONIC_RW2_LE_MAGIC: [u8; 4] = [0x49, 0x49, 0x55, 0x00];
 const JPEG_SOI: [u8; 2] = [0xff, 0xd8];
 const TIFF_HEADER_LEN: u64 = 8;
 
-#[derive(Debug)]
-pub(super) enum RawFallbackError {
-    NoMatchingFallback,
-    ReadFailed(anyhow::Error),
-}
-
-pub(super) fn read_supported_raw(
-    reader: &mut (impl Read + Seek),
-    file_len: u64,
-    parser: &mut MediaParser,
-) -> Result<ExifIter, RawFallbackError> {
-    reader
-        .rewind()
-        .map_err(|error| RawFallbackError::ReadFailed(error.into()))?;
-    let mut header = [0; 4];
-    match reader.read_exact(&mut header) {
-        Ok(()) => {}
-        Err(error) if error.kind() == io::ErrorKind::UnexpectedEof => {
-            return Err(RawFallbackError::NoMatchingFallback);
-        }
-        Err(error) => return Err(RawFallbackError::ReadFailed(error.into())),
-    }
-    let result = match &header {
-        &PANASONIC_RW2_LE_MAGIC => read_panasonic_rw2(reader, file_len, parser),
-        b"II\x2a\0" | b"MM\0\x2a" => tiff::read_metadata(reader, file_len, parser),
-        _ => return Err(RawFallbackError::NoMatchingFallback),
-    };
-    result.map_err(RawFallbackError::ReadFailed)
-}
-
-fn read_panasonic_rw2(
+pub(super) fn read_metadata(
     reader: &mut (impl Read + Seek),
     file_len: u64,
     parser: &mut MediaParser,
 ) -> anyhow::Result<ExifIter> {
-    read_panasonic_rw2_embedded_jpeg(reader, file_len, parser)
+    read_embedded_jpeg(reader, file_len, parser)
         .or_else(|_| tiff::read_metadata(reader, file_len, parser))
 }
 
-fn read_panasonic_rw2_embedded_jpeg(
+fn read_embedded_jpeg(
     reader: &mut (impl Read + Seek),
     file_len: u64,
     parser: &mut MediaParser,
@@ -202,10 +171,8 @@ impl<R: Seek> Seek for ReadRange<'_, R> {
 #[cfg(test)]
 mod tests {
     use super::super::test_support::sparse_reader;
-    use super::{
-        RawFallbackError, ReadRange, read_panasonic_rw2, read_panasonic_rw2_embedded_jpeg,
-        read_supported_raw,
-    };
+    use super::super::{CompatibilityError, read_compatible_exif};
+    use super::{ReadRange, read_embedded_jpeg, read_metadata};
     use nom_exif::{Exif, ExifTag as Tag, MediaParser};
     use std::fs;
     use std::io::{Cursor, Read, Seek, SeekFrom, Write};
@@ -216,7 +183,7 @@ mod tests {
         for magic in [TiffMagic::PanasonicRw2, TiffMagic::Standard] {
             let data = minimal_tiff_data(magic);
             let length = data.len() as u64;
-            let exif: Exif = read_supported_raw(&mut Cursor::new(data), length, &mut parser)
+            let exif: Exif = read_compatible_exif(&mut Cursor::new(data), length, &mut parser)
                 .unwrap()
                 .into();
             assert_eq!(field_string(&exif, Tag::Make).as_deref(), Some("Panasonic"));
@@ -224,8 +191,8 @@ mod tests {
         }
         for data in [b"IIU".as_slice(), b"not a TIFF container"] {
             assert!(matches!(
-                read_supported_raw(&mut Cursor::new(data), data.len() as u64, &mut parser),
-                Err(RawFallbackError::NoMatchingFallback)
+                read_compatible_exif(&mut Cursor::new(data), data.len() as u64, &mut parser),
+                Err(CompatibilityError::NoMatchingReader)
             ));
         }
     }
@@ -236,10 +203,9 @@ mod tests {
 
         let mut file = fs::File::open(&path).unwrap();
         let length = file.metadata().unwrap().len();
-        let exif: Exif =
-            read_panasonic_rw2_embedded_jpeg(&mut file, length, &mut MediaParser::new())
-                .unwrap()
-                .into();
+        let exif: Exif = read_embedded_jpeg(&mut file, length, &mut MediaParser::new())
+            .unwrap()
+            .into();
 
         fs::remove_file(path).unwrap();
 
@@ -257,7 +223,7 @@ mod tests {
 
         let mut file = fs::File::open(&path).unwrap();
         let length = file.metadata().unwrap().len();
-        let exif: Exif = read_panasonic_rw2(&mut file, length, &mut MediaParser::new())
+        let exif: Exif = read_metadata(&mut file, length, &mut MediaParser::new())
             .unwrap()
             .into();
 
@@ -278,7 +244,7 @@ mod tests {
         let length = 26 + jpeg_length as u64;
         data[14..18].copy_from_slice(&(jpeg_length as u32).to_le_bytes());
         let mut reader = sparse_reader(&data, length);
-        let exif: Exif = read_panasonic_rw2(&mut reader, length, &mut MediaParser::new())
+        let exif: Exif = read_metadata(&mut reader, length, &mut MediaParser::new())
             .unwrap()
             .into();
         assert_eq!(field_string(&exif, Tag::Make).as_deref(), Some("Panasonic"));
@@ -298,7 +264,7 @@ mod tests {
         let data = minimal_rw2_data();
         let length = 64 * 1024 * 1024;
         let mut reader = sparse_reader(&data, length);
-        let exif: Exif = read_panasonic_rw2(&mut reader, length, &mut MediaParser::new())
+        let exif: Exif = read_metadata(&mut reader, length, &mut MediaParser::new())
             .unwrap()
             .into();
         assert_eq!(field_string(&exif, Tag::Model).as_deref(), Some("DMC-G85"));
@@ -317,7 +283,7 @@ mod tests {
         data[14..18].copy_from_slice(&u32::MAX.to_le_bytes());
         let length = data.len() as u64;
         let mut reader = sparse_reader(&data, length);
-        let exif: Exif = read_panasonic_rw2(&mut reader, length, &mut MediaParser::new())
+        let exif: Exif = read_metadata(&mut reader, length, &mut MediaParser::new())
             .unwrap()
             .into();
         assert_eq!(field_string(&exif, Tag::Model).as_deref(), Some("DMC-G85"));

@@ -40,8 +40,9 @@
 | Loading, preview, rename | [docs/core-logic.md](docs/core-logic.md); `src/hooks/useFiles.ts`, `src/util/file-transformer.ts`, `src/util/common.ts` |
 | Drag handling | `src/hooks/useDragging.ts` |
 | Templates, history, settings | [docs/core-logic.md](docs/core-logic.md); `src/components/OperationBar.tsx`, `src/hooks/useInputFormat.ts`, `src/store/useConfigStore.ts`, `src/services/storage.ts` |
-| Backend commands | `src-tauri/src/commands/file.rs` |
-| Metadata and TIFF/RAW/RW2 | [docs/metadata.md](docs/metadata.md); `src-tauri/src/utils/file/`, `src-tauri/src/utils/file/image_exif/` |
+| Backend commands and IPC | `src-tauri/src/commands/file.rs`, `src-tauri/src/commands/file/types.rs` |
+| Backend loading and rename | [docs/core-logic.md](docs/core-logic.md); `src-tauri/src/files.rs`, `src-tauri/src/files/`, `src-tauri/src/rename.rs` |
+| Metadata and TIFF/RAW/RW2 | [docs/metadata.md](docs/metadata.md); `src-tauri/src/metadata/`, `src-tauri/src/metadata/exif/` |
 | Tests, CI, fixtures | [docs/testing.md](docs/testing.md) |
 | Icons and generated resources | [docs/icons.md](docs/icons.md) |
 | Releases | `scripts/release.mjs`, `.github/workflows/publish-desktop-release.yml` |

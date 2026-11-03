@@ -6,7 +6,9 @@ This document owns file-loading, naming-preview, settings, and rename behavior. 
 
 - The React frontend owns the interactive workflow, filename previews, and user state.
 - The Tauri Rust backend owns filesystem access, filtering, metadata extraction, and final renames.
-- Commands are registered in [main.rs](../src-tauri/src/main.rs), implemented in [file.rs](../src-tauri/src/commands/file.rs), and called using names in [TauriCommand](../src/const/index.ts).
+- Commands are registered in [main.rs](../src-tauri/src/main.rs), adapted in [commands/file.rs](../src-tauri/src/commands/file.rs), and called using names in [TauriCommand](../src/const/index.ts).
+- [files.rs](../src-tauri/src/files.rs) owns directory/path loading and metadata collection; [rename.rs](../src-tauri/src/rename.rs) owns rename planning, conflict checks, and two-phase execution. These business modules do not depend on Tauri or command payload types.
+- [metadata](../src-tauri/src/metadata/mod.rs) owns image/video extraction and EXIF compatibility readers. File records and rename operations are converted to and from IPC payloads in [commands/file/types.rs](../src-tauri/src/commands/file/types.rs).
 - Async Tauri commands dispatch blocking filesystem work through Tauri's blocking task runtime.
 
 | Command                | Frontend arguments                     | Successful result       |
@@ -15,7 +17,7 @@ This document owns file-loading, naming-preview, settings, and rename behavior. 
 | `get_files_from_paths` | `{ paths: string[] }`                  | `IPCFile[]`             |
 | `rename_files`         | `{ renamePathData: RenamePathData[] }` | `string[]` of new paths |
 
-The complete payloads are defined by the [Rust IPC types](../src-tauri/src/commands/file/types.rs) and [TypeScript types](../src/types/file.d.ts). File records carry a full source path, basename, size in bytes, creation timestamp in milliseconds since the Unix epoch, and a file kind. The image/video metadata contract is maintained in [metadata extraction](metadata.md#extracted-fields-and-result-contract).
+The complete payloads are defined by the [Rust IPC types](../src-tauri/src/commands/file/types.rs) and [TypeScript types](../src/types/file.d.ts). Rust's `IpcFile` and `RenameRequest` correspond to TypeScript's `IPCFile` and `RenamePathData`; their serialized fields use the frontend's camelCase names. File records carry a full source path, basename, size in bytes, creation timestamp in milliseconds since the Unix epoch, and a file kind. The image/video metadata contract is maintained in [metadata extraction](metadata.md#extracted-fields-and-result-contract).
 
 ## File Input Flow
 

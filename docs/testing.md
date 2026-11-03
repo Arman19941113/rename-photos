@@ -10,12 +10,13 @@ Run from the repository root:
 pnpm test
 pnpm typecheck
 pnpm lint
+cargo fmt --manifest-path src-tauri/Cargo.toml --all -- --check
+cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 cargo test --locked --manifest-path src-tauri/Cargo.toml
 ```
 
 The [test workflow](../.github/workflows/test.yml) runs on PRs, pushes to `main`, and manual dispatch.
-Vitest, type checking, and lint run on Linux; Rust tests run on Linux, macOS, and
-Windows. Release-tag checks are defined in the [desktop release workflow](../.github/workflows/publish-desktop-release.yml).
+Vitest, type checking, and lint run on Linux; Rust formatting, Clippy (including test targets, with warnings treated as errors), and tests run on Linux, macOS, and Windows using stable Rust with the `rustfmt` and `clippy` components. Release-tag checks are defined in the [desktop release workflow](../.github/workflows/publish-desktop-release.yml).
 
 ## Test boundaries
 
@@ -23,15 +24,19 @@ Windows. Release-tag checks are defined in the [desktop release workflow](../.gi
 | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`src/util/*.test.ts`](../src/util)                                                       | Formatting, template rules, and normal/strict previews from shared metadata                                                                          |
 | [`useFiles.test.ts`](../src/hooks/useFiles.test.ts)                                       | Hook flow with mocked Tauri/settings/notifications: loading, rename payloads, refresh, failures/retry, and duplicate requests                        |
-| [`commands/file.rs`](../src-tauri/src/commands/file.rs)                                   | Loading rules, filename validation, two-phase rename, and conflict protection                                                                        |
+| [`files/tests.rs`](../src-tauri/src/files/tests.rs)                                       | Directory and explicit-path loading rules                                                                                                          |
+| [`rename/tests.rs`](../src-tauri/src/rename/tests.rs)                                     | Filename validation, two-phase rename, and conflict protection                                                                                     |
 | [`commands/file/real_media_tests.rs`](../src-tauri/src/commands/file/real_media_tests.rs) | Media IPC fields, supported/unsupported extension routing, mixed-batch isolation, distant TIFF/RAW metadata, rename/reload byte preservation, damaged-file isolation, and fixture size budget |
-| [`utils/file/`](../src-tauri/src/utils/file)                                              | Filtering, case-insensitive supported/unsupported extension classification, date/numeric formatting, EXIF field selection, TIFF/RW2 bounds, and metadata read budgets |
+| [`files/`](../src-tauri/src/files)                                                        | Platform filtering and case-insensitive supported/unsupported extension classification                                                            |
+| [`metadata/`](../src-tauri/src/metadata)                                                  | Date/numeric formatting, EXIF field selection, TIFF/RW2 bounds, and metadata read budgets                                                          |
 | [`scripts/*.test.ts`](../scripts)                                                         | Release notes and release operations with mocked GitHub APIs or disposable Git repositories                                                          |
 
 `pnpm typecheck` runs one `tsc -p tsconfig.typecheck.json` for application and test
 code. Builds use `tsconfig.json`. Imported JavaScript scripts have inferred types
 with `allowJs`; `checkJs` is disabled. `tests/support/media-corpus.ts` validates
 shared JSON before exposing typed IPC inputs.
+
+Real-media tests call the async command adapters and their blocking tasks, exercising IPC request conversion and serialized file responses against the shared corpus. Business-module tests call loading and renaming directly.
 
 Tests use temporary copies for filesystem writes. They do not launch the app or
 exercise Tauri transport/UI. Release tests do not commit the working repository
