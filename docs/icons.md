@@ -4,7 +4,7 @@ This document covers icon sources and generated resources. See the [development 
 
 ## Sources
 
-The editable desktop master is [assets/icon/app-icon.svg](../assets/icon/app-icon.svg), a 1024 × 1024 vector with a sun-and-mountain symbol in blue `#3064D7` and cyan `#1EC0DC`, on a white tile with transparent outer padding.
+The editable desktop master is [assets/icon/app-icon.svg](../assets/icon/app-icon.svg), a 1024 × 1024 vector with a sun-and-mountain symbol in deep plum `#7E1552` and coral `#FA514E`, on a white tile with transparent outer padding.
 
 The landing page uses [web/src/app/icon.svg](../web/src/app/icon.svg) with the same symbol and no white tile. It is maintained separately; keep its paths and colors in sync with the desktop master.
 
