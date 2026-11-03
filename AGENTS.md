@@ -1,36 +1,47 @@
 # AGENTS.md
 
-## Project Snapshot
+## Conventions
 
-- Rename Photos is a Tauri desktop app for renaming photos/videos from metadata.
-- Frontend code lives in `src` and uses React, Vite, TypeScript, Tailwind, and NextUI.
-- Backend code lives in `src-tauri/src` and uses Rust/Tauri.
-- `web` is the Next.js landing page, separate from the desktop app.
+- Desktop frontend code belongs in `src/`; filesystem access and renaming belong in `src-tauri/src/`.
+- `web/` is an independent project with its own package manifest, lockfile, and commands.
+- Shared TypeScript types belong in `src/types/`.
+- Rust command payloads belong in `src-tauri/src/commands/file/types.rs`.
+- Keep IPC payloads and TypeScript callers in sync.
 
-## Work Rules
+## Verification
 
-- Keep changes narrow and aligned with the existing frontend/backend boundary.
-- Shared TypeScript types belong in `src/types`; Tauri command payloads belong in Rust `types.rs`.
-- If a change touches both frontend and backend, keep IPC payloads and TypeScript callers in sync.
-- For loading, preview naming, duplicates, or rename conflicts, read [core logic](docs/core-logic.md) first.
-- For classification, metadata fields, date/value formatting, or TIFF/RAW/RW2 parsing, read [metadata extraction](docs/metadata.md) first.
-- For test infrastructure, hook flow tests, CI checks, or media fixtures, read [testing](docs/testing.md) first.
-- For icon sources or generated resources, read [icons](docs/icons.md) first.
-- Update the document that owns any behavior changed by the task. Keep detailed rules in that document and link to them from other documents.
-- Describe current implementation and constraints; keep change history in `CHANGELOG.md`.
+- Routine, low-risk changes can rely on code review and relevant static checks.
+- Add or update tests when they meaningfully protect core logic or complex, error-prone cases.
+- Start with the narrowest relevant checks; broaden only for a concrete risk, failure, or unresolved concern.
+- During commit review, missing documentation or test updates alone do not block routine, low-risk changes or require confirmation.
 
-## Task Map
+## Commands
 
-- Frontend loading/rename flow: `src/hooks/useFiles.ts`
-- Drag handling: `src/hooks/useDragging.ts`
-- Template input: `src/components/OperationBar.tsx`
-- Preview/template logic: `src/util/file-transformer.ts`, `src/util/common.ts`
-- Format history/settings: `src/hooks/useInputFormat.ts`, `src/store/useConfigStore.ts`, `src/services/storage.ts`
-- Backend commands and IPC types: `src-tauri/src/commands/file.rs`, `src-tauri/src/commands/file/types.rs`
-- Backend file filtering/classification/metadata: `src-tauri/src/utils/file/filter.rs`, `src-tauri/src/utils/file/kind.rs`, `src-tauri/src/utils/file/metadata_image.rs`, `src-tauri/src/utils/file/metadata_video.rs`
-- TIFF/RAW/RW2 compatibility readers: `src-tauri/src/utils/file/image_exif/`
+- Run desktop checks from the repository root.
 
-## Development and Checks
+| Check | Command |
+| --- | --- |
+| Test file | `pnpm exec vitest run <test-file>` |
+| Lint file | `pnpm exec eslint <file>` |
+| App and test types | `pnpm typecheck` |
+| Rust test filter | `cargo test --locked --manifest-path src-tauri/Cargo.toml <test-filter>` |
 
-- Setup, run/build commands, and release entry points: [development guide](docs/README.md).
-- Check commands and fixture workflows: [testing](docs/testing.md).
+## Documentation
+
+- Update the owning document when core behavior or contracts change, or existing documentation becomes inaccurate.
+- Minor UI and other non-core fixes otherwise need no documentation updates.
+- Keep change history in `CHANGELOG.md`.
+
+## References and Entry Points
+
+| Task | References |
+| --- | --- |
+| Setup, builds, website | [docs/README.md](docs/README.md) |
+| Loading, preview, rename | [docs/core-logic.md](docs/core-logic.md); `src/hooks/useFiles.ts`, `src/util/file-transformer.ts`, `src/util/common.ts` |
+| Drag handling | `src/hooks/useDragging.ts` |
+| Templates, history, settings | [docs/core-logic.md](docs/core-logic.md); `src/components/OperationBar.tsx`, `src/hooks/useInputFormat.ts`, `src/store/useConfigStore.ts`, `src/services/storage.ts` |
+| Backend commands | `src-tauri/src/commands/file.rs` |
+| Metadata and TIFF/RAW/RW2 | [docs/metadata.md](docs/metadata.md); `src-tauri/src/utils/file/`, `src-tauri/src/utils/file/image_exif/` |
+| Tests, CI, fixtures | [docs/testing.md](docs/testing.md) |
+| Icons and generated resources | [docs/icons.md](docs/icons.md) |
+| Releases | `scripts/release.mjs`, `.github/workflows/publish-desktop-release.yml` |

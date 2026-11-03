@@ -1,6 +1,6 @@
 interface:
   display_name: "Release Rename Photos"
   short_description: "Prepare releases through the project release entry point"
-  default_prompt: "Use $release-rename-photos to confirm the next version, write its changelog, and run the project's release entry point."
+  default_prompt: "Use $release-rename-photos to select the release version, write its changelog, and run the project's release entry point."
 policy:
   allow_implicit_invocation: false
