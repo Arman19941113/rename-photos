@@ -1,11 +1,17 @@
 # Changelog
 
-## [Unreleased]
+## [v1.0.4] - 2026-11-03
+
+### Fixed
+
+- Prevented Arrow Up from moving focus to the table header when the first file row is selected.
+- Prevented rapid repeated clicks from starting duplicate batch rename operations.
 
 ### Changed
 
-- Updated the app icon to a deep plum and coral palette across desktop and mobile resources, and synchronized the website icon.
+- Updated the app icon to a deep plum and coral palette across desktop and mobile resources.
 - Aligned media extension classification with nom-exif: added IIQ and 3G2, and classified unsupported AVI, ORF, and X3F files as other files. Preserved TIFF/RAW and Panasonic RW2 metadata compatibility readers.
+- Unified image and video metadata parsing with nom-exif, reused the parser across each load batch, and bounded TIFF/RAW and RW2 compatibility reads while preserving rename metadata formatting.
 
 ## [v1.0.3] - 2026-11-01
 
