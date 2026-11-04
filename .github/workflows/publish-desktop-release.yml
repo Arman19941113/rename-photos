@@ -23,14 +23,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v6
-
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 24.17.0
-          cache: 'pnpm'
 
       - name: Check release tag matches app version
         run: |
@@ -48,30 +44,9 @@ jobs:
         id: release-notes
         run: node scripts/extract-release-notes.mjs --version "$GITHUB_REF_NAME" --github-output-name body
 
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Rust dependencies
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
-
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
-      - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run frontend and release tests
-        run: pnpm test
-
-      - name: Typecheck frontend
-        run: pnpm typecheck
-
-      - name: Run Rust tests
-        run: cargo test --locked --manifest-path src-tauri/Cargo.toml
+  test-release:
+    needs: validate-release
+    uses: ./.github/workflows/test.yml
 
   prepare-draft-release:
     needs: validate-release
@@ -163,7 +138,7 @@ jobs:
           args: ${{ matrix.args }}
 
   publish-release:
-    needs: [prepare-draft-release, build-release-assets]
+    needs: [test-release, prepare-draft-release, build-release-assets]
     runs-on: ubuntu-latest
     environment: 'production'
     concurrency:

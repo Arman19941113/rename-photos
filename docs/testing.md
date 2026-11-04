@@ -15,8 +15,8 @@ cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D w
 cargo test --locked --manifest-path src-tauri/Cargo.toml
 ```
 
-The [test workflow](../.github/workflows/test.yml) runs on PRs, pushes to `main`, and manual dispatch.
-Vitest, type checking, and lint run on Linux; Rust formatting, Clippy (including test targets, with warnings treated as errors), and tests run on Linux, macOS, and Windows using stable Rust with the `rustfmt` and `clippy` components. Release-tag checks are defined in the [desktop release workflow](../.github/workflows/publish-desktop-release.yml).
+The [test workflow](../.github/workflows/test.yml) runs on PRs and manual dispatch, and is reused by the [desktop release workflow](../.github/workflows/publish-desktop-release.yml).
+Vitest, type checking, and lint run on Linux; Rust formatting, Clippy (including test targets, with warnings treated as errors), and tests run on Linux, macOS, and Windows using stable Rust with the `rustfmt` and `clippy` components.
 
 ## Test boundaries
 

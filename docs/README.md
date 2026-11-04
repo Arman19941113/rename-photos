@@ -68,3 +68,5 @@ Its scripts are defined in [web/package.json](../web/package.json). The [website
 ## Prepare a desktop release
 
 `pnpm release` displays version suggestions. Preparing a selected version requires release notes in [CHANGELOG.md](../CHANGELOG.md) and creates a release commit and tag. Pushing the release tag triggers the [desktop release workflow](../.github/workflows/publish-desktop-release.yml). See [the release script](../scripts/release.mjs) for arguments and working-tree requirements.
+
+Tests and platform builds run in parallel; the release stays in draft until all checks and builds succeed.

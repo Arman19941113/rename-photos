@@ -30,7 +30,6 @@
 
 - Update the owning document when core behavior or contracts change, or existing documentation becomes inaccurate.
 - Minor UI and other non-core fixes otherwise need no documentation updates.
-- Keep change history in `CHANGELOG.md`.
 
 ## References and Entry Points
 
