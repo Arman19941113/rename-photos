@@ -13,6 +13,8 @@
 - Routine, low-risk changes can rely on code review and relevant static checks.
 - Add or update tests when they meaningfully protect core logic or complex, error-prone cases.
 - Start with the narrowest relevant checks; broaden only for a concrete risk, failure, or unresolved concern.
+- Before completing code changes, run the affected CI acceptance scope below; run full acceptance for shared verification changes. Focused checks are for iteration. Report failed or skipped acceptance checks explicitly.
+- Use the Rust toolchain pinned in `rust-toolchain.toml`. `cargo check` does not replace acceptance.
 - During commit review, missing documentation or test updates alone do not block routine, low-risk changes or require confirmation.
 
 ## Commands
@@ -21,6 +23,9 @@
 
 | Check | Command |
 | --- | --- |
+| Full desktop acceptance | `node scripts/check.mjs` |
+| Frontend acceptance (same as CI) | `node scripts/check.mjs frontend` |
+| Rust acceptance (same as CI) | `node scripts/check.mjs rust` |
 | Test file | `pnpm exec vitest run <test-file>` |
 | Lint file | `pnpm exec eslint <file>` |
 | App and test types | `pnpm typecheck` |

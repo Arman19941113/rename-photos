@@ -4,19 +4,20 @@ This document owns check commands, test coverage, and media fixture workflows. S
 
 ## Checks
 
-Run from the repository root:
+Run acceptance checks from the repository root using the same script as CI:
 
 ```sh
-pnpm test
-pnpm typecheck
-pnpm lint
-cargo fmt --manifest-path src-tauri/Cargo.toml --all -- --check
-cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
-cargo test --locked --manifest-path src-tauri/Cargo.toml
+node scripts/check.mjs          # Frontend and Rust
+node scripts/check.mjs frontend # Frontend and release scripts
+node scripts/check.mjs rust     # Rust formatting, Clippy, and tests
 ```
 
+The [shared script](../scripts/check.mjs) runs frontend type checking, lint, and tests, followed by Rust formatting, Clippy (including test targets, with warnings treated as errors), and tests. It stops at the first failure. `cargo check` alone is not acceptance. The independent `web/` project is not included.
+
+Local development and CI use [rust-toolchain.toml](../rust-toolchain.toml) as the single source for the Rust version and components. Install it with `rustup toolchain install --no-self-update`; subsequent acceptance runs do not require `rustup update stable`. Upgrade Rust by updating this file and running full acceptance. Local checks cover the host platform.
+
 The [test workflow](../.github/workflows/test.yml) runs on PRs and manual dispatch, and is reused by the [desktop release workflow](../.github/workflows/publish-desktop-release.yml).
-Vitest, type checking, and lint run on Linux; Rust formatting, Clippy (including test targets, with warnings treated as errors), and tests run on Linux, macOS, and Windows using stable Rust with the `rustfmt` and `clippy` components.
+Frontend checks run on Linux; Rust checks run on Linux, macOS, and Windows.
 
 ## Test boundaries
 

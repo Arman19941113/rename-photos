@@ -107,10 +107,12 @@ jobs:
           node-version: 24.17.0
           cache: 'pnpm'
 
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install --no-self-update
+
+      - name: Install macOS targets
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
 
       - name: Cache Rust dependencies
         uses: swatinem/rust-cache@v2

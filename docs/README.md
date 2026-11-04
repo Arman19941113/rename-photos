@@ -29,7 +29,7 @@ The frontend/backend runtime boundary and IPC contracts are described in [core l
 ## Local setup
 
 - Use the Node.js and pnpm versions specified by `engines` and `packageManager` in [package.json](../package.json).
-- Desktop development also needs Rust and the platform's native Tauri build dependencies. [CI setup](../.github/workflows/test.yml) uses stable Rust and lists the Linux system packages.
+- Desktop development also needs Rustup and the platform's native Tauri build dependencies. [rust-toolchain.toml](../rust-toolchain.toml) pins the Rust version and components for local development and CI; Rustup installs them on first use. [CI setup](../.github/workflows/test.yml) lists the Linux system packages.
 - Rust dependencies are declared in [Cargo.toml](../src-tauri/Cargo.toml) and resolved in [Cargo.lock](../src-tauri/Cargo.lock).
 
 Install desktop frontend dependencies from the repository root:

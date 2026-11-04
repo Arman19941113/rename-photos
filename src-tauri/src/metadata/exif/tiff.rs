@@ -67,8 +67,10 @@ fn copy_ifd(
     let mut entries = vec![0; count * 12];
     reader.read_exact(&mut entries)?;
     let entries = entries
-        .chunks_exact(12)
-        .filter(|entry| keep_tag(endian.u16(entry)))
+        .as_chunks::<12>()
+        .0
+        .iter()
+        .filter(|entry| keep_tag(endian.u16(*entry)))
         .collect::<Vec<_>>();
     align(data);
     let copied = u32::try_from(data.len())?;

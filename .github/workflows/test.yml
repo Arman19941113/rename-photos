@@ -24,9 +24,8 @@ jobs:
           node-version: 24.17.0
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm lint
-      - run: pnpm test
+      - name: Check frontend and release scripts
+        run: node scripts/check.mjs frontend
 
   rust:
     name: Rust (${{ matrix.os }})
@@ -37,9 +36,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v6
         with:
-          components: rustfmt, clippy
+          node-version: 24.17.0
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install --no-self-update
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
@@ -48,8 +49,5 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-      - name: Check Rust formatting
-        run: cargo fmt --manifest-path src-tauri/Cargo.toml --all -- --check
-      - name: Lint Rust
-        run: cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
-      - run: cargo test --locked --manifest-path src-tauri/Cargo.toml
+      - name: Check Rust
+        run: node scripts/check.mjs rust
