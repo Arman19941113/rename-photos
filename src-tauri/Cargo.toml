@@ -14,14 +14,14 @@ tauri-build = { version = "2.7.4", features = [] }
 tauri = { version = "2.12.5", features = ["protocol-asset", "devtools"] }
 tauri-plugin-shell = "2.6.0"
 tauri-plugin-dialog = "2.8.4"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
 nom-exif = "3.8.0"
-chrono = "0.4.41"
-anyhow = "1"
+chrono = "0.4.45"
+anyhow = "1.0.104"
 
 [target.'cfg(target_os = "macos")'.dependencies]
-xattr = "1.6.1"
+xattr = "1.7.0"
 
 [dev-dependencies]
-tempfile = "3.19.1"
+tempfile = "3.27.0"

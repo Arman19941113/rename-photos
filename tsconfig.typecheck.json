@@ -3,7 +3,7 @@
   "compilerOptions": {
     "allowJs": true,
     "checkJs": false,
-    "types": ["node"]
+    "types": ["node", "vite/client"]
   },
   "include": ["src", "scripts/**/*.test.ts", "tests/**/*.ts"]
 }

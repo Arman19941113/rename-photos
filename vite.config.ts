@@ -10,6 +10,10 @@ export default defineConfig(async () => ({
   },
   plugins: [react()],
 
+  build: {
+    target: ['chrome111', 'edge111', 'firefox128', 'safari16.4'],
+  },
+
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent vite from obscuring rust errors

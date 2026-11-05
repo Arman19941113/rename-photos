@@ -17,7 +17,7 @@ Each topic owns its detailed behavior. Other documents link to that topic. Agent
 
 | Location                     | Responsibility                                                               |
 | ---------------------------- | ---------------------------------------------------------------------------- |
-| [`src/`](../src)             | Desktop frontend: React, Vite, TypeScript, Tailwind, and NextUI              |
+| [`src/`](../src)             | Desktop frontend: React, Vite, TypeScript, Tailwind, and HeroUI              |
 | [`src-tauri/`](../src-tauri) | Desktop backend and packaging: Rust and Tauri                                |
 | [`web/`](../web)             | Independent Next.js landing page, with its own package manifest and lockfile |
 | [`tests/`](../tests)         | Shared media fixtures and frontend test support                              |
@@ -28,9 +28,11 @@ The frontend/backend runtime boundary and IPC contracts are described in [core l
 
 ## Local setup
 
-- Use the Node.js and pnpm versions specified by `engines` and `packageManager` in [package.json](../package.json).
+- Use the Node.js and pnpm versions specified by `engines` and `devEngines.packageManager` in [package.json](../package.json). [.node-version](../.node-version) selects Node.js for compatible version managers. Install pnpm separately if your Node distribution does not include Corepack.
 - Desktop development also needs Rustup and the platform's native Tauri build dependencies. [rust-toolchain.toml](../rust-toolchain.toml) pins the Rust version and components for local development and CI; Rustup installs them on first use. [CI setup](../.github/workflows/test.yml) lists the Linux system packages.
-- Rust dependencies are declared in [Cargo.toml](../src-tauri/Cargo.toml) and resolved in [Cargo.lock](../src-tauri/Cargo.lock).
+- Dependency requirements are defined in the package manifests; lockfiles record the resolved versions. Keep both pnpm lockfiles and Cargo.lock checked in, and use frozen/locked installs in CI. Use the user-level pnpm store rather than a store inside the repository.
+
+Development builds require macOS 13.3 or later. The frontend and website target Safari 16.4+, Chrome/Edge 111+, and Firefox 128+; Windows and Linux need a corresponding modern WebView.
 
 Install desktop frontend dependencies from the repository root:
 
@@ -63,7 +65,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Its scripts are defined in [web/package.json](../web/package.json). The [website workflow](../.github/workflows/deploy-web-pages.yml) builds its static export for GitHub Pages.
+Its scripts are defined in [web/package.json](../web/package.json), including independent `typecheck` and `lint` checks. The [website workflow](../.github/workflows/deploy-web-pages.yml) builds its static export for GitHub Pages. The website keeps its own dependency manifest, pnpm settings, and lockfile; installing the desktop project is not required to build it.
 
 ## Prepare a desktop release
 

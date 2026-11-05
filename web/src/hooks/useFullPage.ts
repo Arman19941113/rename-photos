@@ -3,16 +3,16 @@ import { useLayoutEffect, useRef, useState } from 'react'
 
 export function useFullPage({ maxPage }: { maxPage: number }) {
   const [page, setPage] = useState(0)
-  const isScrolling = useRef(false)
-  const wheelTime = useRef(0)
+  const isScrollingRef = useRef(false)
+  const wheelTimeRef = useRef(0)
 
   useLayoutEffect(() => {
     const scrollToPage = () => {
       const newScrollTop = window.innerHeight * page
       if (window.scrollY === newScrollTop) return
-      isScrolling.current = true
+      isScrollingRef.current = true
       scrollTo(newScrollTop).then(() => {
-        isScrolling.current = false
+        isScrollingRef.current = false
       })
     }
     scrollToPage()
@@ -41,12 +41,12 @@ export function useFullPage({ maxPage }: { maxPage: number }) {
       ev.preventDefault()
       // avoid continuous wheel
       if (Math.abs(ev.deltaY) < 4) return
-      const lastTime = wheelTime.current
+      const lastTime = wheelTimeRef.current
       const newTime = Date.now()
-      wheelTime.current = newTime
+      wheelTimeRef.current = newTime
       if (newTime - lastTime < 50) return
       // avoid scrolling conflicts
-      if (isScrolling.current) return
+      if (isScrollingRef.current) return
 
       if (ev.deltaY > 0) {
         scrollDown()

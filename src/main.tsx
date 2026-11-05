@@ -1,4 +1,4 @@
-import { NextUIProvider } from '@nextui-org/system'
+import { HeroUIProvider } from '@heroui/system'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
@@ -7,8 +7,8 @@ import '@/locales/i18n'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <NextUIProvider>
+    <HeroUIProvider>
       <App />
-    </NextUIProvider>
+    </HeroUIProvider>
   </React.StrictMode>,
 )

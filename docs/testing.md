@@ -17,20 +17,25 @@ The [shared script](../scripts/check.mjs) runs frontend type checking, lint, and
 Local development and CI use [rust-toolchain.toml](../rust-toolchain.toml) as the single source for the Rust version and components. Install it with `rustup toolchain install --no-self-update`; subsequent acceptance runs do not require `rustup update stable`. Upgrade Rust by updating this file and running full acceptance. Local checks cover the host platform.
 
 The [test workflow](../.github/workflows/test.yml) runs on PRs and manual dispatch, and is reused by the [desktop release workflow](../.github/workflows/publish-desktop-release.yml).
-Frontend checks run on Linux; Rust checks run on Linux, macOS, and Windows.
+Frontend checks run on Linux; the frontend job also runs `pnpm build` after the shared acceptance script. Rust checks run on Linux, macOS, and Windows using the pinned toolchain.
+
+An independent website job installs only `web/` dependencies and runs its typecheck, lint, and static builds both with and without `GITHUB_PAGES=true`. The website job is included when the test workflow is reused for a release.
+
+For a local native build without packaging, run `pnpm tauri build --no-bundle`. This builds the application without launching it or publishing release assets.
 
 ## Test boundaries
 
-| Location                                                                                  | Responsibility                                                                                                                                       |
-| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`src/util/*.test.ts`](../src/util)                                                       | Formatting, template rules, and normal/strict previews from shared metadata                                                                          |
-| [`useFiles.test.ts`](../src/hooks/useFiles.test.ts)                                       | Hook flow with mocked Tauri/settings/notifications: loading, rename payloads, refresh, failures/retry, and duplicate requests                        |
-| [`files/tests.rs`](../src-tauri/src/files/tests.rs)                                       | Directory and explicit-path loading rules                                                                                                          |
-| [`rename/tests.rs`](../src-tauri/src/rename/tests.rs)                                     | Filename validation, two-phase rename, and conflict protection                                                                                     |
+| Location                                                                                  | Responsibility                                                                                                                                                                                |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`src/util/*.test.ts`](../src/util)                                                       | Formatting, template rules, and normal/strict previews from shared metadata                                                                                                                   |
+| [`useFiles.test.ts`](../src/hooks/useFiles.test.ts)                                       | Hook flow with mocked Tauri/settings/notifications: loading, rename payloads, refresh, failures/retry, and duplicate requests                                                                 |
+| `src/hooks/useInputFormat.test.ts`, `src/services/storage.test.ts`                        | History deduplication and persistence, unchanged storage keys, and settings restored by a recreated Zustand store                                                                             |
+| [`files/tests.rs`](../src-tauri/src/files/tests.rs)                                       | Directory and explicit-path loading rules                                                                                                                                                     |
+| [`rename/tests.rs`](../src-tauri/src/rename/tests.rs)                                     | Filename validation, two-phase rename, and conflict protection                                                                                                                                |
 | [`commands/file/real_media_tests.rs`](../src-tauri/src/commands/file/real_media_tests.rs) | Media IPC fields, supported/unsupported extension routing, mixed-batch isolation, distant TIFF/RAW metadata, rename/reload byte preservation, damaged-file isolation, and fixture size budget |
-| [`files/`](../src-tauri/src/files)                                                        | Platform filtering and case-insensitive supported/unsupported extension classification                                                            |
-| [`metadata/`](../src-tauri/src/metadata)                                                  | Date/numeric formatting, EXIF field selection, TIFF/RW2 bounds, and metadata read budgets                                                          |
-| [`scripts/*.test.ts`](../scripts)                                                         | Release notes and release operations with mocked GitHub APIs or disposable Git repositories                                                          |
+| [`files/`](../src-tauri/src/files)                                                        | Platform filtering and case-insensitive supported/unsupported extension classification                                                                                                        |
+| [`metadata/`](../src-tauri/src/metadata)                                                  | Date/numeric formatting, EXIF field selection, TIFF/RW2 bounds, and metadata read budgets                                                                                                     |
+| [`scripts/*.test.ts`](../scripts)                                                         | Release notes and release operations with mocked GitHub APIs or disposable Git repositories                                                                                                   |
 
 `pnpm typecheck` runs one `tsc -p tsconfig.typecheck.json` for application and test
 code. Builds use `tsconfig.json`. Imported JavaScript scripts have inferred types

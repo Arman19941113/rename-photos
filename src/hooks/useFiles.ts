@@ -50,9 +50,9 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
   }
 
   const [isRenaming, setIsRenaming] = useState(false)
-  const renameInFlight = useRef(false)
+  const renameInFlightRef = useRef(false)
   const handleClickRename = () => {
-    if (renameInFlight.current) return
+    if (renameInFlightRef.current) return
 
     const renameTargets = files.filter(item => !item.shouldSkip)
 
@@ -70,7 +70,7 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
     }
 
     // React batches state updates, so guard repeated calls synchronously as well.
-    renameInFlight.current = true
+    renameInFlightRef.current = true
     setIsRenaming(true)
     invoke<string[]>(TauriCommand.RENAME_FILES, { renamePathData })
       .then(res => {
@@ -90,7 +90,7 @@ export function useFileOperations({ format, onRenamed }: { format: string; onRen
       })
       .catch(err => handleError({ err, title: t('errors.renameFiles') }))
       .finally(() => {
-        renameInFlight.current = false
+        renameInFlightRef.current = false
         setIsRenaming(false)
       })
   }

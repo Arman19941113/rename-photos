@@ -8,8 +8,8 @@ import DownloadLinks, { type DownloadLabels } from '@/components/download-links'
 import { IconLanguage, RiFolderOpenLine, RiSettings4Line } from '@/components/icon'
 import MacShot from '@/components/mac-shot'
 import { useFullPage } from '@/hooks'
-import { Button } from '@nextui-org/button'
-import { Snippet } from '@nextui-org/snippet'
+import { Button } from '@heroui/button'
+import { Snippet } from '@heroui/snippet'
 import clsx from 'clsx'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
@@ -50,7 +50,7 @@ export default function NamePhotos() {
           <div className="ml-6 h-5 w-[1px] bg-default-300" />
           <Link
             href="/zh"
-            className="flex-center ml-6 cursor-pointer text-base font-semibold text-default-600 transition-transform hover:scale-110"
+            className="ml-6 flex-center cursor-pointer text-base font-semibold text-default-600 transition-transform hover:scale-110"
           >
             中
             <IconLanguage className="relative top-[0.5px] ml-0.5 text-large" />
@@ -59,10 +59,10 @@ export default function NamePhotos() {
       </header>
 
       {/* Page0 */}
-      <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
+      <div className="flex h-[100vh] w-1/3 items-center justify-end pt-16 pr-6 pb-24">
         <div className="w-96">
           <h1 className="text-2xl font-bold">Step 1: Choose files to rename</h1>
-          <ul className="list-disc pl-5 pt-3 text-default-600">
+          <ul className="list-disc pt-3 pl-5 text-default-600">
             <li className="py-1">
               Click
               <Button
@@ -80,10 +80,10 @@ export default function NamePhotos() {
       </div>
 
       {/* Page1 */}
-      <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
+      <div className="flex h-[100vh] w-1/3 items-center justify-end pt-16 pr-6 pb-24">
         <div className="w-96">
           <h1 className="text-2xl font-bold">Step 2: Confirm the new names</h1>
-          <ul className="list-decimal pl-5 pt-3 text-default-600">
+          <ul className="list-decimal pt-3 pl-5 text-default-600">
             <li className="py-1">Enter the format in the input box</li>
             <li className="py-1">Preview the new names in the table in real time</li>
           </ul>
@@ -91,10 +91,10 @@ export default function NamePhotos() {
       </div>
 
       {/* Page2 */}
-      <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
+      <div className="flex h-[100vh] w-1/3 items-center justify-end pt-16 pr-6 pb-24">
         <div className="w-96">
           <h1 className="text-2xl font-bold">Step 3: Apply the rename</h1>
-          <ul className="list-disc pl-5 pt-3 text-default-600">
+          <ul className="list-disc pt-3 pl-5 text-default-600">
             <li className="py-1">
               Click
               <Button radius="sm" size="sm" className="btn--grad-pink ml-2">
@@ -105,7 +105,7 @@ export default function NamePhotos() {
           </ul>
 
           <h2 className="mt-8 text-lg font-medium">💡 Open settings to view the rename rules</h2>
-          <ul className="list-disc pl-5 pt-1 text-default-600">
+          <ul className="list-disc pt-1 pl-5 text-default-600">
             <li className="py-1">
               Click
               <motion.button
@@ -126,10 +126,10 @@ export default function NamePhotos() {
       </div>
 
       {/* Page3 */}
-      <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
+      <div className="flex h-[100vh] w-1/3 items-center justify-end pt-16 pr-6 pb-24">
         <div className="w-96">
           <h1 className="text-2xl font-bold">Q&A: Multiple files share metadata</h1>
-          <ul className="list-disc pl-5 pt-3 text-default-600">
+          <ul className="list-disc pt-3 pl-5 text-default-600">
             <li className="py-1">
               If multiple files share the same metadata, the app automatically adds sequence numbers to avoid naming
               conflicts.
@@ -139,10 +139,10 @@ export default function NamePhotos() {
       </div>
 
       {/* Page4 */}
-      <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
+      <div className="flex h-[100vh] w-1/3 items-center justify-end pt-16 pr-6 pb-24">
         <div className="w-96">
           <h1 className="text-2xl font-bold">Q&A: Missing metadata</h1>
-          <ul className="list-disc pl-5 pt-3 text-default-600">
+          <ul className="list-disc pt-3 pl-5 text-default-600">
             <li className="py-1">If a file lacks metadata, placeholders are used.</li>
             <li className="py-1">If strict mode is enabled in Settings, files without metadata are skipped.</li>
           </ul>
@@ -150,7 +150,7 @@ export default function NamePhotos() {
       </div>
 
       {/* Page5 */}
-      <div className="flex h-[100vh] w-1/3 items-center justify-end pb-24 pr-6 pt-16">
+      <div className="flex h-[100vh] w-1/3 items-center justify-end pt-16 pr-6 pb-24">
         <div className="w-96">
           <h1 className="text-2xl font-bold">Download & Install</h1>
           <DownloadLinks labels={downloadLabels} />

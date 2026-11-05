@@ -1,7 +1,8 @@
 import { RiChatHistoryLine, RiFolderOpenLine } from '@/components/icon'
-import { Button } from '@nextui-org/button'
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
-import { Input } from '@nextui-org/input'
+import { Button } from '@heroui/button'
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/dropdown'
+import type { Selection } from '@heroui/table'
+import { Input } from '@heroui/input'
 import { clsx } from 'clsx'
 import { KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -37,16 +38,16 @@ function OperationBar({
   const items = formatOptions.map(option => ({ key: option, value: option }))
 
   useEffect(() => {
-    if (!isRenaming) {
-      setShowRenamingLoading(false)
-      return
-    }
+    if (!isRenaming) return
 
     const timer = window.setTimeout(() => {
       setShowRenamingLoading(true)
     }, RENAMING_LOADING_DELAY_MS)
 
-    return () => window.clearTimeout(timer)
+    return () => {
+      window.clearTimeout(timer)
+      setShowRenamingLoading(false)
+    }
   }, [isRenaming])
 
   const handleCompositionStart = () => {
@@ -73,10 +74,13 @@ function OperationBar({
     onFormatChange(val)
   }
 
-  const handleSelect = (selection: any) => {
-    const [val] = [...selection]
-    onInputValueChange(val)
-    onFormatChange(val)
+  const handleSelect = (selection: Selection) => {
+    if (selection === 'all') return
+    const [value] = selection
+    if (value === undefined) return
+    const format = String(value)
+    onInputValueChange(format)
+    onFormatChange(format)
   }
 
   return (
@@ -93,6 +97,7 @@ function OperationBar({
 
       <div className={clsx(hasFiles ? 'flex' : 'hidden', 'w-full items-center justify-end pl-20')}>
         <Input
+          aria-label={t('buttons.renameFormat')}
           ref={inputRef}
           value={inputValue}
           className="max-w-80"
@@ -107,9 +112,9 @@ function OperationBar({
         />
         <Dropdown placement="bottom-end" offset={14}>
           <DropdownTrigger>
-            <div>
+            <button type="button" aria-label={t('buttons.formatHistory')}>
               <RiChatHistoryLine className="cursor-pointer text-large text-default-500" />
-            </div>
+            </button>
           </DropdownTrigger>
           <DropdownMenu
             color="secondary"
@@ -128,7 +133,7 @@ function OperationBar({
           size="sm"
           className="btn--grad-pink ml-4 shrink-0"
           isDisabled={isRenaming}
-          isLoading={showRenamingLoading}
+          isLoading={isRenaming && showRenamingLoading}
           onClick={onClickRename}
         >
           {t('buttons.rename')}

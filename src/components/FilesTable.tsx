@@ -1,9 +1,9 @@
 import { RiAlertLine, RiCheckLine, RiCloseLine, RiQuestionnaireLine } from '@/components/icon'
 import { MetadataStatus } from '@/const'
 import type { UIFile } from '@/types/file'
-import { ScrollShadow } from '@nextui-org/scroll-shadow'
-import { Selection, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table'
-import { Tooltip } from '@nextui-org/tooltip'
+import { ScrollShadow } from '@heroui/scroll-shadow'
+import { Selection, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/table'
+import { Tooltip } from '@heroui/tooltip'
 import type { KeyboardEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -39,7 +39,7 @@ function FilesTable({
     }
   }
 
-  // NextUI clears Table's onKeyDownCapture, so intercept header navigation on its parent.
+  // HeroUI clears Table's onKeyDownCapture, so intercept header navigation on its parent.
   return (
     <ScrollShadow className="h-full" visibility="bottom" hideScrollBar onKeyDownCapture={handleKeyDownCapture}>
       <Table

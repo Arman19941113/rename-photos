@@ -2,9 +2,9 @@ import { RiInformationLine } from '@/components/icon'
 import { Language } from '@/const'
 import { storageService } from '@/services'
 import { updateStrictMode, updateUseCreatedDate, useConfigStore } from '@/store/useConfigStore.ts'
-import { Radio, RadioGroup } from '@nextui-org/radio'
-import { Switch } from '@nextui-org/switch'
-import { Tooltip } from '@nextui-org/tooltip'
+import { Radio, RadioGroup } from '@heroui/radio'
+import { Switch } from '@heroui/switch'
+import { Tooltip } from '@heroui/tooltip'
 import { useTranslation } from 'react-i18next'
 
 function Basic() {
@@ -32,6 +32,7 @@ function Basic() {
           <h2 className="text-base font-medium">{t('settings.language')}</h2>
         </div>
         <RadioGroup
+          aria-label={t('settings.language')}
           size="sm"
           color="secondary"
           orientation="horizontal"
@@ -55,7 +56,13 @@ function Basic() {
             </div>
           </Tooltip>
         </div>
-        <Switch size="sm" color="secondary" isSelected={strictMode} onValueChange={updateStrictMode} />
+        <Switch
+          aria-label={t('settings.strict.title')}
+          size="sm"
+          color="secondary"
+          isSelected={strictMode}
+          onValueChange={updateStrictMode}
+        />
       </div>
 
       {/* use created date setting */}
@@ -74,7 +81,13 @@ function Basic() {
             </div>
           </Tooltip>
         </div>
-        <Switch size="sm" color="secondary" isSelected={useCreatedDate} onValueChange={updateUseCreatedDate} />
+        <Switch
+          aria-label={t('settings.creationDate.title')}
+          size="sm"
+          color="secondary"
+          isSelected={useCreatedDate}
+          onValueChange={updateUseCreatedDate}
+        />
       </div>
     </div>
   )

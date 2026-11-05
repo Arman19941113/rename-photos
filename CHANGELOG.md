@@ -1,11 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
-### Changed
-
-- Updated Tauri to 2.12.5, the JavaScript API and CLI to 2.12.4, tauri-build to 2.7.4, and the dialog, filesystem, and shell plugins to their latest stable releases.
-
 ## [v1.0.4] - 2026-11-03
 
 ### Fixed

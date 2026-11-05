@@ -1,5 +1,5 @@
 import { formatVars } from '@/const'
-import { Snippet } from '@nextui-org/snippet'
+import { Snippet } from '@heroui/snippet'
 import { useTranslation } from 'react-i18next'
 
 function HelpDoc({ toggleVisible }: { toggleVisible: () => void }) {
@@ -17,7 +17,7 @@ function HelpDoc({ toggleVisible }: { toggleVisible: () => void }) {
         <p>{t('helpDoc.step2Desc')}</p>
         <ul className="flex flex-wrap">
           {formatVars.map(item => (
-            <li className="mr-2 mt-2" key={item}>
+            <li className="mt-2 mr-2" key={item}>
               <Snippet
                 hideSymbol
                 disableTooltip

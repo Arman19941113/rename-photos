@@ -5,7 +5,9 @@
   },
   "buttons": {
     "openFolder": "打开文件夹",
-    "rename": "重命名"
+    "rename": "重命名",
+    "renameFormat": "重命名规则",
+    "formatHistory": "历史规则"
   },
   "errors": {
     "system": "系统错误",

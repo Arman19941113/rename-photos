@@ -9,8 +9,6 @@ import { useInputFormat } from '@/hooks/useInputFormat.ts'
 import { AnimatePresence } from 'framer-motion'
 import { Flip, ToastContainer } from 'react-toastify'
 
-import 'react-toastify/dist/ReactToastify.css'
-
 function App() {
   const { inputValue, setInputValue, format, setFormat, formatOptions, updateLatestFormat } = useInputFormat()
   const {

@@ -1,11 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "../../hero.ts";
+@source "../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   body {
     @apply antialiased;
-    color: #11181C;
+    color: #11181c;
     overscroll-behavior: none;
   }
 }
@@ -13,7 +14,7 @@
 @layer components {
   .btn--grad-blue {
     color: white;
-    background-image: linear-gradient(to right, #77A1D3 0%, #79CBCA 51%, #77A1D3 100%);
+    background-image: linear-gradient(to right, #77a1d3 0%, #79cbca 51%, #77a1d3 100%);
     background-size: 200% auto;
     outline: none;
     user-select: none;
@@ -25,7 +26,7 @@
 
   .btn--grad-pink {
     color: white;
-    background-image: linear-gradient(to right, #FF6E7F 0%, #A4D8F3 51%, #FF6E7F 100%);
+    background-image: linear-gradient(to right, #ff6e7f 0%, #a4d8f3 51%, #ff6e7f 100%);
     background-size: 200% auto;
     background-position: right center;
     outline: none;
@@ -37,8 +38,6 @@
   }
 }
 
-@layer utilities {
-  .flex-center {
-    @apply flex items-center justify-center;
-  }
+@utility flex-center {
+  @apply flex items-center justify-center;
 }

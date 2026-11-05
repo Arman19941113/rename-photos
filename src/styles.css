@@ -1,17 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "../hero.ts";
+@source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --text-s: 13px;
+}
 
 @layer base {
+  /* Preserve Tailwind v3's default for borders without an explicit color. */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200);
+  }
+
   body {
-    @apply antialiased text-sm text-default-800 overflow-hidden;
+    @apply overflow-hidden text-sm text-default-800 antialiased;
   }
 }
 
-@layer utilities {
-  .flex-center {
-    @apply flex items-center justify-center;
-  }
+@utility flex-center {
+  @apply flex items-center justify-center;
 }
 
 .btn--grad-blue {

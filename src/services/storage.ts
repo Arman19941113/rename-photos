@@ -13,7 +13,7 @@ export const storageService = {
    * Language configuration
    */
   getLanguage(): Language {
-    const saved = getLocalStorage(StorageKey.Language)
+    const saved = getLocalStorage<Language>(StorageKey.Language)
     if (saved) return saved
     const browserLang = navigator.language || Language.EN
     return browserLang.toLowerCase().startsWith('zh') ? Language.ZH : Language.EN
@@ -46,7 +46,7 @@ export const storageService = {
    * Format options history
    */
   getFormatOptions(): string[] {
-    const ret = getLocalStorage(StorageKey.FormatOptions)
+    const ret = getLocalStorage<string[]>(StorageKey.FormatOptions)
     if (ret) return ret
     return ['{YYYY}{MM}{DD} {hh}.{mm}.{ss}']
   },

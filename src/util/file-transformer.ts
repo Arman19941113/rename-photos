@@ -17,7 +17,7 @@ export function transformIPCFiles({
   strictMode: boolean
   useCreatedDate: boolean
   format: string
-  t: any
+  t: (key: string) => string
 }): UIFile[] {
   const usedVars = formatVars.filter(v => format.includes(v))
 
@@ -84,7 +84,7 @@ export function transformIPCFiles({
   const newNameCounter: Record<string, number> = {}
   // compute newFilename
   files.forEach(item => {
-    let newFilename = ''
+    let newFilename: string
     if (!format) {
       item.shouldSkip = true
       item.newFilename = item.filename
@@ -106,7 +106,7 @@ export function transformIPCFiles({
     }
     // record lowerNewFilename counts
     const lowerNewFilename = newFilename.toLowerCase()
-    if (newNameCounter.hasOwnProperty(lowerNewFilename)) {
+    if (Object.prototype.hasOwnProperty.call(newNameCounter, lowerNewFilename)) {
       newNameCounter[lowerNewFilename] += 1
     } else {
       newNameCounter[lowerNewFilename] = 1
@@ -122,7 +122,7 @@ export function transformIPCFiles({
     const totalCount = newNameCounter[lowerNewFilename]
     if (totalCount > 1) {
       const countLength = totalCount.toString().length
-      const sequence = nameSeqRecord.hasOwnProperty(lowerNewFilename)
+      const sequence = Object.prototype.hasOwnProperty.call(nameSeqRecord, lowerNewFilename)
         ? ++nameSeqRecord[lowerNewFilename]
         : (nameSeqRecord[lowerNewFilename] = 1)
       const seqString = '_' + sequence.toString().padStart(countLength, '0')
@@ -206,7 +206,7 @@ function generateFilename({
       basename = basename.replace(new RegExp(key, 'g'), getValidPath(value))
     })
     return basename + getExtName(filename)
-  } catch (e) {
+  } catch {
     return format
   }
 }
@@ -264,10 +264,11 @@ function isTemplateSatisfiable({
       case '{current}':
         break
 
-      default:
+      default: {
         // there’s nothing left in a union
         const _exhaustiveCheck: never = v
         throw new Error(`Unhandled format variable: ${_exhaustiveCheck}`)
+      }
     }
   }
 
@@ -281,7 +282,7 @@ function getMetadataStatusAndTips({
 }: {
   metadata: AnyMetadata
   metaError: string | null
-  t: any
+  t: (key: string) => string
 }): { metadataStatus: MetadataStatus; metadataTips: string } {
   if (metaError) {
     return {

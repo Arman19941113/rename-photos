@@ -1,4 +1,4 @@
-export function getLocalStorage(key: string): any {
+export function getLocalStorage<T = unknown>(key: string): T | null {
   try {
     const value = localStorage.getItem(key)
     if (!value) return null
@@ -9,7 +9,7 @@ export function getLocalStorage(key: string): any {
   }
 }
 
-export function setLocalStorage(key: string, value: any): void {
+export function setLocalStorage(key: string, value: unknown): void {
   try {
     localStorage.setItem(key, JSON.stringify(value))
   } catch (error) {
@@ -25,7 +25,7 @@ export function removeLocalStorage(key: string): void {
   }
 }
 
-export function getSessionStorage(key: string): any {
+export function getSessionStorage<T = unknown>(key: string): T | null {
   try {
     const value = sessionStorage.getItem(key)
     if (!value) return null
@@ -36,7 +36,7 @@ export function getSessionStorage(key: string): any {
   }
 }
 
-export function setSessionStorage(key: string, value: any): void {
+export function setSessionStorage(key: string, value: unknown): void {
   try {
     sessionStorage.setItem(key, JSON.stringify(value))
   } catch (error) {

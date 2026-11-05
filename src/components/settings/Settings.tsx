@@ -3,8 +3,8 @@ import About from '@/components/settings/About.tsx'
 import Basic from '@/components/settings/Basic.tsx'
 import HelpDoc from '@/components/settings/HelpDoc.tsx'
 import { toggleVisible, updateVisible, useConfigStore } from '@/store/useConfigStore.ts'
-import { Modal, ModalBody, ModalContent } from '@nextui-org/modal'
-import { Tab, Tabs } from '@nextui-org/tabs'
+import { Modal, ModalBody, ModalContent } from '@heroui/modal'
+import { Tab, Tabs } from '@heroui/tabs'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -27,7 +27,7 @@ function Settings() {
 
   // setting tabs
   const [tab, setTab] = useState('Help')
-  let tabs = [
+  const tabs = [
     {
       id: 'Settings',
       title: (
@@ -89,7 +89,11 @@ function Settings() {
                 color="secondary"
                 variant="underlined"
               >
-                {item => <Tab key={item.id} title={item.title} children={item.content} />}
+                {item => (
+                  <Tab key={item.id} title={item.title}>
+                    {item.content}
+                  </Tab>
+                )}
               </Tabs>
             </div>
           </ModalBody>

@@ -2,4 +2,10 @@ packages:
   - .
 
 allowBuilds:
+  '@heroui/shared-utils': true
   esbuild: true
+
+minimumReleaseAgeExclude:
+  - framer-motion@14.9.1
+  - motion-dom@14.9.1
+  - react-i18next@17.1.12

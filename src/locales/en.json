@@ -5,7 +5,9 @@
   },
   "buttons": {
     "openFolder": "Open Folder",
-    "rename": "Rename"
+    "rename": "Rename",
+    "renameFormat": "Rename format",
+    "formatHistory": "Format history"
   },
   "errors": {
     "system": "System Error",
