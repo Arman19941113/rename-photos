@@ -85,14 +85,18 @@ jobs:
       matrix:
         include:
           - platform: 'macos-latest' # for Arm based macs (M1 and above).
-            args: '--target aarch64-apple-darwin'
+            args: '--target aarch64-apple-darwin --bundles dmg'
+            bundle-path: 'src-tauri/target/aarch64-apple-darwin/release/bundle/dmg'
           - platform: 'macos-latest' # for Intel based macs.
-            args: '--target x86_64-apple-darwin'
+            args: '--target x86_64-apple-darwin --bundles dmg'
+            bundle-path: 'src-tauri/target/x86_64-apple-darwin/release/bundle/dmg'
           # Pin the Linux compatibility baseline; keep Rust CI on the same image.
           - platform: 'ubuntu-24.04'
-            args: ''
+            args: '--bundles deb'
+            bundle-path: 'src-tauri/target/release/bundle/deb'
           - platform: 'windows-latest'
-            args: ''
+            args: '--bundles nsis'
+            bundle-path: 'src-tauri/target/release/bundle/nsis'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -131,16 +135,28 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build and upload release assets
-        uses: tauri-apps/tauri-action@v1
+      - name: Build release installer
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          releaseId: ${{ needs.prepare-draft-release.outputs.release-id }}
-          tagName: ${{ github.ref_name }}
-          releaseDraft: true
-          uploadUpdaterJson: false
-          args: ${{ matrix.args }}
+          TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
+        run: pnpm tauri build ${{ matrix.args }}
+
+      # tauri-action also archives and uploads the macOS .app, even with --bundles dmg.
+      - name: Upload release installer
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          BUNDLE_PATH: ${{ matrix.bundle-path }}
+        run: |
+          shopt -s nullglob
+          installers=("$BUNDLE_PATH"/*.{dmg,exe,deb})
+          if [ "${#installers[@]}" -ne 1 ]; then
+            echo "::error::Expected exactly one installer in $BUNDLE_PATH, found ${#installers[@]}."
+            exit 1
+          fi
+          gh release upload "$RELEASE_TAG" "${installers[0]}" --clobber
 
   publish-release:
     needs: [test-release, prepare-draft-release, build-release-assets]

@@ -9,7 +9,7 @@ const LATEST_RELEASE_URL = 'https://github.com/Arman19941113/rename-photos/relea
 const downloadTargets = [
   { key: 'macApple', assetSuffix: '_aarch64.dmg' },
   { key: 'macIntel', assetSuffix: '_x64.dmg' },
-  { key: 'windows', assetSuffix: '_x64_en-US.msi' },
+  { key: 'windows', assetSuffix: '_x64-setup.exe' },
   { key: 'linux', assetSuffix: '_amd64.deb' },
 ] as const
 
