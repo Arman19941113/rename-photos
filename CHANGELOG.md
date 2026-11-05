@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.1.0] - 2026-11-05
+
+### Changed
+
+- Raised the minimum supported macOS version to 13.3.
+- Updated Tauri and desktop dependencies, including migrating UI components to HeroUI and styles to Tailwind CSS 4.
+- Improved keyboard and screen-reader accessibility for format history, the rename format input, and basic settings controls.
+
 ## [v1.0.4] - 2026-11-03
 
 ### Fixed
