@@ -1,7 +1,14 @@
 @import "tailwindcss";
 @plugin "../../hero.ts";
-@source "../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+  --color-neutral-200: #e5e5e5;
+  --default-transition-duration: 250ms;
+}
 
 @layer base {
   body {
@@ -40,4 +47,11 @@
 
 @utility flex-center {
   @apply flex items-center justify-center;
+}
+
+/* HeroUI's copy feedback still uses this Tailwind 3 utility. */
+@utility transition-transform-opacity {
+  transition-property: transform, scale, opacity;
+  transition-timing-function: ease;
+  transition-duration: var(--default-transition-duration);
 }

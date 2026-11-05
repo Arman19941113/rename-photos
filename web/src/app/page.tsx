@@ -109,7 +109,7 @@ export default function NamePhotos() {
             <li className="py-1">
               Click
               <motion.button
-                className="relative top-[2px] mx-2 text-lg text-default-600 outline-none"
+                className="relative top-[2px] mx-2 cursor-pointer text-lg text-default-600 outline-hidden"
                 whileHover={{ scale: 1.6, rotate: 90 }}
                 whileTap={{ scale: 1.2, rotate: 180 }}
               >
@@ -166,7 +166,7 @@ export default function NamePhotos() {
                 Rename Photos is not currently notarized by Apple. If you downloaded it from the official GitHub
                 Releases page and trust the source, remove the quarantine attribute with:
               </p>
-              <Snippet className="pointer-events-auto mb-24" color="secondary">
+              <Snippet className="pointer-events-auto mb-24 text-secondary-700" color="secondary">
                 sudo xattr -dr com.apple.quarantine &quot;/Applications/Rename Photos.app&quot;
               </Snippet>
             </div>
