@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.2.0] - 2026-11-15
+
+### Added
+
+- Rename JPEG XL (`.jxl`) photos using uncompressed EXIF metadata such as capture date, camera, lens, and exposure settings.
+
+### Fixed
+
+- Limit work in the TIFF compatibility reader so excessive metadata or repeated directory references report an error for the affected file and the rest of the batch can load.
+
 ## [v1.1.0] - 2026-11-05
 
 ### Changed
