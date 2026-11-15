@@ -38,7 +38,7 @@ sudo xattr -dr com.apple.quarantine "/Applications/Rename Photos.app"
 
 ### 支持哪些照片和视频格式？
 
-支持 JPEG、PNG、WebP、TIFF、HEIC / HEIF、AVIF，以及 DNG、ARW、CR2 / CR3、NEF、RAF、RW2 等 RAW 格式的照片元数据读取；视频格式包括 MP4、MOV、M4V、3GP / 3G2、MKV 和 WebM。
+支持 JPEG、PNG、WebP、TIFF、HEIC / HEIF、AVIF、JPEG XL（未压缩 EXIF），以及 DNG、ARW、CR2 / CR3、NEF、RAF、RW2 等 RAW 格式的照片元数据读取；视频格式包括 MP4、MOV、M4V、3GP / 3G2、MKV 和 WebM。
 
 能否读取具体字段，取决于文件本身保存的元数据及格式兼容性。视频可用的命名字段为日期、制造商和相机型号，镜头与曝光参数仅适用于照片。界面中的图片预览和视频播放能力还取决于系统支持，无法预览不代表无法读取元数据。
 

@@ -29,7 +29,7 @@ fn read_image_metadata(
     path: &Path,
     parser: &mut MediaParser,
 ) -> anyhow::Result<Option<ImageMetadata>> {
-    Ok(extract_image_metadata(read_exif(path, parser)?))
+    Ok(read_exif(path, parser)?.and_then(extract_image_metadata))
 }
 
 fn extract_image_metadata(exif: ExifIter) -> Option<ImageMetadata> {
@@ -147,7 +147,9 @@ mod tests {
             "image-sony-2.JPG",
             "test.RW2",
         ] {
-            let iter = read_exif(&root.join(filename), &mut parser).unwrap();
+            let iter = read_exif(&root.join(filename), &mut parser)
+                .unwrap()
+                .unwrap();
             assert_matches_eager(iter, filename);
         }
     }

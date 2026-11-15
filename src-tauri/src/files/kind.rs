@@ -16,11 +16,10 @@ pub(super) fn detect_file_kind(path: &Path) -> FileKind {
         .to_ascii_lowercase();
 
     match ext.as_str() {
-        // Images supported by nom-exif or the TIFF/RAW compatibility readers.
+        // Images supported by nom-exif or the EXIF compatibility readers.
         "jpg" | "jpeg" | "png" | "webp" | "tif" | "tiff" | "heic" | "heif" | "heics" | "avif"
-        | "dng" | "arw" | "cr2" | "cr3" | "nef" | "raf" | "rw2" | "sr2" | "srf" | "pef" | "iiq" => {
-            FileKind::Image
-        }
+        | "jxl" | "dng" | "arw" | "cr2" | "cr3" | "nef" | "raf" | "rw2" | "sr2" | "srf" | "pef"
+        | "iiq" => FileKind::Image,
 
         // Videos
         "mp4" | "mov" | "m4v" | "3gp" | "3g2" | "mkv" | "webm" | "mka" => FileKind::Video,
@@ -39,7 +38,7 @@ mod tests {
     fn detects_images_case_insensitively() {
         assert_extensions_kind(
             &[
-                "jpg", "jpeg", "png", "webp", "tif", "tiff", "heic", "heif", "heics", "avif",
+                "jpg", "jpeg", "png", "webp", "tif", "tiff", "heic", "heif", "heics", "avif", "jxl",
             ],
             FileKind::Image,
         );

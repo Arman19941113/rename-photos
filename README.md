@@ -38,7 +38,7 @@ sudo xattr -dr com.apple.quarantine "/Applications/Rename Photos.app"
 
 ### Which photo and video formats are supported?
 
-Metadata reading is supported for JPEG, PNG, WebP, TIFF, HEIC / HEIF, AVIF, and RAW photo formats such as DNG, ARW, CR2 / CR3, NEF, RAF, and RW2. Video formats include MP4, MOV, M4V, 3GP / 3G2, MKV, and WebM.
+Metadata reading is supported for JPEG, PNG, WebP, TIFF, HEIC / HEIF, AVIF, JPEG XL (uncompressed EXIF), and RAW photo formats such as DNG, ARW, CR2 / CR3, NEF, RAF, and RW2. Video formats include MP4, MOV, M4V, 3GP / 3G2, MKV, and WebM.
 
 Available fields depend on the metadata stored in each file and format compatibility. Video naming fields include date, make, and camera model; lens and exposure settings are available only for photos. Image previews and video playback also depend on system support. A file that cannot be previewed may still have readable metadata.
 

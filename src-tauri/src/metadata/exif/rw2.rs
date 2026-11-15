@@ -1,9 +1,9 @@
 //! Panasonic RW2 metadata via bounded embedded JPEG reads and TIFF fallback.
 
 use nom_exif::{ExifIter, MediaParser, MediaSource};
-use std::io::{self, Read, Seek, SeekFrom};
+use std::io::{Read, Seek, SeekFrom};
 
-use super::tiff;
+use super::{read_range::ReadRange, tiff};
 
 const JPEG_SOI: [u8; 2] = [0xff, 0xd8];
 const TIFF_HEADER_LEN: u64 = 8;
@@ -119,55 +119,6 @@ fn read_u32_le_at(reader: &mut (impl Read + Seek), offset: u64) -> anyhow::Resul
     Ok(u32::from_le_bytes(bytes))
 }
 
-struct ReadRange<'a, R> {
-    reader: &'a mut R,
-    start: u64,
-    length: u64,
-    position: u64,
-}
-
-impl<'a, R: Seek> ReadRange<'a, R> {
-    fn new(reader: &'a mut R, start: u64, length: u64) -> io::Result<Self> {
-        reader.seek(SeekFrom::Start(start))?;
-        Ok(Self {
-            reader,
-            start,
-            length,
-            position: 0,
-        })
-    }
-}
-
-impl<R: Read> Read for ReadRange<'_, R> {
-    fn read(&mut self, bytes: &mut [u8]) -> io::Result<usize> {
-        let length = (self.length - self.position).min(bytes.len() as u64) as usize;
-        let read = self.reader.read(&mut bytes[..length])?;
-        self.position += read as u64;
-        Ok(read)
-    }
-}
-
-impl<R: Seek> Seek for ReadRange<'_, R> {
-    fn seek(&mut self, position: SeekFrom) -> io::Result<u64> {
-        let position = match position {
-            SeekFrom::Start(position) => position as i128,
-            SeekFrom::Current(offset) => self.position as i128 + offset as i128,
-            SeekFrom::End(offset) => self.length as i128 + offset as i128,
-        };
-        if position < 0 || position > self.length as i128 {
-            return Err(io::ErrorKind::InvalidInput.into());
-        }
-        let position = position as u64;
-        let absolute = self
-            .start
-            .checked_add(position)
-            .ok_or(io::ErrorKind::InvalidInput)?;
-        self.reader.seek(SeekFrom::Start(absolute))?;
-        self.position = position;
-        Ok(position)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::super::test_support::sparse_reader;
@@ -184,6 +135,7 @@ mod tests {
             let data = minimal_tiff_data(magic);
             let length = data.len() as u64;
             let exif: Exif = read_compatible_exif(&mut Cursor::new(data), length, &mut parser)
+                .unwrap()
                 .unwrap()
                 .into();
             assert_eq!(field_string(&exif, Tag::Make).as_deref(), Some("Panasonic"));

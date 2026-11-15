@@ -34,7 +34,7 @@ For a local native build without packaging, run `pnpm tauri build --no-bundle`. 
 | [`rename/tests.rs`](../src-tauri/src/rename/tests.rs)                                     | Filename validation, two-phase rename, and conflict protection                                                                                                                                |
 | [`commands/file/real_media_tests.rs`](../src-tauri/src/commands/file/real_media_tests.rs) | Media IPC fields, supported/unsupported extension routing, mixed-batch isolation, distant TIFF/RAW metadata, rename/reload byte preservation, damaged-file isolation, and fixture size budget |
 | [`files/`](../src-tauri/src/files)                                                        | Platform filtering and case-insensitive supported/unsupported extension classification                                                                                                        |
-| [`metadata/`](../src-tauri/src/metadata)                                                  | Date/numeric formatting, EXIF field selection, TIFF/RW2 bounds, and metadata read budgets                                                                                                     |
+| [`metadata/`](../src-tauri/src/metadata)                                                  | Date/numeric formatting, EXIF field selection, and TIFF, RW2, and JPEG XL parsing limits                                                                                                      |
 | [`scripts/*.test.ts`](../scripts)                                                         | Release notes and release operations with mocked GitHub APIs or disposable Git repositories                                                                                                   |
 
 `pnpm typecheck` runs one `tsc -p tsconfig.typecheck.json` for application and test
@@ -65,14 +65,19 @@ The bundled corpus has a total size budget of 256 KiB, enforced by the Rust test
 
 The two iPhone JPEGs share a date and exercise duplicate numbering. The screenshot
 has no tracked EXIF fields; RW2 lacks a lens; both MP4s lack make/model but retain
-a date. Damaged JPEG/MP4 cases are generated in temporary directories.
+a date. Damaged JPEG, JPEG XL, and MP4 cases are generated in temporary directories.
 
 TIFF/RAW compatibility tests generate temporary files with distant metadata,
-both TIFF byte orders, invalid ranges, and cyclic IFDs. Counted readers enforce
+both TIFF byte orders, invalid ranges, and cyclic or shared IFDs. They also check
+the total copy limit for overlapping metadata values. Counted readers enforce
 a small I/O budget while files contain large gaps or trailing sensor data.
-RW2 tests cover bounded JPEG reads and TIFF fallback. Image extraction is also
-compared with eager `nom_exif::Exif` lookup for namespace priority, primary-image
-selection, and partial entry errors. These cases do not add bundled media files.
+RW2 tests cover bounded JPEG reads and TIFF fallback. JPEG XL unit tests cover the
+box scan limit, EXIF boundaries, and skipping large image payloads. The JPEG XL
+IPC test checks naming fields through both loading paths using a synthetic container
+with EXIF from the bundled Sony JPEG and a placeholder codestream. Image extraction
+is also compared with eager `nom_exif::Exif` lookup for namespace priority,
+primary-image selection, and partial entry errors. These cases do not add bundled
+media files.
 
 Extension-routing tests exercise both directory and explicit-path loading. Temporary copies of the bundled MP4 use `3g2a`, `3g2b`, and `3g2c` brands with `.3g2`/`.3G2` filenames and retain the expected track metadata. The distant-TIFF test also uses `.iiq`/`.IIQ` filenames to verify TIFF compatibility routing; it does not represent a separate real Phase One sample or test RAW decoding. AVI, ORF, and X3F paths remain visible as `other` files without metadata fields or parser errors. No additional bundled media is required.
 

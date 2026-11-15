@@ -8,14 +8,14 @@ The backend classifies accepted files by case-insensitive extension in [kind.rs]
 
 | Kind            | Extensions                                                                         |
 | --------------- | ---------------------------------------------------------------------------------- |
-| Image           | `jpg`, `jpeg`, `png`, `webp`, `tif`, `tiff`, `heic`, `heif`, `heics`, `avif`       |
+| Image           | `jpg`, `jpeg`, `png`, `webp`, `tif`, `tiff`, `heic`, `heif`, `heics`, `avif`, `jxl` |
 | Image, RAW-like | `dng`, `arw`, `cr2`, `cr3`, `nef`, `raf`, `rw2`, `sr2`, `srf`, `pef`, `iiq`        |
 | Video           | `mp4`, `mov`, `m4v`, `3gp`, `3g2`, `mkv`, `webm`, `mka`                            |
 | Other           | All other extensions                                                               |
 
 Classification selects a parsing path; extraction also depends on the actual container and its metadata. UI preview support uses a separate extension allowlist described in [core logic](core-logic.md#ui-presentation-rules).
 
-The extension list follows the containers recognized by `nom-exif`, including Phase One IIQ and ISOBMFF 3G2, plus the [TIFF/RAW](#tiff-and-raw-compatibility) and [Panasonic RW2](#panasonic-rw2) compatibility readers. TIFF-based RAW extensions share the TIFF path; this does not guarantee support for every camera variant. `mka` is an audio container and uses the same track-metadata path and `video` IPC shape as videos.
+The extension list follows the containers recognized by `nom-exif`, plus the [TIFF/RAW](#tiff-and-raw-compatibility), [Panasonic RW2](#panasonic-rw2), and [JPEG XL](#jpeg-xl) compatibility readers. TIFF-based RAW extensions share the TIFF path; this does not guarantee support for every camera variant. `mka` is an audio container and uses the same track-metadata path and `video` IPC shape as videos.
 
 AVI, Olympus ORF, and Sigma X3F containers have no supported parsing path. Their extensions are classified as `other`; eligible files still appear in the file list, without metadata or metadata errors.
 
@@ -62,6 +62,8 @@ Each directory or explicit-path load creates one `MediaParser` in the backend bl
 
 Images are opened once by the [image reader](../src-tauri/src/metadata/exif/mod.rs). It first uses `MediaSource::seekable` and `MediaParser::parse_exif`. The resulting `ExifIter` is traversed once, retaining only the eight naming fields without building a complete EXIF map or explicitly decoding GPS.
 
+If standard EXIF parsing fails, the image reader tries a matching compatibility reader. If that reader fails, its error is reported for the file. If no compatibility reader matches, the standard parser's error is retained.
+
 Image fields come from the main image. Successful values are selected in TIFF, EXIF, GPS, then Interop namespace order, independently of traversal order. Thumbnail fields do not fill missing main-image fields, and individual entry errors leave that value unavailable.
 
 Videos use `MediaSource::open` and `MediaParser::parse_track`. A recognized image container on the video path returns no metadata. Both extractors convert read errors to strings at their result-adaptation boundary.
@@ -74,7 +76,7 @@ When standard parsing fails, compatibility readers reuse the same open file. A m
 2. Retain naming and timezone entries, read their referenced values, and rewrite offsets into a compact TIFF buffer.
 3. Parse the compact buffer with `MediaSource::from_memory` and the batch's `MediaParser`.
 
-Both TIFF byte orders and distant metadata offsets are supported. Compatibility reads skip pixel data and gaps between referenced metadata. Referenced ranges and directory nesting are checked before reading; cyclic IFDs fail parsing. Thumbnail IFD chains are excluded from the compact buffer.
+Both TIFF byte orders and distant metadata offsets are supported. Compatibility reads skip pixel data and gaps between referenced metadata. The reader checks referenced ranges and directory nesting before reading. Each supported subdirectory tag can point to one IFD per directory, and any IFD referenced more than once causes a per-file metadata error. These checks bound directory traversal and reject cycles. The compact TIFF buffer is limited to 1 MiB, including copies of overlapping values. Exceeding this limit reports a per-file metadata error. Thumbnail IFD chains are excluded from the compact buffer.
 
 ## Panasonic RW2
 
@@ -84,4 +86,8 @@ The [EXIF reader](../src-tauri/src/metadata/exif/mod.rs) recognizes the Panasoni
 2. Parse the first JPEG candidate through a seekable view bounded by that blob's range. The reader does not allocate a buffer for the declared blob length. JPEGs of at most 128 bytes are parsed from memory.
 3. If no JPEG candidate is found or JPEG parsing fails, use the TIFF compatibility reader on the RW2 metadata. Its compact buffer has a standard TIFF header; the source file is unchanged.
 
-For a container without a matching compatibility reader, the standard parser's error is retained. For matching containers, a compatibility failure supplies the per-file error.
+## JPEG XL
+
+The [JPEG XL reader](../src-tauri/src/metadata/exif/jxl.rs) validates the required `ftyp` box after the signature. To bound work per file, it scans at most 4,096 more box headers for an image codestream and EXIF, skipping image data by seeking. Reaching the end without a codestream payload or needing to scan another box beyond the limit reports a per-file metadata error. The reader passes the TIFF data in an uncompressed `Exif` box to the TIFF compatibility reader and bounds TIFF reads to that box.
+
+Bare JPEG XL codestreams return no naming metadata. A container also returns no naming metadata if the scan reaches the end within the limit and finds image data without an uncompressed `Exif` box. XMP and Brotli-compressed metadata boxes are not read.

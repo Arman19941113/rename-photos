@@ -72,9 +72,15 @@ fn damaged_media_reports_per_file_errors_without_failing_the_load() {
     let jpeg = fs::read(root.join("image-sony-2.JPG")).unwrap();
     let mp4 = fs::read(root.join("video-large.mp4")).unwrap();
     let dir = tempdir().unwrap();
-    let cases: [(&str, &str, &[u8]); 4] = [
+    let cases: [(&str, &str, &[u8]); 6] = [
         ("empty.jpg", "image", b""),
         ("truncated.jpg", "image", &jpeg[..32]),
+        ("truncated.jxl", "image", b"\0\0\0\x0cJXL \x0d\x0a\x87\x0a"),
+        (
+            "missing-codestream.jxl",
+            "image",
+            b"\0\0\0\x0cJXL \x0d\x0a\x87\x0a\0\0\0\x14ftypjxl \0\0\0\0jxl ",
+        ),
         ("invalid.mp4", "video", b"not a media container"),
         ("truncated.mp4", "video", &mp4[..32]),
     ];
@@ -180,6 +186,40 @@ fn three_g2_brands_load_track_metadata_case_insensitively() {
             let path = Path::new(file["pathname"].as_str().unwrap()).to_path_buf();
             assert_metadata_matches(file, &fixture, &path);
         }
+    }
+}
+
+#[test]
+fn jpeg_xl_exif_loads_the_same_naming_fields_as_jpeg() {
+    let mut fixture = fixtures()
+        .into_iter()
+        .find(|fixture| fixture.filename() == "image-sony-2.JPG")
+        .unwrap();
+    let jpeg = fs::read(bundled_media_root().join(fixture.filename())).unwrap();
+    let exif = jpeg
+        .windows(10)
+        .position(|bytes| bytes.starts_with(b"\xFF\xE1") && &bytes[4..] == b"Exif\0\0")
+        .unwrap();
+    let size = u16::from_be_bytes(jpeg[exif + 2..exif + 4].try_into().unwrap()) as usize;
+    let tiff = &jpeg[exif + 10..exif + 2 + size];
+    let mut jxl = b"\0\0\0\x0cJXL \x0d\x0a\x87\x0a\0\0\0\x14ftypjxl \0\0\0\0jxl ".to_vec();
+    jxl.extend_from_slice(&(12 + tiff.len() as u32).to_be_bytes());
+    jxl.extend_from_slice(b"Exif\0\0\0\0");
+    jxl.extend_from_slice(tiff);
+    // The metadata loader only checks for a codestream payload, so use a short stand-in.
+    jxl.extend_from_slice(b"\0\0\0\x0ajxlc\xff\x0a");
+    fixture.input["size"] = jxl.len().into();
+
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("photo.JXL");
+    fs::write(&path, jxl).unwrap();
+    for files in [
+        load_directory(dir.path()).unwrap(),
+        load_paths(&[&path]).unwrap(),
+    ] {
+        assert_eq!(files.len(), 1);
+        let file = serde_json::to_value(&files[0]).unwrap();
+        assert_metadata_matches(file, &fixture, &path);
     }
 }
 

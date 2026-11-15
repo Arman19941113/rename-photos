@@ -1,4 +1,4 @@
-//! Image EXIF reader with compatibility fallbacks for RAW container variants.
+//! Image EXIF reader with compatibility fallbacks for JPEG XL and RAW containers.
 
 use std::{
     fs::File,
@@ -8,6 +8,8 @@ use std::{
 
 use nom_exif::{ExifIter, ExifTag, MediaParser, MediaSource};
 
+mod jxl;
+mod read_range;
 mod rw2;
 mod tiff;
 
@@ -25,11 +27,11 @@ pub(super) const METADATA_TAGS: [ExifTag; 8] = [
     ExifTag::ISOSpeedRatings,
 ];
 
-pub(super) fn read_exif(path: &Path, parser: &mut MediaParser) -> anyhow::Result<ExifIter> {
+pub(super) fn read_exif(path: &Path, parser: &mut MediaParser) -> anyhow::Result<Option<ExifIter>> {
     let mut file = File::open(path).map_err(nom_exif::Error::from)?;
     let result = MediaSource::seekable(&mut file).and_then(|source| parser.parse_exif(source));
     match result {
-        Ok(exif) => Ok(exif),
+        Ok(exif) => Ok(Some(exif)),
         Err(container_error) => {
             let file_len = file.metadata()?.len();
             read_compatible_exif(&mut file, file_len, parser).map_err(|fallback_error| {
@@ -61,7 +63,7 @@ fn read_compatible_exif(
     reader: &mut (impl Read + Seek),
     file_len: u64,
     parser: &mut MediaParser,
-) -> Result<ExifIter, CompatibilityError> {
+) -> Result<Option<ExifIter>, CompatibilityError> {
     reader
         .rewind()
         .map_err(|error| CompatibilityError::ReadFailed(error.into()))?;
@@ -74,8 +76,17 @@ fn read_compatible_exif(
         Err(error) => return Err(CompatibilityError::ReadFailed(error.into())),
     }
     let result = match &header {
-        &PANASONIC_RW2_LE_MAGIC => rw2::read_metadata(reader, file_len, parser),
-        b"II\x2a\0" | b"MM\0\x2a" => tiff::read_metadata(reader, file_len, parser),
+        &PANASONIC_RW2_LE_MAGIC => rw2::read_metadata(reader, file_len, parser).map(Some),
+        b"II\x2a\0" | b"MM\0\x2a" => tiff::read_metadata(reader, file_len, parser).map(Some),
+        &jxl::SIGNATURE_SIZE => {
+            if !jxl::has_signature_suffix(reader)
+                .map_err(|error| CompatibilityError::ReadFailed(error.into()))?
+            {
+                return Err(CompatibilityError::NoMatchingReader);
+            }
+            jxl::read_metadata(reader, file_len, parser)
+        }
+        [0xff, 0x0a, ..] => Ok(None), // A bare JPEG XL codestream has no metadata boxes.
         _ => return Err(CompatibilityError::NoMatchingReader),
     };
     result.map_err(CompatibilityError::ReadFailed)
